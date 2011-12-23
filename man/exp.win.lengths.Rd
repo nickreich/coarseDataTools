@@ -1,0 +1,22 @@
+\name{exp.win.lengths}
+\alias{exp.win.lengths}
+\docType{data}
+\title{
+Exposure window lengths from an influenza outbreak at a NYC school
+}
+\description{
+A numeric vector of exposure window lengths taken from a dataset of doubly interval-censored incubation period observations.  All observations came from a NYC public school.  The outbreak has been described in full in Lessler et al. (see citation below). 
+}
+\usage{data(exp.win.lengths)}
+\format{
+A numeric vector with 134 positive values.  Each value represents an exposure window length from an observation of the incubation period for that individual.  The exposure window length is the length of time during which exposure could have occured.  For example, if an individual could have been exposed anytime between 6am on Monday to 6am on Wednesday, her exposure window length would be 2 days.
+}
+\source{
+Lessler J et al.  New England Journal of Medicine. Outbreak of 2009 Pandemic Influenza A (H1N1) at a New York City School. 2009. 361(27):2628-2636. \url{http://content.nejm.org/cgi/content/full/361/27/2628}
+}
+\examples{
+data(exp.win.lengths)
+summary(exp.win.lengths)
+hist(exp.win.lengths)
+}
+\keyword{datasets}
