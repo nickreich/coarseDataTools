@@ -1,0 +1,13 @@
+ChangeLog file for coarseDataTools
+
+v0.1 - added functions (with documentation) for estimating the relative case fatality ratio.  Currently only tested on situations with two groups of interest, i.e. two levels of covariate J.
+
+v0.2 - added functions (with documentation) for estimating a univariate distribution with an arbitrary mixture of doubly interval-censored, single interval-censored and exact observations using a maximum likelihood approach.  
+
+v0.3 - added documentation for datafiles.
+
+v0.4 - added functions for simulation precision of estimated percentiles from coarse incubation period datasets.
+
+v0.5 - added get.obs.type() function to easily generate observation types for data set up in doubly interval censored format. 
+
+v0.5.1 - changed code to eliminate NOTE message in R CMD CHECK.
