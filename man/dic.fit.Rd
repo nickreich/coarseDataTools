@@ -8,11 +8,11 @@ This function fits a log-normal model to doubly interval-censored survival data.
 }
 \usage{
 dic.fit(dat, 
-	start.log.sigma = log(log(2)), 
-	opt.method = "L-BFGS-B", 
-	mu.int = c(log(0.5), log(13)), 
-	log.sigma.int = c(log(log(1.01)), log(log(5))), 
-	ptiles = c(0.05, 0.95, 0.99), ...)
+        start.log.sigma = log(log(2)), 
+        opt.method = "L-BFGS-B", 
+        mu.int = c(log(0.5), log(13)), 
+        log.sigma.int = c(log(log(1.01)), log(log(5))), 
+        ptiles = c(0.05, 0.95, 0.99), ...)
 }
 
 \arguments{
