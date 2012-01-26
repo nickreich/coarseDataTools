@@ -60,7 +60,6 @@ Nicholas G. Reich
 \examples{
 data(fluA.inc.per)
 dic.fit(fluA.inc.per)
-
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
