@@ -560,11 +560,11 @@ dic.fit.mcmc <- function(dat,
         if (dist == "L"){
             ## default gamma on scale param and (inproper) uniform on location
             ll <- tryCatch(-loglik(pars,dat,dist) +
-                           dgamma(pars.untrans[2],shape=par.prior.param1[2],
-                                  rate=par.prior.param2[2],log=T),
-                           ## sum(dnorm(pars.untrans,
-                           ##           par.prior.param1,
-                           ##           par.prior.param2,log=T)),
+                           ## dgamma(pars.untrans[2],shape=par.prior.param1[2],
+                                  ## rate=par.prior.param2[2],log=T),
+                           sum(dnorm(pars.untrans,
+                                     par.prior.param1,
+                                     par.prior.param2,log=T)),
                            error=function(e) {
                                warning("Loglik failure, returning -Inf")
                                return(-Inf)
