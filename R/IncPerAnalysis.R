@@ -167,20 +167,57 @@ dic.fit <- function(dat,
             colnames(quant.matrix) <- c("est", "CIlow", "CIhigh", "SD")
         }
 
-        return(list(ests=round(quant.matrix, 3),
-                    conv=1,
-                    MSG=NULL,
-                    Sig.log.scale=Sig,
-                    loglik=-tmp$value,
-                    dist=dist))
+        if ("boot.params" %in% ls()) {
+            bp <- data.frame(boot.params)
+            ci.method <- "Bootstrap"
+        } else {
+            bp <- data.frame()
+            ci.method <- "Asymtotic"
+        }
+
+        return(
+            new("cd.fit",
+                ests=round(quant.matrix,3),
+                conv = 1,
+                MSG = "",
+                loglik=-tmp$value,
+                samples = bp,
+                data=data.frame(dat),
+                dist=dist,
+                inv.hessian = Sig,
+                est.method = "Maximum Likihood - optim",
+                ci.method = ci.method
+                )
+            )
+
+        ## return(list(ests=round(quant.matrix, 3),
+        ##             conv=1,
+        ##             MSG=NULL,
+        ##             Sig.log.scale=Sig,
+        ##             loglik=-tmp$value,
+        ##             dist=dist))
 
     } else { ## if optimization fails:
-        return(list(ests=matrix(NA, nrow=5, ncol=4),
-                    conv=0,
-                    MSG=msg,
-                    Sig.log.scale=NULL,
-                    loglik=NULL,
-                    dist=NULL))
+        ## return(list(ests=matrix(NA, nrow=5, ncol=4),
+        ##             conv=0,
+        ##             MSG=msg,
+        ##             Sig.log.scale=NULL,
+        ##             loglik=NULL,
+        ##             dist=NULL))
+                return(
+                    new("cd.fit",
+                        ests=matrix(NA, nrow=5, ncol=4),
+                        conv = 0,
+                        MSG = msg,
+                        loglik=-tmp$value,
+                        samples = data.frame(),
+                        data=data.frame(dat),
+                        dist=dist,
+                        inv.hessian = NULL,
+                        est.method = "Maximum Likihood - optim",
+                        ci.method = ci.method
+                        )
+                    )
     }
 }
 
@@ -346,24 +383,22 @@ exactlik <- function(mu, sigma, EL, ER, SL, SR, dist){
 }
 
 
-##' negative log likelihood for a set of parameters, data, and, a distribution
-##' @param pars params
+##' negative log likelihood for a set of parameters, data, and a distribution
+##' @param pars transformed parameters \in (-\infty,\infty)
 ##' @param dat data
 ##' @param dist distribution
 ##' @return negative log likelihood
 loglik <- function(pars, dat, dist) {
     ## calculates the log-likelihood of DIC data
     ## dat must have EL, ER, SL, SR and type columns
-    ## mu <- pars[1]
-    ## sigma <- exp(pars[2])
 
-    # expecting transformed params from optimiztion
-    # e.g. for log-normal expecting c(mu,log.sigma)
+    ## expecting transformed params from optimiztion
+    ## e.g. for log-normal expecting c(mu,log.sigma)
     pars <- dist.optim.untransform(dist,pars)
     mu <- pars[1]
     sigma <- pars[2]
 
-    cat(sprintf("mu = %.2f, sigma = %.2f \n",mu, sigma))  ## for debugging
+    ## cat(sprintf("mu = %.2f, sigma = %.2f \n",mu, sigma))  ## for debugging
     n <- nrow(dat)
     totlik <- 0
     for(i in 1:n){
@@ -481,61 +516,77 @@ get.obs.type <- function(dat) {
 }
 
 
-##' Bayesian version of Log-normal model
 ##' Fits the distribution to the passed in data using MCMC
-##' as implemented in MCMCpack asssuming lognormal prior for the median
-##' and log-log normal prior for the dispersion.
+##' as implemented in MCMCpack. The following priors are used:
+##' Survival Model = Log-normal --> $(\mu,\sigma) \sim Gamma()$
+##' Survival Model = Weibull --> $\alpha \sim Gamma()$, $\beta \sim Normal()$
+##' Survival Model = Gamma --> $\alpha,\beta) \sim \frac{1}{\beta}$
 ##' @param dat the data
-##' @param par.prior.mu the mean for the prior distribution for the parameters a vector of [log median, log log dispersion]
-##' @param par.prior.sd vector of standard deviations for the prior on the log scale
+##' @param par.prior.param1 vector of first prior parameters
+##' @param par.prior.param2 vector of second prior parameters
 ##' @param init.pars the initial parameters, defaults to par.prior.mu
 ##' @param ptiles what percentiles of the incubation period to return estimates for
-##' @param verbose how often do you want a print out from MCMCpack on iteration number and acceptance rate
+##' @param verbose how often do you want a print out from MCMCpack on iteration number and MH acceptance rate
 ##' @param burnin number of burnin samples
 ##' @param n.samples number of samples to draw from the posterior
 ##' @param dist distribution to be used
 ##' @param ... additional parameters to MCMCmetrop1R
+##' @param par.prior.mu the mean for the prior distribution for the parameters a vector of [log median, log log dispersion]
+##' @param par.prior.sd vector of standard deviations for the prior on the log scale
 ##' @return list with (1) ests - a matrix of estimates with columns est (e.g., the median estimate), (2) CIlow (0.025 quantile) and CIhigh (0.975 quantile), and (3) an mcmc object as defined in MCMC pack containing the posterior samples
 dic.fit.mcmc <- function(dat,
-                         par.prior.mu = c(0,0),
-                         par.prior.sd = c(1000,1000),
-                         init.pars = par.prior.mu,
+                         par.prior.param1 = c(0,0.001),
+                         par.prior.param2 = c(1000,0.001),
+                         init.pars = c(1,1),
                          ptiles = c(0.05,0.95,0.99),
                          verbose=1000,#how often to print update
-                         burnin = 30000,
-                         n.samples = 50000,
+                         burnin = 3000,
+                         n.samples = 5000,
                          dist = "L",
                          ...){
 
     require(MCMCpack)
 
-    if (n.samples <= burnin) stop("Number of samples needs to be more than the number of burnin samples")
-
     ## log liklihood function to pass to MCMCpack sampler
     local.ll <- function(pars,
                          dat,
-                         par.prior.mu,
-                         par.prior.sd,
+                         par.prior.1,
+                         par.prior.2,
                          dist) {
+
+        ## get parameters on untransformed scale
+        pars.untrans <- dist.optim.untransform(dist,pars)
+
         if (dist == "L"){
-            ## using normals for priors on both parameters
-            ll <- tryCatch(-loglik(pars,dat,dist)+sum(dnorm(pars, par.prior.mu, par.prior.sd, log=T)),
+            ## default gamma on scale param and (inproper) uniform on location
+            ll <- tryCatch(-loglik(pars,dat,dist) +
+                           dgamma(pars.untrans[2],shape=par.prior.param1[2],
+                                  rate=par.prior.param2[2],log=T),
+                           ## sum(dnorm(pars.untrans,
+                           ##           par.prior.param1,
+                           ##           par.prior.param2,log=T)),
                            error=function(e) {
                                warning("Loglik failure, returning -Inf")
                                return(-Inf)
                            })
+
         } else if (dist == "W"){
-            # using normal prior on the first param and gamma on second
+            ## using normal prior on the first param and gamma on second
             ll <- tryCatch(-loglik(pars,dat,dist) +
-                           dnorm(pars[1], par.prior.mu[1], par.prior.sd[1],log=T) +
-                           dgamma(pars[2],par.prior.mu[2],par.prior.sd[2],log=T),
+                           dnorm(pars.untrans[1],
+                                 par.prior.param1[1],
+                                 par.prior.param2[1],log=T) +
+                           dgamma(pars.untrans[2],
+                                  shape=par.prior.param1[2],
+                                  rate=par.prior.param2[2],log=T),
                            error=function(e) {
+                               recover()
                                warning("Loglik failure, returning -Inf")
                                return(-Inf)
                            })
         } else if (dist == "G"){
             ## using "non-informative" prior 1/scale for the joint prior \pi(a,b) \propto \frac{1}{\beta}
-            ll <- tryCatch(-loglik(pars,dat,dist) + log(1/pars[2]),
+            ll <- tryCatch(-loglik(pars,dat,dist) + log(1/pars.untrans[2]),
                            error=function(e) {
                                warning("Loglik failure, returning -Inf")
                                return(-Inf)
@@ -544,26 +595,26 @@ dic.fit.mcmc <- function(dat,
         } else {
             stop("Sorry, unknown distribution type. Check the 'dist' option.")
         }
-
         return(ll)
     }
 
-    cat(sprintf("Running MCMC to get Bayesian estimates \n"))
+
+    cat(sprintf("Running %.0f MCMC iterations to get Bayesian estimates \n",n.samples+burnin))
 
     msg <- NULL
     fail <- FALSE
 
-    #run the MCMC chains
+    ## run the MCMC chains
     tryCatch(mcmc.run <- MCMCmetrop1R(local.ll,
-                             init.pars,
-                             dat = dat,
-                             par.prior.mu = par.prior.mu,
-                             par.prior.sd = par.prior.sd,
-                             verbose=verbose,
-                             dist=dist,
-                             burnin = burnin,
-                             mcmc=n.samples,
-                             ...),
+                                      init.pars,
+                                      dat = dat,
+                                      par.prior.1 = par.prior.param1,
+                                      par.prior.2 = par.prior.param2,
+                                      verbose=verbose,
+                                      dist=dist,
+                                      burnin = burnin,
+                                      mcmc=n.samples,
+                                      ...),
              error=function(e){
                  msg <<- e$message
                  fail <<- TRUE
@@ -575,32 +626,80 @@ dic.fit.mcmc <- function(dat,
 
     if (!fail){
 
-        ## make the return matrix
-        est.pars <- matrix(nrow=length(ptiles)+2,
-                           ncol=3)
-        colnames(est.pars) <- c("est","CIlow", "CIhigh")
-        rownames(est.pars) <- c("m", "disp", sprintf("p%d", 100*ptiles))
+        ## untransform MCMC parameter draws to natural scale
+        untrans.mcmcs <- t(apply(mcmc.run[,1:2],1,function(x) dist.optim.untransform(dist=dist,pars=x)))
 
-        est.pars[1,] <- quantile(exp(mcmc.run[,1]), c(0.5,0.025,0.975))
-        est.pars[2,] <- quantile(exp(exp(mcmc.run[,2])), c(0.5,0.025,0.975))
+        ## append median to the percentiles in case it isn't there
+        ptiles.appended <- union(0.5,ptiles)
+        est.pars <- matrix(nrow=length(ptiles.appended)+2,ncol=3)
 
-        ## make sure at least one ptile was requested
-        if (length(ptiles)>0) {
-        for (i in 1:length(ptiles)) {
-            est.pars[i+2,] <-
-                quantile(qlnorm(ptiles[i],mcmc.run[,1], exp(mcmc.run[,2])),
-                         c(0.5, 0.025, 0.975))
+        if (dist == "L"){
+            param1.name <- "meanlog"
+            param2.name <- "sdlog"
+
+            mcmc.quantiles <- apply(untrans.mcmcs,1,function(x) qlnorm(ptiles.appended,meanlog=x[1],sdlog=x[2]))
+
+
+        } else if (dist == "G"){
+            param1.name <- "shape"
+            param2.name <- "scale"
+            mcmc.quantiles <- apply(untrans.mcmcs,1,function(x) qgamma(ptiles.appended,shape=x[1],scale=x[2]))
+
+        } else if (dist == "W"){
+            param1.name <- "shape"
+            param2.name <- "scale"
+            mcmc.quantiles <- apply(untrans.mcmcs,1,function(x) qweibull(ptiles.appended,shape=x[1],scale=x[2]))
+
+        } else {
+            stop("Sorry, unknown distribution type. Check the 'dist' option.")
+            ## not actually needed but just in case
         }
-    }
-        return(list(ests=round(est.pars,3),
-                    MSG=NULL,
-                    mcmc=mcmc.run,
-                    dist=dist))
+
+        ## make the return matrix
+        colnames(est.pars) <- c("est","CIlow", "CIhigh")
+        rownames(est.pars) <- c(param1.name,param2.name,paste0("p", 100*ptiles.appended))
+
+        est.pars[1,] <- quantile(untrans.mcmcs[,1], c(0.5,0.025,0.975))
+        est.pars[2,] <- quantile(untrans.mcmcs[,2], c(0.5,0.025,0.975))
+        cis.ptiles <- t(apply(mcmc.quantiles,1,function(x) quantile(x,c(0.5,.025,.975))))
+        est.pars[3:nrow(est.pars),1:3] <- cis.ptiles
+
+        ## return(list(ests=round(est.pars,3),
+        ##             MSG=NULL,
+        ##             mcmc=mcmc.run,
+        ##             dist=dist))
+
+        rc <- new("cd.fit.mcmc",
+                  ests=round(est.pars,3),
+                  conv = numeric(),
+                  MSG = "",
+                  loglik=numeric(),
+                  samples = data.frame(untrans.mcmcs),
+                  data=data.frame(dat),
+                  dist=dist,
+                  inv.hessian = matrix(),
+                  est.method = "MCMC",
+                  ci.method = "MCMC"
+                  )
+
+        return(rc)
+
+
     } else {
-        return(list(ests=matrix(NA, nrow=5, ncol=4),
-                    MSG=msg,
-                    mcmc=NULL,
-                    dist=dist))
+        rc <- new("cd.fit.mcmc",
+                  ests=matrix(NA, nrow=5, ncol=3),
+                  conv = numeric(),
+                  MSG = msg,
+                  loglik=numeric(),
+                  samples = data.frame(),
+                  data=data.frame(dat),
+                  dist=dist,
+                  inv.hessian = matrix(),
+                  est.method = "MCMC",
+                  ci.method = "MCMC"
+                  )
+        print("Try adjusting the starting parameters init.pars")
+        return(rc)
     }
 }
 
