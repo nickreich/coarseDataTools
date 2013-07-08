@@ -230,21 +230,39 @@ dic.fit <- function(dat,
 
 
 ## profile likelihood for mu -- used by dic.fit() to get starting values
+##' @param mu
+##' @param sigma
+##' @param dat
+##' @param dist
+##' @return
 pl.mu <- function(mu, sigma, dat, dist){
     loglik(pars=c(mu, sigma),dist=dist,dat=dat)
 }
 
 
 ## profile likelihood for sigma -- used by dic.fit() to get starting values
+##' @param sigma
+##' @param mu
+##' @param dat
+##' @param dist
+##' @return
 pl.sigma <- function(sigma, mu, dat, dist){
     loglik(pars=c(mu, sigma), dist=dist, dat=dat)
 }
 
 ## functions that manipulate/calculate the likelihood for the censored data
 
-## the functions coded here are taken directly from the
-## doubly interval censored likelihood notes.
-
+##' the functions coded here are taken directly from the
+##' doubly interval censored likelihood notes.
+##' @param t
+##' @param EL
+##' @param ER
+##' @param SL
+##' @param SR
+##' @param mu
+##' @param sigma
+##' @param dist
+##' @return
 fw1 <- function(t, EL, ER, SL, SR, mu, sigma, dist){
     ## function that calculates the first function for the DIC integral
     if (dist=="W"){
@@ -256,6 +274,15 @@ fw1 <- function(t, EL, ER, SL, SR, mu, sigma, dist){
     }
 }
 
+##' @param t
+##' @param EL
+##' @param ER
+##' @param SL
+##' @param SR
+##' @param mu
+##' @param sigma
+##' @param dist
+##' @return
 fw3 <- function(t, EL, ER, SL, SR, mu, sigma, dist){
     ## function that calculates the third function for the DIC integral
     if (dist == "W"){
@@ -268,6 +295,15 @@ fw3 <- function(t, EL, ER, SL, SR, mu, sigma, dist){
 }
 
 
+##' @param mu
+##' @param sigma
+##' @param EL
+##' @param ER
+##' @param SL
+##' @param SR
+##' @param type
+##' @param dist
+##' @return
 lik <- function(mu, sigma, EL, ER, SL, SR, type, dist){
     ## returns the right likelihood for the type of data
     ## 0 = DIC, 1=SIC, 2=exact
@@ -277,6 +313,14 @@ lik <- function(mu, sigma, EL, ER, SL, SR, type, dist){
 }
 
 
+##' @param mu
+##' @param sigma
+##' @param EL
+##' @param ER
+##' @param SL
+##' @param SR
+##' @param dist
+##' @return
 diclik <- function(mu, sigma, EL, ER, SL, SR, dist){
     ## calculates the DIC likelihood by integration
 
@@ -330,7 +374,15 @@ diclik <- function(mu, sigma, EL, ER, SL, SR, dist){
     }
 }
 
-## this dic likelihood is designed for data that has overlapping intervals
+##' this dic likelihood is designed for data that has overlapping intervals
+##' @param mu
+##' @param sigma
+##' @param EL
+##' @param ER
+##' @param SL
+##' @param SR
+##' @param dist
+##' @return
 diclik2 <- function(mu, sigma, EL, ER, SL, SR, dist){
     if(SL>ER) {
         return(diclik(mu, sigma, EL, ER, SL, SR, dist))
@@ -343,7 +395,14 @@ diclik2 <- function(mu, sigma, EL, ER, SL, SR, dist){
     }
 }
 
-## likelihood functions for diclik2
+##' likelihood functions for diclik2
+##' @param x
+##' @param SL
+##' @param SR
+##' @param mu
+##' @param sigma
+##' @param dist
+##' @return
 diclik2.helper1 <- function(x, SL, SR, mu, sigma, dist){
     if (dist =="W"){
         pweibull(SR-x, shape=mu, scale=sigma) - pweibull(SL-x, shape=mu, scale=sigma)
@@ -354,6 +413,12 @@ diclik2.helper1 <- function(x, SL, SR, mu, sigma, dist){
     }
 }
 
+##' @param x
+##' @param SR
+##' @param mu
+##' @param sigma
+##' @param dist
+##' @return
 diclik2.helper2 <- function(x, SR, mu, sigma, dist){
     if (dist =="W"){
         pweibull(SR-x, shape=mu, scale=sigma)
@@ -364,6 +429,15 @@ diclik2.helper2 <- function(x, SR, mu, sigma, dist){
     }
 }
 
+
+##' @param mu
+##' @param sigma
+##' @param EL
+##' @param ER
+##' @param SL
+##' @param SR
+##' @param dist
+##' @return
 siclik <- function(mu, sigma, EL, ER, SL, SR, dist){
     ## calculates the SIC likelihood as the difference in CDFs
     if (dist =="W"){
@@ -375,6 +449,14 @@ siclik <- function(mu, sigma, EL, ER, SL, SR, dist){
     }
 }
 
+##' @param mu
+##' @param sigma
+##' @param EL
+##' @param ER
+##' @param SL
+##' @param SR
+##' @param dist
+##' @return
 exactlik <- function(mu, sigma, EL, ER, SL, SR, dist){
     ## calculates the likelihood for an exact observation
 
@@ -437,7 +519,7 @@ dic.getSE <- function(mu, log.s, Sig, ptiles, dist, dat, opt.method, n.boots=100
         cat(sprintf("Computing Asymtotic Confidence Intervals for Log Normal Model \n"))
         s <- exp(log.s)
         qnorms <- qnorm(ptiles)
-        df <- matrix(c(exp(mu), 0,exp(mu+qnorms*s),
+        df <- matrix(c(1, 0,exp(mu+qnorms*s),
                        0, s, qnorms * exp(mu + qnorms*s + log.s)),
                      nrow=2, ncol=2+length(ptiles), byrow=TRUE)
         ses <- sqrt(diag(t(df)%*%Sig%*%df))
@@ -509,7 +591,9 @@ single.boot <- function(mu.s,sigma.s,opt.method,dat.tmp,dist,...){
     return(tmp)
 }
 
-
+##' Tries to guess the observation types (sic,dic, or exact)
+##' @param dat
+##' @return vector of guessed types
 get.obs.type <- function(dat) {
     type <- rep(0, nrow(dat))
     ## get the single interval censored
@@ -670,11 +754,6 @@ dic.fit.mcmc <- function(dat,
         cis.ptiles <- t(apply(mcmc.quantiles,1,function(x) quantile(x,c(0.5,.025,.975))))
         est.pars[3:nrow(est.pars),1:3] <- cis.ptiles
 
-        ## return(list(ests=round(est.pars,3),
-        ##             MSG=NULL,
-        ##             mcmc=mcmc.run,
-        ##             dist=dist))
-
         rc <- new("cd.fit.mcmc",
                   ests=round(est.pars,3),
                   conv = numeric(),
@@ -689,7 +768,6 @@ dic.fit.mcmc <- function(dat,
                   )
 
         return(rc)
-
 
     } else {
         rc <- new("cd.fit.mcmc",
