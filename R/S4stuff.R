@@ -23,7 +23,7 @@ setMethod("show","cd.fit",function(object){
     print(object@ests)
     cat(sprintf("\n-2*Log Likelihood = %.1f \n",-2*object@loglik))
     if (object@conv == 0) warning("This model did not converge. Try different starting values or increase the number of iterations")
-    if (object@dist == "L") {
+    if (object@dist == "L" & nrow(object@samples) > 0) {
         se.dispersion <- sqrt(object@inv.hessian[2,2] * (exp(object@ests[2,1] + log(object@ests[2,1])))^2) #using delta method
         cat(sprintf("\nNote: dispersion parameter is exp(sdlog). In this case it is %.3f (95%% CI %.3f-%.3f). \n",
                     exp(object@ests[2,1]),
