@@ -63,39 +63,39 @@ precision.simulation <- function(N,
 
 
 precision.simulation.exact <- function(N,
-				     med,
-				     disp,
-				     percentile,
-				     nsim,
-				     verb) {
-	storage <- matrix(NA, ncol=3, nrow=nsim)
-	colnames(storage) <- c("ests", "SE", "conv")
+                                       med,
+                                       disp,
+                                       percentile,
+                                       nsim,
+                                       verb) {
+    storage <- matrix(NA, ncol=3, nrow=nsim)
+    colnames(storage) <- c("ests", "SE", "conv")
 
-	data <- matrix(0, ncol=6, nrow=nsim*N)
-	colnames(data) <- c("dataset.id", "EL", "ER", "SL", "SR", "type")
-	data[,"dataset.id"] <- rep(1:nsim, each=N)
-	data[,"SL"] <- rlnorm(N*nsim, meanlog=log(med), sdlog=log(disp))
-	data[,"SR"] <- data[,"SL"]
-	data[,"type"] <- 2
+    data <- matrix(0, ncol=6, nrow=nsim*N)
+    colnames(data) <- c("dataset.id", "EL", "ER", "SL", "SR", "type")
+    data[,"dataset.id"] <- rep(1:nsim, each=N)
+    data[,"SL"] <- rlnorm(N*nsim, meanlog=log(med), sdlog=log(disp))
+    data[,"SR"] <- data[,"SL"]
+    data[,"type"] <- 2
 
-	for(i in 1:nsim){
-		tmp.dat <- data[which(data[,"dataset.id"]==i),]
-		tmp.fit <- dic.fit(tmp.dat, ptiles=percentile)
-		if(tmp.fit$conv==1){
-			row.name <- paste("p", round(percentile*100), sep="")
-			which.row <-
-				which(rownames(tmp.fit$ests)==row.name)[1]
-			storage[i,c("ests", "SE")] <-
-				tmp.fit$ests[which.row, c("est", "StdErr")]
-		} else {
-			storage[i,c("ests", "SE")] <- NA
-		}
-		storage[i,"conv"] <- tmp.fit$conv
-		if(verb & i%%(round(nsim/10))==0)
+    for(i in 1:nsim){
+        tmp.dat <- data[which(data[,"dataset.id"]==i),]
+        tmp.fit <- dic.fit(tmp.dat, ptiles=percentile)
+        if(tmp.fit$conv==1){
+            row.name <- paste("p", round(percentile*100), sep="")
+            which.row <-
+                which(rownames(tmp.fit$ests)==row.name)[1]
+            storage[i,c("ests", "SE")] <-
+                tmp.fit$ests[which.row, c("est", "StdErr")]
+        } else {
+            storage[i,c("ests", "SE")] <- NA
+        }
+        storage[i,"conv"] <- tmp.fit$conv
+        if(verb & i%%(round(nsim/10))==0)
 			print(paste("iteration",i,"complete ::", Sys.time()))
 
-	}
-	return(storage)
+    }
+    return(storage)
 }
 
 
@@ -121,7 +121,7 @@ precision.simulation.coarse <- function(N,
 		if(tmp.fit$conv==1){
 			row.name <- paste("p", round(percentile*100), sep="")
 			which.row <-
-				which(rownames(tmp.fit$ests)==row.name)[1]
+                            which(rownames(tmp.fit$ests)==row.name)[1]
 			storage[i,c("ests", "SE")] <-
 				tmp.fit$ests[which.row, c("est", "StdErr")]
 		} else {
@@ -138,7 +138,7 @@ precision.simulation.coarse <- function(N,
 
 generate.coarse.data <- function(N, med, disp, pct.type.A, exp.win.dat) {
 
-	n.type.A <- round(N*pct.type.A)
+ 	n.type.A <- round(N*pct.type.A)
 	n.type.B <- N-n.type.A
 
 
