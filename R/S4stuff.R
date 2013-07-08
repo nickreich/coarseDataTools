@@ -23,13 +23,15 @@ setMethod("show","cd.fit",function(object){
     print(object@ests)
     cat(sprintf("\n -2*Log Likelihood = %.1f \n",-2*object@loglik))
     if (object@conv == 0) warning("This model did not converge. Try different starting values or increase the number of iterations")
+    if (object@dist == "L") cat(sprintf("Note: dispersion parameter is exp(sdlog). In this case it is %.3f. \n",exp(object@ests[2,1])))
 })
 
 ## we don't want boots and data printing out all the time
 setMethod("show","cd.fit.mcmc",function(object){
     cat(sprintf("Coarse Data Model Parameter and Quantile Estimates: \n"))
     print(object@ests)
-    print("Note: please check that the MCMC converged. MCMC samples are available in the mcmc slot (e.g. my.fit@mcmc)")
+    if (object@dist == "L") cat(sprintf("Note: dispersion parameter is exp(sdlog). In this case it is %.3f. \n",exp(object@ests[2,1])))
+    cat(sprintf("Note: please check that the MCMC converged. MCMC samples are available in the mcmc slot (e.g. my.fit@mcmc) \n"))
 })
 
 

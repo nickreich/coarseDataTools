@@ -79,29 +79,37 @@ dic.fit <- function(dat,
     ## check if optimaization went well
     if(!fail){
 
+        ## always going to report median even if not requested
+        ptiles.appended <- union(0.5,ptiles)
+
         ## get asymtotic CIs and SEs
         if (dist == "L" & n.boots<=0 ){
 
             med <- exp(untransformed.fit.params[1])
             disp <- exp(untransformed.fit.params[2])
 
-            norm.quants <- qnorm(ptiles)
-            ests <- c(med,
-                      disp,
+            norm.quants <- qnorm(ptiles.appended)
+
+            ## ests <- c(med,
+            ##           disp,
+            ##           med*disp^norm.quants)
+
+            ests <- c(untransformed.fit.params[1],
+                      untransformed.fit.params[2],
                       med*disp^norm.quants)
 
             Sig <- solve(tmp$hessian)
-            ses <- dic.getSE(dat=dat,mu=log(med),log.s=log(log(disp)),Sig=Sig,ptiles=ptiles,dist=dist,opt.method=opt.method,n.boots=0)
+            ses <- dic.getSE(dat=dat,mu=log(med),log.s=log(log(disp)),Sig=Sig,ptiles=ptiles.appended,dist=dist,opt.method=opt.method,n.boots=0)
 
             cil <- ests - qt(.975, n-1)*ses
             cih <- ests + qt(.975, n-1)*ses
             ## save the quantile estimates
             quant.matrix <- matrix(c(ests, cil, cih, ses),
-                                   nrow=2+length(ptiles), byrow=FALSE)
+                                   nrow=2+length(ptiles.appended), byrow=FALSE)
 
-            ptiles.names <- paste("p", 100*ptiles, sep="")
+            ptiles.names <- paste0("p", 100*ptiles.appended)
 
-            rownames(quant.matrix) <- c("p50", "disp", ptiles.names)
+            rownames(quant.matrix) <- c("meanlog", "sdlog", ptiles.names)
             colnames(quant.matrix) <- c("est", "CIlow", "CIhigh", "StdErr")
 
         } else { ## for other distributions
@@ -130,7 +138,6 @@ dic.fit <- function(dat,
 
             ## adding median to  below since the exp(shape) paramter no longer has the nice interpretration
             ## of the log-normal model
-            ptiles.appended <- union(0.5,ptiles)
 
             if (dist == "L"){
                 boot.funcs <- apply(boot.params,1,function(x) qlnorm(ptiles.appended,meanlog=x[1],sdlog=x[2]))
@@ -172,7 +179,7 @@ dic.fit <- function(dat,
             ci.method <- "Bootstrap"
         } else {
             bp <- data.frame()
-            ci.method <- "Asymtotic"
+            ci.method <- "Asymptotic"
         }
 
         return(
@@ -416,13 +423,13 @@ loglik <- function(pars, dat, dist) {
 ## calculates the standard errors for estimates from dic.fit() using delta method or bootstrap
 ##' @param mu - shape param
 ##' @param log.s - log.scale param
-##' @param Sig
-##' @param ptiles
-##' @param dist
-##' @param dat
-##' @param opt.method
+##' @param Sig - var-cov matrix from hessian
+##' @param ptiles - percentiles of interest
+##' @param dist - failure time distribtion
+##' @param dat - data
+##' @param opt.method - optimization method for optim (see ?optim for options)
 ##' @param n.boots number of bootstraps
-##' @return
+##' @return standard errors for when asymtotic results are requested or matrix with bootstrap parameter estimates
 dic.getSE <- function(mu, log.s, Sig, ptiles, dist, dat, opt.method, n.boots=100){
     boots <- vector("list",n.boots)
 
@@ -430,8 +437,8 @@ dic.getSE <- function(mu, log.s, Sig, ptiles, dist, dat, opt.method, n.boots=100
         cat(sprintf("Computing Asymtotic Confidence Intervals for Log Normal Model \n"))
         s <- exp(log.s)
         qnorms <- qnorm(ptiles)
-        df <- matrix(c(exp(mu), 0, exp(mu+qnorms*s),
-                       0, exp(s+log.s), qnorms * exp(mu + qnorms*s + log.s)),
+        df <- matrix(c(exp(mu), 0,exp(mu+qnorms*s),
+                       0, s, qnorms * exp(mu + qnorms*s + log.s)),
                      nrow=2, ncol=2+length(ptiles), byrow=TRUE)
         ses <- sqrt(diag(t(df)%*%Sig%*%df))
         return(ses)
@@ -580,7 +587,6 @@ dic.fit.mcmc <- function(dat,
                                   shape=par.prior.param1[2],
                                   rate=par.prior.param2[2],log=T),
                            error=function(e) {
-                               recover()
                                warning("Loglik failure, returning -Inf")
                                return(-Inf)
                            })

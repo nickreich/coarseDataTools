@@ -121,7 +121,7 @@ precision.simulation.coarse <- function(N,
 		if(tmp.fit$conv==1){
 			row.name <- paste("p", round(percentile*100), sep="")
 			which.row <-
-				which(rownames(tmp.fit$ests)==row.name)[1]
+                            which(rownames(tmp.fit$ests)==row.name)[1]
 			storage[i,c("ests", "SE")] <-
 				tmp.fit$ests[which.row, c("est", "StdErr")]
 		} else {
