@@ -18,7 +18,6 @@ setClass("cd.fit.mcmc",
 
 ## we don't want boots and data printing out all the time
 setMethod("show","cd.fit",function(object){
-
     cat(sprintf("Coarse Data Model Parameter and Quantile Estimates: \n"))
     print(object@ests)
     cat(sprintf("\n-2*Log Likelihood = %.1f \n",-2*object@loglik))
@@ -44,18 +43,25 @@ setMethod("show","cd.fit.mcmc",function(object){
 
 
 ##' @export
+##' @param object cd.fit object
 setMethod("logLik",
           "cd.fit",
           function(object){
               object@loglik
           })
 
-##' For now this is going to plot the estimated survival function and if bootstrap or mcmc samples are present, it will plot these samples with alpha
+##' For now this is going to plot the estimated survival
+##' function and if bootstrap or mcmc samples are present, it will plot these samples with alpha
 ##' @export
+##' @param x
+##' @param y
+##' @param col.main - color for plotting the main estimate
+##' @param col.samps - color for the samples (should include some alpha transparency)
+##' @param plot.n.samps - how many posterior or boostrap samples do you want to plot?
+##' @param ... - other options to pass to plot
 setMethod("plot",
           "cd.fit",
           function(x,y,
-                   xlims,
                    col.main=rgb(230, 85, 13,maxColorValue=255),
                    col.samps=rgb(99,99,99,10,maxColorValue=255),
                    plot.n.samps=200,
@@ -71,18 +77,17 @@ setMethod("plot",
 
               xlims <- range(x@data)
               xs <-seq(xlims[1],xlims[2],length=100)
-              plot(-100,-100,xlim=xlims,ylim=c(0,1),xlab="Time",ylab="Proportion with Symptoms")
+              plot(-100,-100,xlim=xlims,ylim=c(0,1),xlab="Time",ylab="Proportion with Symptoms",...)
               if (x@dist == "L"){
                   if (plot.n.samps> 0 & nrow(x@samples) > 0){
                       apply(plot.samples,1,function(y) lines(xs,plnorm(xs,meanlog=y[1],sdlog=y[2]),col=col.samps))
                   }
                   lines(xs,plnorm(xs,meanlog=par1,sdlog=par2),col=col.main,lwd=2)
-              } else if (x@dist == "G"){
+              } else if (x@dist == "G" | x@dist == "E"){
                   if (plot.n.samps > 0 & nrow(x@samples) > 0){
                       apply(plot.samples,1,function(y) lines(xs,pgamma(xs,shape=y[1],scale=y[2]),col=col.samps))
                   }
                   lines(xs,pgamma(xs,shape=par1,scale=par2),col=col.main,lwd=2)
-
               } else if (x@dist == "W"){
                   if (plot.n.samps > 0 & nrow(x@samples) > 0){
                       apply(plot.samples,1,function(y) lines(xs,pweibull(xs,y[1],y[2]),col=col.samps))

@@ -611,7 +611,8 @@ get.obs.type <- function(dat) {
 ##' as implemented in MCMCpack. The following priors are used:
 ##' Survival Model = Log-normal --> $(\mu,\sigma) \sim Gamma()$
 ##' Survival Model = Weibull --> $\alpha \sim Gamma()$, $\beta \sim Normal()$
-##' Survival Model = Gamma --> $\alpha,\beta) \sim \frac{1}{\beta}$
+##' Survival Model = Gamma --> $(\kappa,\theta) \sim \frac{1}{\beta}$
+##' Survival Model = Erlang --> $p(\kappa,\theta) \propto 1$
 ##' @param dat the data
 ##' @param par.prior.param1 vector of first prior parameters
 ##' @param par.prior.param2 vector of second prior parameters
@@ -620,7 +621,7 @@ get.obs.type <- function(dat) {
 ##' @param verbose how often do you want a print out from MCMCpack on iteration number and MH acceptance rate
 ##' @param burnin number of burnin samples
 ##' @param n.samples number of samples to draw from the posterior
-##' @param dist distribution to be used
+##' @param dist distribution to be used (L for log-normal,W for weibull, G for Gamma, and E for erlang)
 ##' @param ... additional parameters to MCMCmetrop1R
 ##' @param par.prior.mu the mean for the prior distribution for the parameters a vector of [log median, log log dispersion]
 ##' @param par.prior.sd vector of standard deviations for the prior on the log scale
@@ -637,6 +638,8 @@ dic.fit.mcmc <- function(dat,
                          ...){
 
     require(MCMCpack)
+    ## check to make sure distribution is supported
+    if(!dist %in% c("G","W","L","E")) stop("Please use one of the following distributions Log-Normal (L) , Weibull (W), Gamma (G), or Erlang (E)")
 
     ## log liklihood function to pass to MCMCpack sampler
     local.ll <- function(pars,
@@ -682,12 +685,20 @@ dic.fit.mcmc <- function(dat,
                                return(-Inf)
                            })
 
+        } else if (dist == "E"){ # for Erlang
+            ## Erlang is just a gamma so we are going to use this trick
+            ll <- tryCatch(-loglik(pars,dat,dist="G"),
+                           # no priors for now will add later
+                           error=function(e) {
+                               warning("Loglik failure, returning -Inf")
+                               return(-Inf)
+                           })
+
         } else {
             stop("Sorry, unknown distribution type. Check the 'dist' option.")
         }
         return(ll)
     }
-
 
     cat(sprintf("Running %.0f MCMC iterations to get Bayesian estimates \n",n.samples+burnin))
 
@@ -715,7 +726,6 @@ dic.fit.mcmc <- function(dat,
              })
 
     if (!fail){
-
         ## untransform MCMC parameter draws to natural scale
         untrans.mcmcs <- t(apply(mcmc.run[,1:2],1,function(x) dist.optim.untransform(dist=dist,pars=x)))
 
@@ -726,20 +736,19 @@ dic.fit.mcmc <- function(dat,
         if (dist == "L"){
             param1.name <- "meanlog"
             param2.name <- "sdlog"
-
             mcmc.quantiles <- apply(untrans.mcmcs,1,function(x) qlnorm(ptiles.appended,meanlog=x[1],sdlog=x[2]))
-
-
         } else if (dist == "G"){
             param1.name <- "shape"
             param2.name <- "scale"
             mcmc.quantiles <- apply(untrans.mcmcs,1,function(x) qgamma(ptiles.appended,shape=x[1],scale=x[2]))
-
         } else if (dist == "W"){
             param1.name <- "shape"
             param2.name <- "scale"
             mcmc.quantiles <- apply(untrans.mcmcs,1,function(x) qweibull(ptiles.appended,shape=x[1],scale=x[2]))
-
+        } else if (dist == "E"){
+            param1.name <- "shape"
+            param2.name <- "scale"
+            mcmc.quantiles <- apply(untrans.mcmcs,1,function(x) qgamma(ptiles.appended,shape=x[1],scale=x[2]))
         } else {
             stop("Sorry, unknown distribution type. Check the 'dist' option.")
             ## not actually needed but just in case
@@ -797,8 +806,8 @@ dist.optim.transform <- function(dist,pars){
         log(pars) # for shape and scale
     } else if (dist == "W"){
         log(pars) # for shape and scale
-    } else if (dist == "Erlang"){
-        stop("Not yet complete")
+    } else if (dist == "E"){
+        log(pars)
     } else if (dist == "L"){
         c(pars[1],log(pars[2])) # for meanlog, sdlog
     } else {
@@ -806,7 +815,7 @@ dist.optim.transform <- function(dist,pars){
     }
 }
 
-##' Untransforms parameters
+##' Untransforms parameters before entering likelihood
 ##' @param dist
 ##' @param pars
 ##' @return vector of untransformed parameters
@@ -815,8 +824,11 @@ dist.optim.untransform <- function(dist,pars){
         exp(pars) # for shape and scale
     } else if (dist == "W"){
         exp(pars) # for shape and scale
-    } else if (dist == "Erlang"){
-        stop("Not yet complete")
+    } else if (dist == "E"){
+        ## we want shape to be restricted to integers
+        tmp <- exp(pars)
+        tmp[1] <- round(tmp[1],0)
+        tmp
     } else if (dist == "L"){
         c(pars[1],exp(pars[2])) # for meanlog, sdlog
     } else {
