@@ -11,3 +11,5 @@ v0.4 - added functions for simulation precision of estimated percentiles from co
 v0.5 - added get.obs.type() function to easily generate observation types for data set up in doubly interval censored format. 
 
 v0.5.1 - changed code to eliminate NOTE message in R CMD CHECK.
+
+v0.6 - added Azman/Lessler contributions: MCMC estimation functions, ability to fit Weibull and Gamma distirbutions, bootstrap confidence intervals.

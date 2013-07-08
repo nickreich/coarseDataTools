@@ -1,9 +1,9 @@
 Package: coarseDataTools
-Version: 0.5.1
+Version: 0.6
 Date: 2011-04-20	
 Title: A collection of functions to help with analysis of coarse infectious disease data
-Author: Nicholas G. Reich <nick.reich@gmail.com>, Justin Lessler <jlessler@jhsph.edu>
-Maintainer: Nicholas G. Reich <nick.reich@gmail.com>
+Author: Nicholas G. Reich <nick@schoolph.umass.edu>, Justin Lessler <jlessler@jhsph.edu>, Andrew Azman <andrewazman@gmail.com>
+Maintainer: Nicholas G. Reich <nick@schoolph.umass.edu>
 License: GPL (>= 2)
 Depends: survival
 Description: This package contains functions to analyze coarse data.  Its development was motivated by applications to infectious disease: in particular, problems with estimating the incubation period and the case fatality ratio of a given disease.  Sample data files are included in the package.
