@@ -1,11 +1,35 @@
-##' Fits a log-normal, Gamma, or Weibull model to doubly interval censored survival data
-##' @param dat a matrix with columns named "EL", "ER", "SL", "SR", corresponding to the left (L) and right (R) endpoints of the windows of possible exposure (E) and symptom onset (S). Also, a "type" column must be specified and have entries with 0, 1, or 2, corresponding to doubly interval-censored, single interval-censored or exact observations, respsectively.
+##' Fits a log-normal, Gamma, Erlang, or Weibull model to doubly interval
+##' censored survival data
+##' 
+##' \code{dic.fit} fits a parametric accelerated failure time model to survival 
+##' data. The data may be specified to have different levels of censoring (see
+##' Details). Currently, three distributions are supported: log-normal, gamma, and
+##' Weibull. (The Erlang distribution is supported in the \code{dic.fit.mcmc} function, which implements an MCMC version of this code.) We use a consistent (par1, par2) notation for each distribution, they map in the following manner:
+##' Log-normal(meanlog=par1, sdlog=par2)
+##' Gamma(shape=par1, scale=par2)
+##' Weibull(shape=par1, scale=par2)
+##' 
+##' 
+##' 
+##' @param dat a matrix with columns named "EL", "ER", "SL", "SR", corresponding
+##'   to the left (L) and right (R) endpoints of the windows of possible
+##'   exposure (E) and symptom onset (S). Also, a "type" column must be
+##'   specified and have entries with 0, 1, or 2, corresponding to doubly
+##'   interval-censored, single interval-censored or exact observations,
+##'   respsectively.
 ##' @param start.par2 starting value for 2nd parameter of desired distribtution
 ##' @param opt.method method used by optim
-##' @param par1.int the log-scale interval of possible median values (in the same units as the observations in dat).  Narrowing this interval can help speed up convergence of the algorithm, but care must be taken so that possible values are not excluded or that the maximization does not return a value at an endpoint of this interval.
+##' @param par1.int the log-scale interval of possible median values (in the
+##'   same units as the observations in dat).  Narrowing this interval can help
+##'   speed up convergence of the algorithm, but care must be taken so that
+##'   possible values are not excluded or that the maximization does not return
+##'   a value at an endpoint of this interval.
 ##' @param par2.int the log-scale interval of possible dispersion values
 ##' @param ptiles percentiles of interest
-##' @param dist what distribution to use to fit the data. Default "L" for log-normal. "G" for gamma, and "W" for Weibull. Note: If dist is Gamma (G) or Weibull (W), the mu refers to the shape and sigma refers to the scale param.
+##' @param dist what distribution to use to fit the data. Default "L" for
+##'   log-normal. "G" for gamma, and "W" for Weibull. Note: If dist is Gamma (G)
+##'   or Weibull (W), the mu refers to the shape and sigma refers to the scale
+##'   param.
 ##' @param n.boots number of bootstrap resamples if non-log normal model
 ##' @param ... additional options passed to optim
 ##' @param start.sigma the log-scale starting value for the dispersion
@@ -601,216 +625,6 @@ single.boot <- function(par1.s,par2.s,opt.method,dat.tmp,dist,...){
         }
 
     return(tmp)
-}
-
-##' Tries to guess the observation types (sic,dic, or exact)
-##' @param dat
-##' @return vector of guessed types
-get.obs.type <- function(dat) {
-    type <- rep(0, nrow(dat))
-    ## get the single interval censored
-    type[dat[,"EL"]==dat[,"ER"]]<-1
-    type[dat[,"SL"]==dat[,"SR"]]<-1
-    type[dat[,"ER"]>=dat[,"SL"]]<-1
-
-    ## some of those are actually exact!
-    type[(dat[,"EL"]==dat[,"ER"]) & (dat[,"SL"]==dat[,"SR"])]<- 2
-    return(type)
-}
-
-
-##' Fits the distribution to the passed in data using MCMC
-##' as implemented in MCMCpack. The following priors are used:
-##' Survival Model = Log-normal --> $(par1,par2) \sim Gamma()$
-##' Survival Model = Weibull --> $par1 \sim Gamma()$, $par2 \sim Normal()$
-##' Survival Model = Gamma --> $(par1,par2) \sim \frac{1}{\beta}$
-##' Survival Model = Erlang --> $p(par1,par2) \propto 1$
-##' @param dat the data
-##' @param prior.par1 vector of first prior parameters
-##' @param prior.par2 vector of second prior parameters
-##' @param init.pars the initial parameters, defaults to par.prior.par1
-##' @param ptiles what percentiles of the incubation period to return estimates for
-##' @param verbose how often do you want a print out from MCMCpack on iteration number and MH acceptance rate
-##' @param burnin number of burnin samples
-##' @param n.samples number of samples to draw from the posterior
-##' @param dist distribution to be used (L for log-normal,W for weibull, G for Gamma, and E for erlang)
-##' @param ... additional parameters to MCMCmetrop1R
-##' @return list with (1) ests - a matrix of estimates with columns est (e.g., the median estimate), (2) CIlow (0.025 quantile) and CIhigh (0.975 quantile), and (3) an mcmc object as defined in MCMC pack containing the posterior samples
-dic.fit.mcmc <- function(dat,
-                         prior.par1 = c(0,0.001),
-                         prior.par2 = c(1000,0.001),
-                         init.pars = c(1,1),
-                         ptiles = c(0.05,0.95,0.99),
-                         verbose=1000,#how often to print update
-                         burnin = 3000,
-                         n.samples = 5000,
-                         dist = "L",
-                         ...){
-
-    require(MCMCpack)
-
-    ## check to make sure data is well formed for CDT use:
-    check.data.structure(dat)
-
-    ## check to make sure distribution is supported
-    if(!dist %in% c("G","W","L","E")) stop("Please use one of the following distributions Log-Normal (L) , Weibull (W), Gamma (G), or Erlang (E)")
-
-    ## log liklihood function to pass to MCMCpack sampler
-    local.ll <- function(pars,
-                         dat,
-                         prior.par1,
-                         prior.par2,
-                         dist) {
-
-        ## get parameters on untransformed scale
-        pars.untrans <- dist.optim.untransform(dist,pars)
-
-        if (dist == "L"){
-            ## default gamma on scale param and (inproper) uniform on location
-            ll <- tryCatch(-loglik(pars,dat,dist) +
-                           ## dgamma(pars.untrans[2],shape=par.prior.param1[2],
-                                  ## rate=par.prior.param2[2],log=T),
-                           sum(dnorm(pars.untrans,
-                                     prior.par1,
-                                     prior.par2,log=T)),
-                           error=function(e) {
-                               warning("Loglik failure, returning -Inf")
-                               return(-Inf)
-                           })
-
-        } else if (dist == "W"){
-            ## using normal prior on the first param and gamma on second
-            ll <- tryCatch(
-                -loglik(pars,dat,dist) +
-                dnorm(pars.untrans[1],
-                      prior.par1[1],
-                      prior.par2[1],log=T) +
-                dgamma(pars.untrans[2],
-                       shape=prior.par1[2],
-                       rate=prior.par2[2],log=T),
-                error=function(e) {
-                    warning("Loglik failure, returning -Inf")
-                    return(-Inf)
-                })
-        } else if (dist == "G"){
-            ## using "non-informative" prior 1/scale for the joint prior \pi(a,b) \propto \frac{1}{\beta}
-            ll <- tryCatch(-loglik(pars,dat,dist) + log(1/pars.untrans[2]),
-                           error=function(e) {
-                               warning("Loglik failure, returning -Inf")
-                               return(-Inf)
-                           })
-
-        } else if (dist == "E"){ # for Erlang
-            ## Erlang is just a gamma so we are going to use this trick
-            ll <- tryCatch(-loglik(pars,dat,dist="G"),
-                           # no priors for now will add later
-                           error=function(e) {
-                               warning("Loglik failure, returning -Inf")
-                               return(-Inf)
-                           })
-
-        } else {
-            stop("Sorry, unknown distribution type. Check the 'dist' option.")
-        }
-        return(ll)
-    }
-
-    cat(sprintf("Running %.0f MCMC iterations \n",n.samples+burnin))
-
-    msg <- NULL
-    fail <- FALSE
-
-    ## run the MCMC chains
-    tryCatch(mcmc.run <- MCMCmetrop1R(local.ll,
-                                      init.pars,
-                                      dat = dat,
-                                      prior.par1 = prior.par1,
-                                      prior.par2 = prior.par2,
-                                      verbose=verbose,
-                                      dist=dist,
-                                      burnin = burnin,
-                                      mcmc=n.samples,
-                                      logfun=TRUE,
-                                      ...),
-             error=function(e){
-                 msg <<- e$message
-                 fail <<- TRUE
-             },
-             warning = function(w){
-                 msg <<- w$message
-                 fail <<- TRUE
-             })
-
-    if (!fail){
-        ## untransform MCMC parameter draws to natural scale
-        untrans.mcmcs <- t(apply(mcmc.run[,1:2],1,function(x) dist.optim.untransform(dist=dist,pars=x)))
-
-        ## append median to the percentiles in case it isn't there
-        ptiles.appended <- union(0.5,ptiles)
-        est.pars <- matrix(nrow=length(ptiles.appended)+2,ncol=3)
-
-        if (dist == "L"){
-            par1.name <- "meanlog"
-            par2.name <- "sdlog"
-            mcmc.quantiles <- apply(untrans.mcmcs,1,function(x) qlnorm(ptiles.appended,meanlog=x[1],sdlog=x[2]))
-        } else if (dist == "G"){
-            par1.name <- "shape"
-            par2.name <- "scale"
-            mcmc.quantiles <- apply(untrans.mcmcs,1,function(x) qgamma(ptiles.appended,shape=x[1],scale=x[2]))
-        } else if (dist == "W"){
-            par1.name <- "shape"
-            par2.name <- "scale"
-            mcmc.quantiles <- apply(untrans.mcmcs,1,function(x) qweibull(ptiles.appended,shape=x[1],scale=x[2]))
-        } else if (dist == "E"){
-            par1.name <- "shape"
-            par2.name <- "scale"
-            mcmc.quantiles <- apply(untrans.mcmcs,1,function(x) qgamma(ptiles.appended,shape=x[1],scale=x[2]))
-        } else {
-            stop("Sorry, unknown distribution type. Check the 'dist' option.")
-            ## not actually needed but just in case
-        }
-
-        ## make the return matrix
-        colnames(est.pars) <- c("est","CIlow", "CIhigh")
-        rownames(est.pars) <- c(par1.name,par2.name,paste0("p", 100*ptiles.appended))
-
-        est.pars[1,] <- quantile(untrans.mcmcs[,1], c(0.5,0.025,0.975))
-        est.pars[2,] <- quantile(untrans.mcmcs[,2], c(0.5,0.025,0.975))
-        cis.ptiles <- t(apply(mcmc.quantiles,1,function(x) quantile(x,c(0.5,.025,.975))))
-        est.pars[3:nrow(est.pars),1:3] <- cis.ptiles
-
-        rc <- new("cd.fit.mcmc",
-                  ests=round(est.pars,3),
-                  conv = numeric(),
-                  MSG = "",
-                  loglik=numeric(),
-                  samples = data.frame(untrans.mcmcs),
-                  data=data.frame(dat),
-                  dist=dist,
-                  inv.hessian = matrix(),
-                  est.method = "MCMC",
-                  ci.method = "MCMC"
-                  )
-
-        return(rc)
-
-    } else {
-        rc <- new("cd.fit.mcmc",
-                  ests=matrix(NA, nrow=5, ncol=3),
-                  conv = numeric(),
-                  MSG = msg,
-                  loglik=numeric(),
-                  samples = data.frame(),
-                  data=data.frame(dat),
-                  dist=dist,
-                  inv.hessian = matrix(),
-                  est.method = "MCMC",
-                  ci.method = "MCMC"
-                  )
-
-        print("Try adjusting the starting parameters init.pars")
-        return(rc)
-    }
 }
 
 
