@@ -638,6 +638,18 @@ dic.fit.mcmc <- function(dat,
                          ...){
 
     require(MCMCpack)
+
+    ## check format of dat
+    cnames <- colnames(dat)
+    if(!("EL" %in% cnames)) stop("dat must have column named EL")
+    if(!("ER" %in% cnames)) stop("dat must have column named ER")
+    if(!("SL" %in% cnames)) stop("dat must have column named SL")
+    if(!("SR" %in% cnames)) stop("dat must have column named SR")
+
+    if(!("type" %in% cnames)) stop("dat must have column named type")
+    if(!all(dat[,"type"] %in% c(0,1,2)))
+        stop("values in type column must be either 0, 1 or 2.")
+
     ## check to make sure distribution is supported
     if(!dist %in% c("G","W","L","E")) stop("Please use one of the following distributions Log-Normal (L) , Weibull (W), Gamma (G), or Erlang (E)")
 
