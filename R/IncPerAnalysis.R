@@ -1,23 +1,23 @@
 ##' Fits a log-normal, Gamma, or Weibull model to doubly interval censored survival data
 ##' @param dat a matrix with columns named "EL", "ER", "SL", "SR", corresponding to the left (L) and right (R) endpoints of the windows of possible exposure (E) and symptom onset (S). Also, a "type" column must be specified and have entries with 0, 1, or 2, corresponding to doubly interval-censored, single interval-censored or exact observations, respsectively.
-##' @param start.sigma the log-scale starting value for the dispersion
+##' @param start.par2 starting value for 2nd parameter of desired distribtution
 ##' @param opt.method method used by optim
-##' @param mu.int the log-scale interval of possible median values (in the same units as the observations in dat).  Narrowing this interval can help speed up convergence of the algorithm, but care must be taken so that possible values are not excluded or that the maximization does not return a value at an endpoint of this interval. 
-##' @param sigma.int the log-scale interval of possible dispersion values
+##' @param par1.int the log-scale interval of possible median values (in the same units as the observations in dat).  Narrowing this interval can help speed up convergence of the algorithm, but care must be taken so that possible values are not excluded or that the maximization does not return a value at an endpoint of this interval.
+##' @param par2.int the log-scale interval of possible dispersion values
 ##' @param ptiles percentiles of interest
 ##' @param dist what distribution to use to fit the data. Default "L" for log-normal. "G" for gamma, and "W" for Weibull. Note: If dist is Gamma (G) or Weibull (W), the mu refers to the shape and sigma refers to the scale param.
 ##' @param n.boots number of bootstrap resamples if non-log normal model
 ##' @param ... additional options passed to optim
+##' @param start.sigma the log-scale starting value for the dispersion
 ##' @return a cd.fit S4 object.
-##' @seealso \code{\link{cd.fit}} 
+##' @seealso \code{\link{cd.fit}}
 ##' @export
-##' @examples 
-
+##' @examples
 dic.fit <- function(dat,
-		    start.sigma=log(2),
+		    start.par2=log(2),
 		    opt.method="L-BFGS-B",
-		    mu.int=c(log(.5), log(13)),
-		    sigma.int=c(log(1.01), log(log(5))),
+		    par1.int=c(log(.5), log(13)),
+		    par2.int=c(log(1.01), log(log(5))),
 		    ptiles=c(.05, .95, .99),
                     dist="L",
                     n.boots=0,
@@ -40,16 +40,16 @@ dic.fit <- function(dat,
     if(class(dat)=="data.frame") stop("dat should be a matrix.")
 
     ## find starting values for DIC analysis using profile likelihoods
-    start.mu <- optimize(f=pl.mu, interval=mu.int,
-                         sigma=start.sigma, dat=dat,dist=dist)$min
-    start.sigma <- optimize(f=pl.sigma, interval=sigma.int, mu=start.mu,
-                                dat=dat,dist=dist)$min
+    start.par1 <- optimize(f=pl.par1, interval=par1.int,
+                           par2=start.par2, dat=dat,dist=dist)$min
+    start.par2 <- optimize(f=pl.par2, interval=par2.int, par1=start.par1,
+                           dat=dat,dist=dist)$min
 
     ## find MLEs for doubly censored data using optim
     tmp <- list(convergence=1)
     msg <- NULL
     fail <- FALSE
-    tryCatch(tmp <- optim(par=c(start.mu, start.sigma),
+    tryCatch(tmp <- optim(par=c(start.par1, start.par2),
                           method=opt.method, hessian=TRUE,
                           lower=c(log(0.5), log(log(1.04))),
                           fn=loglik, dat=dat,dist=dist, ...),
@@ -83,12 +83,13 @@ dic.fit <- function(dat,
 
             med <- exp(untransformed.fit.params[1])
             disp <- exp(untransformed.fit.params[2])
+
             norm.quants <- qnorm(ptiles.appended)
             ests <- c(untransformed.fit.params[1],
                       untransformed.fit.params[2],
                       med*disp^norm.quants)
             Sig <- solve(tmp$hessian)
-            ses <- dic.getSE(dat=dat,mu=log(med),log.s=log(log(disp)),Sig=Sig,ptiles=ptiles.appended,dist=dist,opt.method=opt.method)
+            ses <- dic.getSE(dat=dat,par1=log(med),log.par2=log(log(disp)),Sig=Sig,ptiles=ptiles.appended,dist=dist,opt.method=opt.method)
             ## get cis
             cil <- ests - qt(.975, n-1)*ses
             cih <- ests + qt(.975, n-1)*ses
@@ -103,13 +104,15 @@ dic.fit <- function(dat,
         } else if (dist == "W" & n.boots <=0){
             shape <- untransformed.fit.params[1]
             scale <- untransformed.fit.params[2]
+
             ests <- c(shape,
                       scale,
                       scale*(-log(1-ptiles.appended))^(1/shape))
 
             Sig <- solve(tmp$hessian)
-            ses <- dic.getSE(dat=dat,mu=shape,
-                             log.s=log(scale),
+            ses <- dic.getSE(dat=dat,
+                             par1=shape,
+                             log.par2=log(scale),
                              Sig=Sig,
                              ptiles=ptiles.appended,
                              dist=dist,
@@ -133,8 +136,8 @@ dic.fit <- function(dat,
 
             ##get estimates and cis for shape and scale
             boot.params <- dic.get.boots(dat=dat,
-                                         mu=untransformed.fit.params[1], # param 1
-                                         sigma=untransformed.fit.params[2], # log param 2, keeping it logged to stay consistent with previous function
+                                         par1=untransformed.fit.params[1],
+                                         par2=untransformed.fit.params[2], # keeping it logged to stay consistent with previous function
                                          dist=dist,
                                          opt.method=opt.method,
                                          n.boots=n.boots)
@@ -225,24 +228,24 @@ dic.fit <- function(dat,
 
 
 ## profile likelihood for mu -- used by dic.fit() to get starting values
-##' @param mu 
-##' @param sigma
+##' @param par1
+##' @param par2
 ##' @param dat
 ##' @param dist
 ##' @return
-pl.mu <- function(mu, sigma, dat, dist){
-    loglik(pars=c(mu, sigma),dist=dist, dat=dat)
+pl.par1 <- function(par1, par2, dat, dist){
+    loglik(pars=c(par1, par2),dist=dist, dat=dat)
 }
 
 
 ## profile likelihood for sigma -- used by dic.fit() to get starting values
-##' @param sigma
-##' @param mu
+##' @param par2
+##' @param par1
 ##' @param dat
 ##' @param dist
 ##' @return
-pl.sigma <- function(sigma, mu, dat, dist){
-    loglik(pars=c(mu, sigma), dist=dist, dat=dat)
+pl.par2 <- function(par2, par1, dat, dist){
+    loglik(pars=c(par1, par2), dist=dist, dat=dat)
 }
 
 ## functions that manipulate/calculate the likelihood for the censored data
@@ -254,18 +257,18 @@ pl.sigma <- function(sigma, mu, dat, dist){
 ##' @param ER
 ##' @param SL
 ##' @param SR
-##' @param mu
-##' @param sigma
+##' @param par1
+##' @param par2
 ##' @param dist
 ##' @return
-fw1 <- function(t, EL, ER, SL, SR, mu, sigma, dist){
+fw1 <- function(t, EL, ER, SL, SR, par1, par2, dist){
     ## function that calculates the first function for the DIC integral
     if (dist=="W"){
-        (ER-SL+t) * dweibull(x=t,shape=mu,scale=sigma)
+        (ER-SL+t) * dweibull(x=t,shape=par1,scale=par2)
     } else if (dist=="G") {
-        (ER-SL+t) * dgamma(x=t, shape=mu, scale=sigma)
+        (ER-SL+t) * dgamma(x=t, shape=par1, scale=par2)
     } else {
-        (ER-SL+t) * dlnorm(x=t, meanlog=mu, sdlog=sigma)
+        (ER-SL+t) * dlnorm(x=t, meanlog=par1, sdlog=par2)
     }
 }
 
@@ -274,24 +277,24 @@ fw1 <- function(t, EL, ER, SL, SR, mu, sigma, dist){
 ##' @param ER
 ##' @param SL
 ##' @param SR
-##' @param mu
-##' @param sigma
+##' @param par1
+##' @param par2
 ##' @param dist
 ##' @return
-fw3 <- function(t, EL, ER, SL, SR, mu, sigma, dist){
+fw3 <- function(t, EL, ER, SL, SR, par1, par2, dist){
     ## function that calculates the third function for the DIC integral
     if (dist == "W"){
-	(SR-EL-t) * dweibull(x=t, shape=mu, scale=sigma)
+	(SR-EL-t) * dweibull(x=t, shape=par1, scale=par2)
     } else if (dist == "G"){
-    	(SR-EL-t) * dgamma(x=t, shape=mu, scale=sigma)
+    	(SR-EL-t) * dgamma(x=t, shape=par1, scale=par2)
     } else {
-        (SR-EL-t) * dlnorm(x=t, meanlog=mu, sdlog=sigma)
+        (SR-EL-t) * dlnorm(x=t, meanlog=par1, sdlog=par2)
     }
 }
 
 
-##' @param mu
-##' @param sigma
+##' @param par1
+##' @param par2
 ##' @param EL
 ##' @param ER
 ##' @param SL
@@ -299,46 +302,46 @@ fw3 <- function(t, EL, ER, SL, SR, mu, sigma, dist){
 ##' @param type
 ##' @param dist
 ##' @return
-lik <- function(mu, sigma, EL, ER, SL, SR, type, dist){
+lik <- function(par1, par2, EL, ER, SL, SR, type, dist){
     ## returns the right likelihood for the type of data
     ## 0 = DIC, 1=SIC, 2=exact
-    if(type==0) return(diclik2(mu, sigma, EL, ER, SL, SR, dist))
-    if(type==1) return(siclik(mu, sigma, EL, ER, SL, SR, dist))
-    if(type==2) return(exactlik(mu, sigma, EL, ER, SL, SR, dist))
+    if(type==0) return(diclik2(par1, par2, EL, ER, SL, SR, dist))
+    if(type==1) return(siclik(par1, par2, EL, ER, SL, SR, dist))
+    if(type==2) return(exactlik(par1, par2, EL, ER, SL, SR, dist))
 }
 
 
-##' @param mu
-##' @param sigma
+##' calculates the DIC likelihood by integration
+##' @param par1
+##' @param par2
 ##' @param EL
 ##' @param ER
 ##' @param SL
 ##' @param SR
 ##' @param dist
 ##' @return
-diclik <- function(mu, sigma, EL, ER, SL, SR, dist){
-    ## calculates the DIC likelihood by integration
+diclik <- function(par1, par2, EL, ER, SL, SR, dist){
 
     ## if symptom window is bigger than exposure window
     if(SR-SL>ER-EL){
         dic1 <- integrate(fw1, lower=SL-ER, upper=SL-EL,
                           subdivisions=10,
-                          mu=mu, sigma=sigma,
+                          par1=par1, par2=par2,
                           EL=EL, ER=ER, SL=SL, SR=SR,
                           dist=dist)$value
         if (dist == "W"){
             dic2 <- (ER-EL)*
-                (pweibull(SR-ER, shape=mu, scale=sigma) - pweibull(SL-EL, shape=mu, scale=sigma))
+                (pweibull(SR-ER, shape=par1, scale=par2) - pweibull(SL-EL, shape=par1, scale=par2))
         } else if (dist == "G"){
             dic2 <- (ER-EL)*
-                (pgamma(SR-ER, shape=mu, scale=sigma) - pgamma(SL-EL, shape=mu, scale=sigma))
+                (pgamma(SR-ER, shape=par1, scale=par2) - pgamma(SL-EL, shape=par1, scale=par2))
         } else {
             dic2 <- (ER-EL)*
-                (plnorm(SR-ER, mu, sigma) - plnorm(SL-EL, mu, sigma))
+                (plnorm(SR-ER, par1, par2) - plnorm(SL-EL, par1, par2))
         }
         dic3 <- integrate(fw3, lower=SR-ER, upper=SR-EL,
                           subdivisions=10,
-                          mu=mu, sigma=sigma,
+                          par1=par1, par2=par2,
                           EL=EL, ER=ER, SL=SL, SR=SR,
                           dist=dist)$value
         return(dic1 + dic2 + dic3)
@@ -347,22 +350,22 @@ diclik <- function(mu, sigma, EL, ER, SL, SR, dist){
     ## if exposure window is bigger than symptom window
     else{
         dic1 <- integrate(fw1, lower=SL-ER, upper=SR-ER,                          subdivisions=10,
-                          mu=mu, sigma=sigma,
+                          par1=par1, par2=par2,
                           EL=EL, ER=ER, SL=SL, SR=SR,
                           dist=dist)$value
         if (dist == "W"){
             dic2 <- (SR-SL)*
-                (pweibull(SL-EL, shape=mu, scale=sigma) - pweibull(SR-ER, shape=mu, scale=sigma))
+                (pweibull(SL-EL, shape=par1, scale=par2) - pweibull(SR-ER, shape=par1, scale=par2))
         } else if (dist == "G"){
             dic2 <- (SR-SL)*
-                (pgamma(SL-EL, shape=mu, scale=sigma) - pgamma(SR-ER, shape=mu, scale=sigma))
+                (pgamma(SL-EL, shape=par1, scale=par2) - pgamma(SR-ER, shape=par1, scale=par2))
         } else {
             dic2 <- (SR-SL)*
-                (plnorm(SL-EL, mu, sigma) - plnorm(SR-ER, mu, sigma))
+                (plnorm(SL-EL, par1, par2) - plnorm(SR-ER, par1, par2))
         }
         dic3 <- integrate(fw3, lower=SL-EL, upper=SR-EL,
                           subdivisions=10,
-                          mu=mu, sigma=sigma,
+                          par1=par1, par2=par2,
                           EL=EL, ER=ER, SL=SL, SR=SR,
                           dist=dist)$value
         return(dic1 + dic2 + dic3)
@@ -370,22 +373,22 @@ diclik <- function(mu, sigma, EL, ER, SL, SR, dist){
 }
 
 ##' this dic likelihood is designed for data that has overlapping intervals
-##' @param mu
-##' @param sigma
+##' @param par1
+##' @param par2
 ##' @param EL
 ##' @param ER
 ##' @param SL
 ##' @param SR
 ##' @param dist
 ##' @return
-diclik2 <- function(mu, sigma, EL, ER, SL, SR, dist){
+diclik2 <- function(par1, par2, EL, ER, SL, SR, dist){
     if(SL>ER) {
-        return(diclik(mu, sigma, EL, ER, SL, SR, dist))
+        return(diclik(par1, par2, EL, ER, SL, SR, dist))
     } else {
         lik1 <- integrate(diclik2.helper1, lower=EL, upper=SL,
-                          SL=SL, SR=SR, mu=mu, sigma=sigma, dist=dist)$value
+                          SL=SL, SR=SR, par1=par1, par2=par2, dist=dist)$value
         lik2 <- integrate(diclik2.helper2, lower=SL, upper=ER,
-                          SR=SR, mu=mu, sigma=sigma, dist=dist)$value
+                          SR=SR, par1=par1, par2=par2, dist=dist)$value
         return(lik1+lik2)
     }
 }
@@ -394,75 +397,75 @@ diclik2 <- function(mu, sigma, EL, ER, SL, SR, dist){
 ##' @param x
 ##' @param SL
 ##' @param SR
-##' @param mu
-##' @param sigma
+##' @param par1
+##' @param par2
 ##' @param dist
 ##' @return
-diclik2.helper1 <- function(x, SL, SR, mu, sigma, dist){
+diclik2.helper1 <- function(x, SL, SR, par1, par2, dist){
     if (dist =="W"){
-        pweibull(SR-x, shape=mu, scale=sigma) - pweibull(SL-x, shape=mu, scale=sigma)
+        pweibull(SR-x, shape=par1, scale=par2) - pweibull(SL-x, shape=par1, scale=par2)
     } else if (dist =="G") {
-        pgamma(SR-x, shape=mu, scale=sigma) - pgamma(SL-x, shape=mu, scale=sigma)
+        pgamma(SR-x, shape=par1, scale=par2) - pgamma(SL-x, shape=par1, scale=par2)
     } else {
-        plnorm(SR-x, mu, sigma) - plnorm(SL-x, mu, sigma)
+        plnorm(SR-x, par1, par2) - plnorm(SL-x, par1, par2)
     }
 }
 
 ##' @param x
 ##' @param SR
-##' @param mu
-##' @param sigma
+##' @param par1
+##' @param par2
 ##' @param dist
 ##' @return
-diclik2.helper2 <- function(x, SR, mu, sigma, dist){
+diclik2.helper2 <- function(x, SR, par1, par2, dist){
     if (dist =="W"){
-        pweibull(SR-x, shape=mu, scale=sigma)
+        pweibull(SR-x, shape=par1, scale=par2)
     } else if (dist =="G") {
-        pgamma(SR-x, shape=mu, scale=sigma)
+        pgamma(SR-x, shape=par1, scale=par2)
     } else {
-	plnorm(SR-x, mu, sigma)
+	plnorm(SR-x, par1, par2)
     }
 }
 
 
-##' @param mu
-##' @param sigma
+##' @param par1
+##' @param par2
 ##' @param EL
 ##' @param ER
 ##' @param SL
 ##' @param SR
 ##' @param dist
 ##' @return
-siclik <- function(mu, sigma, EL, ER, SL, SR, dist){
+siclik <- function(par1, par2, EL, ER, SL, SR, dist){
     ## calculates the SIC likelihood as the difference in CDFs
     if (dist =="W"){
-        pweibull(SR-EL, shape=mu, scale=sigma) - pweibull(SL-ER, shape=mu, scale=sigma)
+        pweibull(SR-EL, shape=par1, scale=par2) - pweibull(SL-ER, shape=par1, scale=par2)
     } else if (dist =="G") {
-        pgamma(SR-EL, shape=mu, scale=sigma) - pgamma(SL-ER, shape=mu, scale=sigma)
+        pgamma(SR-EL, shape=par1, scale=par2) - pgamma(SL-ER, shape=par1, scale=par2)
     } else {
-        plnorm(SR-EL, mu, sigma) - plnorm(SL-ER, mu, sigma)
+        plnorm(SR-EL, par1, par2) - plnorm(SL-ER, par1, par2)
     }
 }
 
-##' @param mu
-##' @param sigma
+##' @param par1
+##' @param par2
 ##' @param EL
 ##' @param ER
 ##' @param SL
 ##' @param SR
 ##' @param dist
 ##' @return
-exactlik <- function(mu, sigma, EL, ER, SL, SR, dist){
+exactlik <- function(par1, par2, EL, ER, SL, SR, dist){
     ## calculates the likelihood for an exact observation
 
     ## NB: the two Ss should be equal and the two Es should be equal
-    ##     so it doesn't matter which pair we use in the formula below.
+    ##     so it doesn't matter which pair we use in the forpar1la below.
     if (dist =="W"){
-        dweibull(SR-EL, shape=mu, scale=sigma)
+        dweibull(SR-EL, shape=par1, scale=par2)
     } else if (dist =="G") {
-        dgamma(SR-EL, shape=mu, scale=sigma)
+        dgamma(SR-EL, shape=par1, scale=par2)
     } else {
-        dlnorm(SR-EL, mu, sigma)
+        dlnorm(SR-EL, par1, par2)
     }
 }
 
@@ -477,17 +480,17 @@ loglik <- function(pars, dat, dist) {
     ## dat must have EL, ER, SL, SR and type columns
 
     ## expecting transformed params from optimiztion
-    ## e.g. for log-normal expecting c(mu,log.sigma)
+    ## e.g. for log-normal expecting c(meanlog,log(sdlog))
     pars <- dist.optim.untransform(dist,pars)
-    mu <- pars[1]
-    sigma <- pars[2]
+    par1 <- pars[1]
+    par2 <- pars[2]
 
-    ## cat(sprintf("mu = %.2f, sigma = %.2f \n",mu, sigma))  ## for debugging
+    ## cat(sprintf("par1 = %.2f, par2 = %.2f \n",par1, par2))  ## for debugging
     n <- nrow(dat)
     totlik <- 0
     for(i in 1:n){
         totlik <- totlik +
-            log(lik(mu, sigma, type=dat[i,"type"],
+            log(lik(par1, par2, type=dat[i,"type"],
                     EL=dat[i,"EL"], ER=dat[i,"ER"],
                     SL=dat[i,"SL"], SR=dat[i,"SR"],
                     dist=dist))
@@ -498,43 +501,43 @@ loglik <- function(pars, dat, dist) {
 
 
 ## calculates the standard errors for estimates from dic.fit() using delta method (NOTE: only works for Log Normal and Weibull Models at the moment)
-##' @param mu - param 1 for given distribution
-##' @param log.s - log.scale param 2 (log-log dispersion for log-normal)
+##' @param par1
+##' @param log.par2 log.scale param 2 (log-log dispersion for log-normal)
 ##' @param Sig - var-cov matrix from hessian
 ##' @param ptiles - percentiles of interest
 ##' @param dist - failure time distribtion
 ##' @param dat - data
 ##' @param opt.method - optimization method for optim (see ?optim for options)
 ##' @return asymptotic standard errors for Log-Normal or Weibull models
-dic.getSE <- function(mu, log.s, Sig, ptiles, dist, dat, opt.method){
+dic.getSE <- function(par1, log.par2, Sig, ptiles, dist, dat, opt.method){
 
         cat(sprintf("Computing Asymtotic Confidence Intervals \n"))
-        s <- exp(log.s)
+        par2 <- exp(log.par2) # log.par2 input historically so I kept it as is
+
         if (dist == "L"){
             qnorms <- qnorm(ptiles)
-            df <- matrix(c(1, 0,exp(mu+qnorms*s),
-                           0, s, qnorms * exp(mu + qnorms*s + log.s)),
+            df <- matrix(c(1, 0,exp(par1+qnorms*par2),
+                           0, par2, qnorms * exp(par1 + qnorms*par2 + log.par2)),
                          nrow=2, ncol=2+length(ptiles), byrow=TRUE)
         } else if (dist == "W"){
-            df <- matrix(c(mu,0,
-                           -(s*(-log(1-ptiles))^(1/mu)*log(-log(1-ptiles)))/mu^2, #d/dmu
-                           0,s,
-                           (-log(1-ptiles))^(1/mu)), #d/ds
+            df <- matrix(c(par1,0,
+                           -(par2*(-log(1-ptiles))^(1/par1)*log(-log(1-ptiles)))/par1^2, #d/dmu
+                           0,par2,
+                           (-log(1-ptiles))^(1/par1)), #d/ds
                          nrow=2, ncol=2+length(ptiles), byrow=TRUE)
         }
         ses <- sqrt(diag(t(df)%*%Sig%*%df))
         return(ses)
     }
 
-##' @param mu param 1
-##' @param sigma param 2
+##' @param par1
+##' @param par2
 ##' @param dist distribution
 ##' @param dat data
 ##' @param opt.method optim method
 ##' @param n.boots number of bootstraps
 ##' @return matrix of bootstrap estimates of untransformed parameters for distrbution
-##' @author Andrew Azman
-dic.get.boots <- function(mu, sigma, dist, dat, opt.method, n.boots=100){
+dic.get.boots <- function(par1, par2, dist, dat, opt.method, n.boots=100){
     cat(sprintf("Bootstrapping (n=%i) Standard Errors for %s \n",n.boots,dist))
     boots <- vector("list",n.boots)
 
@@ -544,33 +547,33 @@ dic.get.boots <- function(mu, sigma, dist, dat, opt.method, n.boots=100){
     pb <- txtProgressBar(min = 0, max = n.boots, style = 3)
     for (i in 1:n.boots){
         boots[[i]] <-
-            single.boot(mu.s=mu,sigma.s=sigma,opt.method=opt.method,dat.tmp=dat[line.nums[,i],],dist=dist)
+            single.boot(par1.s=par1,par2.s=par2,opt.method=opt.method,dat.tmp=dat[line.nums[,i],],dist=dist)
         setTxtProgressBar(pb, i)
     }
-
     close(pb)
 
     ## grab the params from each
     ## remember if any failed there will be NAs here
-    mus <- sapply(boots,function(x) x$par[1])
-    sigmas <- sapply(boots,function(x) x$par[2])
+    par1s <- sapply(boots,function(x) x$par[1])
+    par2s <- sapply(boots,function(x) x$par[2])
 
-    return(cbind(mus=mus,sigmas=sigmas))
+    return(cbind(par1=par1s,par2=par2s))
 }
 
 ## estimates one set of parameters for a single bootstrap resample
-##' @param mu.s starting value for first param
-##' @param s.s starting value for second param
+##' @param par1.s starting value for first param
+##' @param par2.s starting value for second param
 ##' @param opt.method optimization method
 ##' @param dat.tmp one relaization of resampled data
 ##' @param dist distribution
 ##' @param ...
-##' @return returns optim list object with estiamtes for the untransformed two parameters of the specified dist
-single.boot <- function(mu.s,sigma.s,opt.method,dat.tmp,dist,...){
+##' @return returns optim list object with estimates for the untransformed two parameters of the specified dist
+single.boot <- function(par1.s,par2.s,opt.method,dat.tmp,dist,...){
+
     tmp <- list(convergence=1)
     msg <- NULL
     fail <- FALSE
-    pars.transformed <- dist.optim.transform(dist,c(mu.s,sigma.s))
+    pars.transformed <- dist.optim.transform(dist,c(par1.s,par2.s))
     tryCatch(tmp <- optim(par=pars.transformed,
                           method=opt.method, hessian=FALSE,
                           lower=c(-10,-10),
@@ -618,26 +621,24 @@ get.obs.type <- function(dat) {
 
 ##' Fits the distribution to the passed in data using MCMC
 ##' as implemented in MCMCpack. The following priors are used:
-##' Survival Model = Log-normal --> $(\mu,\sigma) \sim Gamma()$
-##' Survival Model = Weibull --> $\alpha \sim Gamma()$, $\beta \sim Normal()$
-##' Survival Model = Gamma --> $(\kappa,\theta) \sim \frac{1}{\beta}$
-##' Survival Model = Erlang --> $p(\kappa,\theta) \propto 1$
+##' Survival Model = Log-normal --> $(par1,par2) \sim Gamma()$
+##' Survival Model = Weibull --> $par1 \sim Gamma()$, $par2 \sim Normal()$
+##' Survival Model = Gamma --> $(par1,par2) \sim \frac{1}{\beta}$
+##' Survival Model = Erlang --> $p(par1,par2) \propto 1$
 ##' @param dat the data
-##' @param par.prior.param1 vector of first prior parameters
-##' @param par.prior.param2 vector of second prior parameters
-##' @param init.pars the initial parameters, defaults to par.prior.mu
+##' @param prior.par1 vector of first prior parameters
+##' @param prior.par2 vector of second prior parameters
+##' @param init.pars the initial parameters, defaults to par.prior.par1
 ##' @param ptiles what percentiles of the incubation period to return estimates for
 ##' @param verbose how often do you want a print out from MCMCpack on iteration number and MH acceptance rate
 ##' @param burnin number of burnin samples
 ##' @param n.samples number of samples to draw from the posterior
 ##' @param dist distribution to be used (L for log-normal,W for weibull, G for Gamma, and E for erlang)
 ##' @param ... additional parameters to MCMCmetrop1R
-##' @param par.prior.mu the mean for the prior distribution for the parameters a vector of [log median, log log dispersion]
-##' @param par.prior.sd vector of standard deviations for the prior on the log scale
 ##' @return list with (1) ests - a matrix of estimates with columns est (e.g., the median estimate), (2) CIlow (0.025 quantile) and CIhigh (0.975 quantile), and (3) an mcmc object as defined in MCMC pack containing the posterior samples
 dic.fit.mcmc <- function(dat,
-                         par.prior.param1 = c(0,0.001),
-                         par.prior.param2 = c(1000,0.001),
+                         prior.par1 = c(0,0.001),
+                         prior.par2 = c(1000,0.001),
                          init.pars = c(1,1),
                          ptiles = c(0.05,0.95,0.99),
                          verbose=1000,#how often to print update
@@ -657,8 +658,8 @@ dic.fit.mcmc <- function(dat,
     ## log liklihood function to pass to MCMCpack sampler
     local.ll <- function(pars,
                          dat,
-                         par.prior.1,
-                         par.prior.2,
+                         prior.par1,
+                         prior.par2,
                          dist) {
 
         ## get parameters on untransformed scale
@@ -670,8 +671,8 @@ dic.fit.mcmc <- function(dat,
                            ## dgamma(pars.untrans[2],shape=par.prior.param1[2],
                                   ## rate=par.prior.param2[2],log=T),
                            sum(dnorm(pars.untrans,
-                                     par.prior.param1,
-                                     par.prior.param2,log=T)),
+                                     prior.par1,
+                                     prior.par2,log=T)),
                            error=function(e) {
                                warning("Loglik failure, returning -Inf")
                                return(-Inf)
@@ -679,17 +680,18 @@ dic.fit.mcmc <- function(dat,
 
         } else if (dist == "W"){
             ## using normal prior on the first param and gamma on second
-            ll <- tryCatch(-loglik(pars,dat,dist) +
-                           dnorm(pars.untrans[1],
-                                 par.prior.param1[1],
-                                 par.prior.param2[1],log=T) +
-                           dgamma(pars.untrans[2],
-                                  shape=par.prior.param1[2],
-                                  rate=par.prior.param2[2],log=T),
-                           error=function(e) {
-                               warning("Loglik failure, returning -Inf")
-                               return(-Inf)
-                           })
+            ll <- tryCatch(
+                -loglik(pars,dat,dist) +
+                dnorm(pars.untrans[1],
+                      prior.par1[1],
+                      prior.par2[1],log=T) +
+                dgamma(pars.untrans[2],
+                       shape=prior.par1[2],
+                       rate=prior.par2[2],log=T),
+                error=function(e) {
+                    warning("Loglik failure, returning -Inf")
+                    return(-Inf)
+                })
         } else if (dist == "G"){
             ## using "non-informative" prior 1/scale for the joint prior \pi(a,b) \propto \frac{1}{\beta}
             ll <- tryCatch(-loglik(pars,dat,dist) + log(1/pars.untrans[2]),
@@ -722,8 +724,8 @@ dic.fit.mcmc <- function(dat,
     tryCatch(mcmc.run <- MCMCmetrop1R(local.ll,
                                       init.pars,
                                       dat = dat,
-                                      par.prior.1 = par.prior.param1,
-                                      par.prior.2 = par.prior.param2,
+                                      prior.par1 = prior.par1,
+                                      prior.par2 = prior.par2,
                                       verbose=verbose,
                                       dist=dist,
                                       burnin = burnin,
@@ -748,20 +750,20 @@ dic.fit.mcmc <- function(dat,
         est.pars <- matrix(nrow=length(ptiles.appended)+2,ncol=3)
 
         if (dist == "L"){
-            param1.name <- "meanlog"
-            param2.name <- "sdlog"
+            par1.name <- "meanlog"
+            par2.name <- "sdlog"
             mcmc.quantiles <- apply(untrans.mcmcs,1,function(x) qlnorm(ptiles.appended,meanlog=x[1],sdlog=x[2]))
         } else if (dist == "G"){
-            param1.name <- "shape"
-            param2.name <- "scale"
+            par1.name <- "shape"
+            par2.name <- "scale"
             mcmc.quantiles <- apply(untrans.mcmcs,1,function(x) qgamma(ptiles.appended,shape=x[1],scale=x[2]))
         } else if (dist == "W"){
-            param1.name <- "shape"
-            param2.name <- "scale"
+            par1.name <- "shape"
+            par2.name <- "scale"
             mcmc.quantiles <- apply(untrans.mcmcs,1,function(x) qweibull(ptiles.appended,shape=x[1],scale=x[2]))
         } else if (dist == "E"){
-            param1.name <- "shape"
-            param2.name <- "scale"
+            par1.name <- "shape"
+            par2.name <- "scale"
             mcmc.quantiles <- apply(untrans.mcmcs,1,function(x) qgamma(ptiles.appended,shape=x[1],scale=x[2]))
         } else {
             stop("Sorry, unknown distribution type. Check the 'dist' option.")
@@ -770,7 +772,7 @@ dic.fit.mcmc <- function(dat,
 
         ## make the return matrix
         colnames(est.pars) <- c("est","CIlow", "CIhigh")
-        rownames(est.pars) <- c(param1.name,param2.name,paste0("p", 100*ptiles.appended))
+        rownames(est.pars) <- c(par1.name,par2.name,paste0("p", 100*ptiles.appended))
 
         est.pars[1,] <- quantile(untrans.mcmcs[,1], c(0.5,0.025,0.975))
         est.pars[2,] <- quantile(untrans.mcmcs[,2], c(0.5,0.025,0.975))
@@ -805,6 +807,7 @@ dic.fit.mcmc <- function(dat,
                   est.method = "MCMC",
                   ci.method = "MCMC"
                   )
+
         print("Try adjusting the starting parameters init.pars")
         return(rc)
     }

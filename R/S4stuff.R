@@ -37,7 +37,7 @@ setMethod("show","cd.fit.mcmc",function(object){
     cat(sprintf("Coarse Data Model Parameter and Quantile Estimates: \n"))
     print(object@ests)
     if (object@dist == "L") cat(sprintf("\n Note: dispersion parameter is exp(sdlog). In this case it is %.3f. \n",exp(object@ests[2,1])))
-    cat(sprintf("Note: please check that the MCMC converged. MCMC samples are available in the mcmc slot (e.g. my.fit@mcmc) \n"))
+    cat(sprintf("Note: please check that the MCMC converged on the target distribution by running multiple chains. MCMC samples are available in the mcmc slot (e.g. my.fit@mcmc) \n"))
 })
 
 
