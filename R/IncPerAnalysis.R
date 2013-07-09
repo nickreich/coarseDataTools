@@ -24,21 +24,13 @@ dic.fit <- function(dat,
                     ...) {
 
     ## check format of dat
-    cnames <- colnames(dat)
-    if(!("EL" %in% cnames)) stop("dat must have column named EL")
-    if(!("ER" %in% cnames)) stop("dat must have column named ER")
-    if(!("SL" %in% cnames)) stop("dat must have column named SL")
-    if(!("SR" %in% cnames)) stop("dat must have column named SR")
-
-    if(!("type" %in% cnames)) stop("dat must have column named type")
-    if(!all(dat[,"type"] %in% c(0,1,2)))
-        stop("values in type column must be either 0, 1 or 2.")
+    check.data.structure(dat)
 
     ## check to make sure distribution is supported
     if(!dist %in% c("G","W","L")) stop("Please use one of the following distributions Log-Normal (L) , Weibull (W), or Gamma (G)")
 
     ## no asymptotic results for disributions other than gamma at the moment so will need bootstrap to be larger tha 0 if dist != "L"
-    if(dist %in% c("G","W") & n.boots <=0) stop("You must use bootstraping with this distrbution at the moment.  Please increase n.boots to something larger than 0")
+    if(dist %in% c("G") & n.boots <=0) stop("You must use bootstraping with this distrbution at the moment.  Please increase n.boots to something larger than 0")
 
     ## fix sample size
     n <- nrow(dat)
@@ -91,29 +83,48 @@ dic.fit <- function(dat,
 
             med <- exp(untransformed.fit.params[1])
             disp <- exp(untransformed.fit.params[2])
-
             norm.quants <- qnorm(ptiles.appended)
-
-            ## ests <- c(med,
-            ##           disp,
-            ##           med*disp^norm.quants)
-
             ests <- c(untransformed.fit.params[1],
                       untransformed.fit.params[2],
                       med*disp^norm.quants)
-
             Sig <- solve(tmp$hessian)
-            ses <- dic.getSE(dat=dat,mu=log(med),log.s=log(log(disp)),Sig=Sig,ptiles=ptiles.appended,dist=dist,opt.method=opt.method,n.boots=0)
-
+            ses <- dic.getSE(dat=dat,mu=log(med),log.s=log(log(disp)),Sig=Sig,ptiles=ptiles.appended,dist=dist,opt.method=opt.method)
+            ## get cis
             cil <- ests - qt(.975, n-1)*ses
             cih <- ests + qt(.975, n-1)*ses
+            ## save the quantile estimates
+            quant.matrix <- matrix(c(ests, cil, cih, ses),
+                                   nrow=2+length(ptiles.appended), byrow=FALSE)
+            ptiles.names <- paste0("p", 100*ptiles.appended)
+
+            rownames(quant.matrix) <- c("meanlog", "sdlog", ptiles.names)
+            colnames(quant.matrix) <- c("est", "CIlow", "CIhigh", "StdErr")
+
+        } else if (dist == "W" & n.boots <=0){
+            shape <- untransformed.fit.params[1]
+            scale <- untransformed.fit.params[2]
+            ests <- c(shape,
+                      scale,
+                      scale*(-log(1-ptiles.appended))^(1/shape))
+
+            Sig <- solve(tmp$hessian)
+            ses <- dic.getSE(dat=dat,mu=shape,
+                             log.s=log(scale),
+                             Sig=Sig,
+                             ptiles=ptiles.appended,
+                             dist=dist,
+                             opt.method=opt.method)
+            ## get cis
+            cil <- ests - qt(.975, n-1)*ses
+            cih <- ests + qt(.975, n-1)*ses
+
             ## save the quantile estimates
             quant.matrix <- matrix(c(ests, cil, cih, ses),
                                    nrow=2+length(ptiles.appended), byrow=FALSE)
 
             ptiles.names <- paste0("p", 100*ptiles.appended)
 
-            rownames(quant.matrix) <- c("meanlog", "sdlog", ptiles.names)
+            rownames(quant.matrix) <- c("shape", "scale", ptiles.names)
             colnames(quant.matrix) <- c("est", "CIlow", "CIhigh", "StdErr")
 
         } else { ## for other distributions
@@ -121,15 +132,14 @@ dic.fit <- function(dat,
             Sig <- solve(tmp$hessian)
 
             ##get estimates and cis for shape and scale
-            boot.params <- dic.getSE(dat=dat,
-                                     mu=untransformed.fit.params[1], # param 1
-                                     log.s=log(untransformed.fit.params[2]), # log param 2, keeping it logged to stay consistent with previous function
-                                     Sig=NULL,
-                                     ptiles=ptiles,
-                                     dist=dist,
-                                     opt.method=opt.method,
-                                     n.boots=n.boots)
-
+            boot.params <- dic.get.boots(dat=dat,
+                                         mu=untransformed.fit.params[1], # param 1
+                                         sigma=untransformed.fit.params[2], # log param 2, keeping it logged to stay consistent with previous function
+                                         Sig=NULL,
+                                         ptiles=ptiles,
+                                         dist=dist,
+                                         opt.method=opt.method,
+                                         n.boots=n.boots)
 
             na.rows <- is.na(rowSums(boot.params))
             ## if we have any bootstraps that we couldn't get the MLE for:
@@ -148,31 +158,26 @@ dic.fit <- function(dat,
                 ests <- qlnorm(ptiles.appended,untransformed.fit.params[1],untransformed.fit.params[2])
                 param1.name <- "meanlog"
                 param2.name <- "sdlog"
-
             } else if (dist == "W"){
                 boot.funcs <- apply(boot.params,1,function(x) qweibull(ptiles.appended,shape=x[1],scale=x[2]))
                 ests <- qweibull(ptiles.appended,shape=untransformed.fit.params[1],scale=untransformed.fit.params[2])
-
                 param1.name <- "shape"
                 param2.name <- "scale"
-
             } else if (dist == "G"){
                 boot.funcs <- apply(boot.params,1,function(x) qgamma(ptiles.appended,shape=x[1],scale=x[2]))
-
                 ests <- qgamma(ptiles.appended,shape=untransformed.fit.params[1],scale=untransformed.fit.params[2])
-
                 param1.name <- "shape"
                 param2.name <- "scale"
             }
 
+            ## std deviations of bootstraps for parameters
             sds.params <- apply(boot.params,2,sd)
 
-            ## get percentile estimates including the median
-            ## ests.ptiles <- apply(boot.funcs,1,mean)
-
+            ## get percentile estimates
             cis.ptiles <- apply(boot.funcs,1,function(x) quantile(x,c(.025,.975)))
             sds.ptiles <- apply(boot.funcs,1,sd)
             quant.matrix <- matrix(c(untransformed.fit.params,ests,cis.params[1,],cis.ptiles[1,],cis.params[2,],cis.ptiles[2,],sds.params,sds.ptiles), nrow=2+1+length(ptiles), byrow=FALSE)
+            ## deal with row and column names
             ptiles.names <- paste0("p", 100*ptiles.appended)
             rownames(quant.matrix) <- c(param1.name, param2.name, ptiles.names)
             colnames(quant.matrix) <- c("est", "CIlow", "CIhigh", "SD")
@@ -201,34 +206,22 @@ dic.fit <- function(dat,
                 )
             )
 
-        ## return(list(ests=round(quant.matrix, 3),
-        ##             conv=1,
-        ##             MSG=NULL,
-        ##             Sig.log.scale=Sig,
-        ##             loglik=-tmp$value,
-        ##             dist=dist))
-
     } else { ## if optimization fails:
-        ## return(list(ests=matrix(NA, nrow=5, ncol=4),
-        ##             conv=0,
-        ##             MSG=msg,
-        ##             Sig.log.scale=NULL,
-        ##             loglik=NULL,
-        ##             dist=NULL))
-                return(
-                    new("cd.fit",
-                        ests=matrix(NA, nrow=5, ncol=4),
-                        conv = 0,
-                        MSG = msg,
-                        loglik=-tmp$value,
-                        samples = data.frame(),
-                        data=data.frame(dat),
-                        dist=dist,
-                        inv.hessian = NULL,
-                        est.method = "Maximum Likihood - optim",
-                        ci.method = ci.method
-                        )
-                    )
+
+        return(
+            new("cd.fit",
+                ests=matrix(NA, nrow=5, ncol=4),
+                conv = 0,
+                MSG = msg,
+                loglik=-tmp$value,
+                samples = data.frame(),
+                data=data.frame(dat),
+                dist=dist,
+                inv.hessian = NULL,
+                est.method = "Maximum Likihood - optim",
+                ci.method = ci.method
+                )
+            )
     }
 }
 
@@ -506,51 +499,57 @@ loglik <- function(pars, dat, dist) {
 }
 
 
-## calculates the standard errors for estimates from dic.fit() using delta method or bootstrap
-##' @param mu - shape param
-##' @param log.s - log.scale param
+## calculates the standard errors for estimates from dic.fit() using delta method (NOTE: only works for Log Normal and Weibull Models at the moment)
+##' @param mu - param 1 for given distribution
+##' @param log.s - log.scale param 2 (log-log dispersion for log-normal)
 ##' @param Sig - var-cov matrix from hessian
 ##' @param ptiles - percentiles of interest
 ##' @param dist - failure time distribtion
 ##' @param dat - data
 ##' @param opt.method - optimization method for optim (see ?optim for options)
-##' @param n.boots number of bootstraps
-##' @return standard errors for when asymtotic results are requested or matrix with bootstrap parameter estimates
-dic.getSE <- function(mu, log.s, Sig, ptiles, dist, dat, opt.method, n.boots=100){
-    boots <- vector("list",n.boots)
+##' @return asymptotic standard errors for Log-Normal or Weibull models
+dic.getSE <- function(mu, log.s, Sig, ptiles, dist, dat, opt.method){
 
-    if (dist == "L" & n.boots <= 0) {
-        cat(sprintf("Computing Asymtotic Confidence Intervals for Log Normal Model \n"))
+        cat(sprintf("Computing Asymtotic Confidence Intervals \n"))
         s <- exp(log.s)
-        qnorms <- qnorm(ptiles)
-        df <- matrix(c(1, 0,exp(mu+qnorms*s),
-                       0, s, qnorms * exp(mu + qnorms*s + log.s)),
-                     nrow=2, ncol=2+length(ptiles), byrow=TRUE)
+        if (dist == "L"){
+            qnorms <- qnorm(ptiles)
+            df <- matrix(c(1, 0,exp(mu+qnorms*s),
+                           0, s, qnorms * exp(mu + qnorms*s + log.s)),
+                         nrow=2, ncol=2+length(ptiles), byrow=TRUE)
+        } else if (dist == "W"){
+            df <- matrix(c(mu,0,
+                           -(s*(-log(1-ptiles))^(1/mu)*log(-log(1-ptiles)))/mu^2, #d/dmu
+                           0,s,
+                           (-log(1-ptiles))^(1/mu)), #d/ds
+                         nrow=2, ncol=2+length(ptiles), byrow=TRUE)
+        }
         ses <- sqrt(diag(t(df)%*%Sig%*%df))
         return(ses)
-
-    } else {
-
-        cat(sprintf("Bootstrapping (n=%i) Standard Errors for %s \n",n.boots,dist))
-        ## sample line numbers from the data
-        line.nums <- matrix(sample(1:nrow(dat),nrow(dat)*n.boots,replace=T),nrow=nrow(dat),ncol=n.boots)
-        ## set up progress bar
-        pb <- txtProgressBar(min = 0, max = n.boots, style = 3)
-        for (i in 1:n.boots){
-            boots[[i]] <-
-                single.boot(mu.s=mu,sigma.s=exp(log.s),opt.method=opt.method,dat.tmp=dat[line.nums[,i],],dist=dist)
-            setTxtProgressBar(pb, i)
-        }
-
-        close(pb)
-
-        ## grab the params from each
-        ## remember if any failed there will be NAs here
-        mus <- sapply(boots,function(x) x$par[1])
-        sigmas <- sapply(boots,function(x) x$par[2])
-
-        return(cbind(mus=mus,sigmas=sigmas))
     }
+
+dic.get.boots <- function(mu, sigma, Sig, ptiles, dist, dat, opt.method, n.boots=100){
+    cat(sprintf("Bootstrapping (n=%i) Standard Errors for %s \n",n.boots,dist))
+    boots <- vector("list",n.boots)
+
+    ## sample line numbers from the data
+    line.nums <- matrix(sample(1:nrow(dat),nrow(dat)*n.boots,replace=T),nrow=nrow(dat),ncol=n.boots)
+    ## set up progress bar
+    pb <- txtProgressBar(min = 0, max = n.boots, style = 3)
+    for (i in 1:n.boots){
+        boots[[i]] <-
+            single.boot(mu.s=mu,sigma.s=sigma,opt.method=opt.method,dat.tmp=dat[line.nums[,i],],dist=dist)
+        setTxtProgressBar(pb, i)
+    }
+
+    close(pb)
+
+    ## grab the params from each
+    ## remember if any failed there will be NAs here
+    mus <- sapply(boots,function(x) x$par[1])
+    sigmas <- sapply(boots,function(x) x$par[2])
+
+    return(cbind(mus=mus,sigmas=sigmas))
 }
 
 ## estimates one set of parameters for a single bootstrap resample
@@ -643,16 +642,8 @@ dic.fit.mcmc <- function(dat,
 
     require(MCMCpack)
 
-    ## check format of dat
-    cnames <- colnames(dat)
-    if(!("EL" %in% cnames)) stop("dat must have column named EL")
-    if(!("ER" %in% cnames)) stop("dat must have column named ER")
-    if(!("SL" %in% cnames)) stop("dat must have column named SL")
-    if(!("SR" %in% cnames)) stop("dat must have column named SR")
-
-    if(!("type" %in% cnames)) stop("dat must have column named type")
-    if(!all(dat[,"type"] %in% c(0,1,2)))
-        stop("values in type column must be either 0, 1 or 2.")
+    ## check to make sure data is well formed for CDT use:
+    check.data.structure(dat)
 
     ## check to make sure distribution is supported
     if(!dist %in% c("G","W","L","E")) stop("Please use one of the following distributions Log-Normal (L) , Weibull (W), Gamma (G), or Erlang (E)")
@@ -716,7 +707,7 @@ dic.fit.mcmc <- function(dat,
         return(ll)
     }
 
-    cat(sprintf("Running %.0f MCMC iterations to get Bayesian estimates \n",n.samples+burnin))
+    cat(sprintf("Running %.0f MCMC iterations \n",n.samples+burnin))
 
     msg <- NULL
     fail <- FALSE
@@ -731,6 +722,7 @@ dic.fit.mcmc <- function(dat,
                                       dist=dist,
                                       burnin = burnin,
                                       mcmc=n.samples,
+                                      logfun=TRUE,
                                       ...),
              error=function(e){
                  msg <<- e$message
@@ -850,4 +842,24 @@ dist.optim.untransform <- function(dist,pars){
     } else {
         stop(sprintf("Distribtion (%s) not supported",dist))
     }
+}
+
+##' Issues a stop if the data does not conform with the expected structure
+##' @param dat data for use in CDT
+##' @return NULL
+##' @author Andrew Azman
+check.data.structure <- function(dat){
+    ## check format of dat
+    cnames <- colnames(dat)
+    if(!("EL" %in% cnames)) stop("dat must have column named EL")
+    if(!("ER" %in% cnames)) stop("dat must have column named ER")
+    if(!("SL" %in% cnames)) stop("dat must have column named SL")
+    if(!("SR" %in% cnames)) stop("dat must have column named SR")
+
+    if(!("type" %in% cnames)) stop("dat must have column named type")
+    if(!all(dat[,"type"] %in% c(0,1,2)))
+        stop("values in type column must be either 0, 1 or 2.")
+
+    if (any(is.na(dat[,c("EL","ER","SL","SR","type")]))) stop("Missing (NA) values not permitted")
+    NULL
 }
