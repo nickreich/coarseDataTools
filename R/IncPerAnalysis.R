@@ -1,14 +1,18 @@
 ##' Fits a log-normal, Gamma, or Weibull model to doubly interval censored survival data
-##' @param dat a matrix with columns named "EL", "ER", "SL", "SR", type = either "dic" or "sic" [because optim() can be sensitive to starting parameters, some of them may be changed in the options of dic.fit().]
+##' @param dat a matrix with columns named "EL", "ER", "SL", "SR", corresponding to the left (L) and right (R) endpoints of the windows of possible exposure (E) and symptom onset (S). Also, a "type" column must be specified and have entries with 0, 1, or 2, corresponding to doubly interval-censored, single interval-censored or exact observations, respsectively.
 ##' @param start.sigma the log-scale starting value for the dispersion
 ##' @param opt.method method used by optim
-##' @param mu.int the log-scale interval of possible median values (in days)
+##' @param mu.int the log-scale interval of possible median values (in the same units as the observations in dat).  Narrowing this interval can help speed up convergence of the algorithm, but care must be taken so that possible values are not excluded or that the maximization does not return a value at an endpoint of this interval. 
 ##' @param sigma.int the log-scale interval of possible dispersion values
 ##' @param ptiles percentiles of interest
-##' @param dist what distribution to use. Default "L" for log-normal. "G" for gamma, and "W" for Weibull. Note: If dist is Gamma (G) or Weibull (W), the mu refers to the shape and sigma refers to the scale param.
+##' @param dist what distribution to use to fit the data. Default "L" for log-normal. "G" for gamma, and "W" for Weibull. Note: If dist is Gamma (G) or Weibull (W), the mu refers to the shape and sigma refers to the scale param.
 ##' @param n.boots number of bootstrap resamples if non-log normal model
 ##' @param ... additional options passed to optim
-##' @return
+##' @return a cd.fit S4 object.
+##' @seealso \code{\link{cd.fit}} 
+##' @export
+##' @examples 
+
 dic.fit <- function(dat,
 		    start.sigma=log(2),
 		    opt.method="L-BFGS-B",
@@ -221,13 +225,13 @@ dic.fit <- function(dat,
 
 
 ## profile likelihood for mu -- used by dic.fit() to get starting values
-##' @param mu
+##' @param mu 
 ##' @param sigma
 ##' @param dat
 ##' @param dist
 ##' @return
 pl.mu <- function(mu, sigma, dat, dist){
-    loglik(pars=c(mu, sigma),dist=dist,dat=dat)
+    loglik(pars=c(mu, sigma),dist=dist, dat=dat)
 }
 
 
