@@ -131,8 +131,6 @@ dic.fit <- function(dat,
             boot.params <- dic.get.boots(dat=dat,
                                          mu=untransformed.fit.params[1], # param 1
                                          sigma=untransformed.fit.params[2], # log param 2, keeping it logged to stay consistent with previous function
-                                         Sig=NULL,
-                                         ptiles=ptiles,
                                          dist=dist,
                                          opt.method=opt.method,
                                          n.boots=n.boots)
@@ -524,7 +522,15 @@ dic.getSE <- function(mu, log.s, Sig, ptiles, dist, dat, opt.method){
         return(ses)
     }
 
-dic.get.boots <- function(mu, sigma, Sig, ptiles, dist, dat, opt.method, n.boots=100){
+##' @param mu param 1
+##' @param sigma param 2
+##' @param dist distribution
+##' @param dat data
+##' @param opt.method optim method
+##' @param n.boots number of bootstraps
+##' @return matrix of bootstrap estimates of untransformed parameters for distrbution
+##' @author Andrew Azman
+dic.get.boots <- function(mu, sigma, dist, dat, opt.method, n.boots=100){
     cat(sprintf("Bootstrapping (n=%i) Standard Errors for %s \n",n.boots,dist))
     boots <- vector("list",n.boots)
 
