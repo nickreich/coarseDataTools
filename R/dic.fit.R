@@ -37,7 +37,6 @@
 ##'   param.
 ##' @param n.boots number of bootstrap resamples if non-log normal model
 ##' @param ... additional options passed to optim
-##' @param start.sigma the log-scale starting value for the dispersion
 ##' @return a cd.fit S4 object.
 ##' @seealso \code{\link{cd.fit}}
 ##' @export

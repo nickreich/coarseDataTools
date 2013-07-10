@@ -9,7 +9,8 @@ Maintainer: Nicholas G. Reich <nick@schoolph.umass.edu>
 License: GPL (>= 2)
 Depends:
     survival,
-    MCMCpack
+    MCMCpack,
+    methods
 Description: This package contains functions to analyze coarse data.  Its
     development was motivated by applications to infectious disease: in
     particular, problems with estimating the incubation period and the case
