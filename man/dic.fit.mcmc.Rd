@@ -49,10 +49,9 @@ as implemented in MCMCpack.}
 }
 \details{
   The following priors are used: Survival Model =
-  Log-normal --> $(par1,par2) \sim Gamma()$ Survival Model
-  = Weibull --> $par1 \sim Gamma()$, $par2 \sim Normal()$
-  Survival Model = Gamma --> $(par1,par2) \sim
-  \frac{1}{\beta}$ Survival Model = Erlang -->
-  $p(par1,par2) \propto 1$
+  Log-normal --> $(par1,par2) ~ Gamma()$ Survival Model =
+  Weibull --> $par1 ~ Gamma()$, $par2 ~ Normal()$ Survival
+  Model = Gamma --> $(par1,par2) ~ 1/beta$ Survival Model =
+  Erlang --> $p(par1,par2) proportionalto 1$
 }
 
