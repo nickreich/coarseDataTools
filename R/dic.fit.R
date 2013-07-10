@@ -1,7 +1,7 @@
-##' Fits a log-normal, Gamma, Erlang, or Weibull model to doubly interval 
+##' Fits a log-normal, Gamma, Erlang, or Weibull model to doubly interval
 ##' censored survival data
-##' 
-##' \code{dic.fit} fits a parametric accelerated failure time model to survival 
+##'
+##' \code{dic.fit} fits a parametric accelerated failure time model to survival
 ##' data.   It was developed with the application to incubation periods in mind.
 ##' The data can be a mixture of doubly interval-censored, single
 ##' interval-censored or exact observations from a single univariate
@@ -9,31 +9,31 @@
 ##' gamma, and Weibull. (The Erlang distribution is supported in the
 ##' \code{dic.fit.mcmc} function, which implements an MCMC version of this
 ##' code.) We use a consistent (par1, par2) notation for each distribution, they
-##' map in the following manner: 
-##' Log-normal(meanlog=par1, sdlog=par2) 
-##' Gamma(shape=par1, scale=par2) 
+##' map in the following manner:
+##' Log-normal(meanlog=par1, sdlog=par2)
+##' Gamma(shape=par1, scale=par2)
 ##' Weibull(shape=par1, scale=par2)
-##' 
-##' 
-##' 
+##'
+##'
+##'
 ##' @param dat a matrix with columns named "EL", "ER", "SL", "SR", corresponding
-##'   to the left (L) and right (R) endpoints of the windows of possible 
-##'   exposure (E) and symptom onset (S). Also, a "type" column must be 
-##'   specified and have entries with 0, 1, or 2, corresponding to doubly 
-##'   interval-censored, single interval-censored or exact observations, 
+##'   to the left (L) and right (R) endpoints of the windows of possible
+##'   exposure (E) and symptom onset (S). Also, a "type" column must be
+##'   specified and have entries with 0, 1, or 2, corresponding to doubly
+##'   interval-censored, single interval-censored or exact observations,
 ##'   respsectively.
 ##' @param start.par2 starting value for 2nd parameter of desired distribtution
 ##' @param opt.method method used by optim
-##' @param par1.int the log-scale interval of possible median values (in the 
-##'   same units as the observations in dat).  Narrowing this interval can help 
-##'   speed up convergence of the algorithm, but care must be taken so that 
-##'   possible values are not excluded or that the maximization does not return 
+##' @param par1.int the log-scale interval of possible median values (in the
+##'   same units as the observations in dat).  Narrowing this interval can help
+##'   speed up convergence of the algorithm, but care must be taken so that
+##'   possible values are not excluded or that the maximization does not return
 ##'   a value at an endpoint of this interval.
 ##' @param par2.int the log-scale interval of possible dispersion values
 ##' @param ptiles percentiles of interest
-##' @param dist what distribution to use to fit the data. Default "L" for 
+##' @param dist what distribution to use to fit the data. Default "L" for
 ##'   log-normal. "G" for gamma, and "W" for Weibull. Note: If dist is Gamma (G)
-##'   or Weibull (W), the mu refers to the shape and sigma refers to the scale 
+##'   or Weibull (W), the mu refers to the shape and sigma refers to the scale
 ##'   param.
 ##' @param n.boots number of bootstrap resamples if non-log normal model
 ##' @param ... additional options passed to optim
@@ -83,7 +83,7 @@ dic.fit <- function(dat,
     fail <- FALSE
     tryCatch(tmp <- optim(par=c(start.par1, start.par2),
                           method=opt.method, hessian=TRUE,
-                          lower=c(log(0.5), log(log(1.04))),
+                         # lower=c(log(0.5), log(log(1.04))),
                           fn=loglikhd, dat=dat,dist=dist, ...),
              error = function(e) {
                  msg <<- e$message
@@ -108,7 +108,7 @@ dic.fit <- function(dat,
     if(!fail){
 
         ## always going to report median even if not requested
-        ptiles.appended <- union(0.5,ptiles)
+        ptiles.appended <- sort(union(0.5,ptiles))
 
         ## get asymtotic CIs and SEs
         if (dist == "L" & n.boots<=0 ){

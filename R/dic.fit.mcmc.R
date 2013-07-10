@@ -1,12 +1,12 @@
 ##' Fits the distribution to the passed-in data using MCMC
-##' as implemented in MCMCpack. 
-##' 
+##' as implemented in MCMCpack.
+##'
 ##' Similar to \code{dic.fit} but uses MCMC instead of a direct likelihood optimization routine to fit the model. Currently, four distributions are supported: log-normal, gamma, Weibull, and Erlang
-##' 
-##'   The following priors are used: 
-##'   Survival Model = Log-normal --> $(par1,par2) ~ Gamma()$ 
+##'
+##'   The following priors are used:
+##'   Survival Model = Log-normal --> $(par1,par2) ~ Gamma()$
 ##'   Survival Model = Weibull --> $par1 ~ Gamma()$, $par2 ~ Normal()$
-##'   Survival Model = Gamma --> $(par1,par2) ~ 1/beta$ 
+##'   Survival Model = Gamma --> $(par1,par2) ~ 1/beta$
 ##'   Survival Model = Erlang --> $p(par1,par2) proportionalto 1$
 ##' @param dat the data
 ##' @param prior.par1 vector of first prior parameters
@@ -29,25 +29,25 @@ dic.fit.mcmc <- function(dat,
                          n.samples = 5000,
                          dist = "L",
                          ...){
-        
+
         require(MCMCpack)
-        
+
         ## check to make sure data is well formed for CDT use:
         check.data.structure(dat)
-        
+
         ## check to make sure distribution is supported
         if(!dist %in% c("G","W","L","E")) stop("Please use one of the following distributions Log-Normal (L) , Weibull (W), Gamma (G), or Erlang (E)")
-        
+
         ## log liklihood function to pass to MCMCpack sampler
         local.ll <- function(pars,
                              dat,
                              prior.par1,
                              prior.par2,
                              dist) {
-                
+
                 ## get parameters on untransformed scale
                 pars.untrans <- dist.optim.untransform(dist,pars)
-                
+
                 if (dist == "L"){
                         ## default gamma on scale param and (inproper) uniform on location
                         ll <- tryCatch(-loglikhd(pars,dat,dist) +
@@ -60,7 +60,7 @@ dic.fit.mcmc <- function(dat,
                                                warning("Loglik failure, returning -Inf")
                                                return(-Inf)
                                        })
-                        
+
                 } else if (dist == "W"){
                         ## using normal prior on the first param and gamma on second
                         ll <- tryCatch(
@@ -82,7 +82,7 @@ dic.fit.mcmc <- function(dat,
                                                warning("Loglik failure, returning -Inf")
                                                return(-Inf)
                                        })
-                        
+
                 } else if (dist == "E"){ # for Erlang
                         ## Erlang is just a gamma so we are going to use this trick
                         ll <- tryCatch(-loglikhd(pars,dat,dist="G"),
@@ -91,18 +91,18 @@ dic.fit.mcmc <- function(dat,
                                                warning("Loglik failure, returning -Inf")
                                                return(-Inf)
                                        })
-                        
+
                 } else {
                         stop("Sorry, unknown distribution type. Check the 'dist' option.")
                 }
                 return(ll)
         }
-        
+
         cat(sprintf("Running %.0f MCMC iterations \n",n.samples+burnin))
-        
+
         msg <- NULL
         fail <- FALSE
-        
+
         ## run the MCMC chains
         tryCatch(mcmc.run <- MCMCmetrop1R(local.ll,
                                           init.pars,
@@ -123,15 +123,15 @@ dic.fit.mcmc <- function(dat,
                          msg <<- w$message
                          fail <<- TRUE
                  })
-        
+
         if (!fail){
                 ## untransform MCMC parameter draws to natural scale
                 untrans.mcmcs <- t(apply(mcmc.run[,1:2],1,function(x) dist.optim.untransform(dist=dist,pars=x)))
-                
+
                 ## append median to the percentiles in case it isn't there
-                ptiles.appended <- union(0.5,ptiles)
+                ptiles.appended <- sort(union(0.5,ptiles))
                 est.pars <- matrix(nrow=length(ptiles.appended)+2,ncol=3)
-                
+
                 if (dist == "L"){
                         par1.name <- "meanlog"
                         par2.name <- "sdlog"
@@ -152,16 +152,16 @@ dic.fit.mcmc <- function(dat,
                         stop("Sorry, unknown distribution type. Check the 'dist' option.")
                         ## not actually needed but just in case
                 }
-                
+
                 ## make the return matrix
                 colnames(est.pars) <- c("est","CIlow", "CIhigh")
                 rownames(est.pars) <- c(par1.name,par2.name,paste0("p", 100*ptiles.appended))
-                
+
                 est.pars[1,] <- quantile(untrans.mcmcs[,1], c(0.5,0.025,0.975))
                 est.pars[2,] <- quantile(untrans.mcmcs[,2], c(0.5,0.025,0.975))
                 cis.ptiles <- t(apply(mcmc.quantiles,1,function(x) quantile(x,c(0.5,.025,.975))))
                 est.pars[3:nrow(est.pars),1:3] <- cis.ptiles
-                
+
                 rc <- new("cd.fit.mcmc",
                           ests=round(est.pars,3),
                           conv = numeric(),
@@ -174,9 +174,9 @@ dic.fit.mcmc <- function(dat,
                           est.method = "MCMC",
                           ci.method = "MCMC"
                 )
-                
+
                 return(rc)
-                
+
         } else {
                 rc <- new("cd.fit.mcmc",
                           ests=matrix(NA, nrow=5, ncol=3),
@@ -190,7 +190,7 @@ dic.fit.mcmc <- function(dat,
                           est.method = "MCMC",
                           ci.method = "MCMC"
                 )
-                
+
                 print("Try adjusting the starting parameters init.pars")
                 return(rc)
         }
