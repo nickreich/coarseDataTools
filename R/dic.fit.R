@@ -568,7 +568,6 @@ dist.optim.untransform <- function(dist,pars){
 }
 
 ## Issues a stop if the data does not conform with the expected structure
-## author: Andrew Azman
 check.data.structure <- function(dat){
     ## check format of dat
     cnames <- colnames(dat)

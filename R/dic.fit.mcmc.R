@@ -22,7 +22,7 @@
 ##' @export
 dic.fit.mcmc <- function(dat,
                          prior.par1 = c(0,0.001),
-                         prior.par2 = c(1000,0.001),
+                         prior.par2 = if (dist == "L") {c(1000,1000)} else {c(1000,0.001)},
                          init.pars = c(1,1),
                          ptiles = c(0.05,0.95,0.99),
                          verbose=1000,#how often to print update
@@ -105,15 +105,15 @@ dic.fit.mcmc <- function(dat,
         fail <- FALSE
 
         ## run the MCMC chains
-        tryCatch(mcmc.run <- MCMCmetrop1R(local.ll,
-                                          init.pars,
+        tryCatch(mcmc.run <- MCMCmetrop1R(fun=local.ll,
+                                          theta.init=init.pars,
+                                          burnin = burnin,
+                                          mcmc=n.samples,
                                           dat = dat,
                                           prior.par1 = prior.par1,
                                           prior.par2 = prior.par2,
                                           verbose=verbose,
                                           dist=dist,
-                                          burnin = burnin,
-                                          mcmc=n.samples,
                                           logfun=TRUE,
                                           ...),
                  error=function(e){

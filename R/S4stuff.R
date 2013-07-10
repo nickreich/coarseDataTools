@@ -13,6 +13,7 @@ setClass("cd.fit",
                         est.method="character",
                         ci.method="character"))
 
+##' @export
 setClass("cd.fit.mcmc",
          contains="cd.fit")
 
