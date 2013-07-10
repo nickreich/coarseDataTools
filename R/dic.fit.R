@@ -61,7 +61,7 @@ dic.fit <- function(dat,
     ## check to make sure distribution is supported
     if(!dist %in% c("G","W","L")) stop("Please use one of the following distributions Log-Normal (L) , Weibull (W), or Gamma (G)")
 
-    ## no asymptotic results for disributions other than gamma at the moment so will need bootstrap to be larger tha 0 if dist != "L"
+    ## no asymptotic results for gamma disribution at the moment so will need bootstrap to be larger tha 0 if dist != "L"
     if(dist %in% c("G") & n.boots <=0) stop("You must use bootstraping with this distrbution at the moment.  Please increase n.boots to something larger than 0")
 
     ## fix sample size
