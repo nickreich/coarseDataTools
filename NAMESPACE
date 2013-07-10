@@ -1,4 +1,7 @@
 export(dic.fit)
+export(dic.fit.mcmc)
+export(get.obs.type)
 exportClasses(cd.fit)
+exportClasses(cd.fit.mcmc)
 exportMethods(logLik)
 exportMethods(plot)
