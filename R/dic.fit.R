@@ -1,34 +1,39 @@
-##' Fits a log-normal, Gamma, Erlang, or Weibull model to doubly interval
+##' Fits a log-normal, Gamma, Erlang, or Weibull model to doubly interval 
 ##' censored survival data
 ##' 
 ##' \code{dic.fit} fits a parametric accelerated failure time model to survival 
-##' data. The data may be specified to have different levels of censoring (see
-##' Details). Currently, three distributions are supported: log-normal, gamma, and
-##' Weibull. (The Erlang distribution is supported in the \code{dic.fit.mcmc} function, which implements an MCMC version of this code.) We use a consistent (par1, par2) notation for each distribution, they map in the following manner:
-##' Log-normal(meanlog=par1, sdlog=par2)
-##' Gamma(shape=par1, scale=par2)
+##' data.   It was developed with the application to incubation periods in mind.
+##' The data can be a mixture of doubly interval-censored, single
+##' interval-censored or exact observations from a single univariate
+##' distribution. Currently, three distributions are supported: log-normal,
+##' gamma, and Weibull. (The Erlang distribution is supported in the
+##' \code{dic.fit.mcmc} function, which implements an MCMC version of this
+##' code.) We use a consistent (par1, par2) notation for each distribution, they
+##' map in the following manner: 
+##' Log-normal(meanlog=par1, sdlog=par2) 
+##' Gamma(shape=par1, scale=par2) 
 ##' Weibull(shape=par1, scale=par2)
 ##' 
 ##' 
 ##' 
 ##' @param dat a matrix with columns named "EL", "ER", "SL", "SR", corresponding
-##'   to the left (L) and right (R) endpoints of the windows of possible
-##'   exposure (E) and symptom onset (S). Also, a "type" column must be
-##'   specified and have entries with 0, 1, or 2, corresponding to doubly
-##'   interval-censored, single interval-censored or exact observations,
+##'   to the left (L) and right (R) endpoints of the windows of possible 
+##'   exposure (E) and symptom onset (S). Also, a "type" column must be 
+##'   specified and have entries with 0, 1, or 2, corresponding to doubly 
+##'   interval-censored, single interval-censored or exact observations, 
 ##'   respsectively.
 ##' @param start.par2 starting value for 2nd parameter of desired distribtution
 ##' @param opt.method method used by optim
-##' @param par1.int the log-scale interval of possible median values (in the
-##'   same units as the observations in dat).  Narrowing this interval can help
-##'   speed up convergence of the algorithm, but care must be taken so that
-##'   possible values are not excluded or that the maximization does not return
+##' @param par1.int the log-scale interval of possible median values (in the 
+##'   same units as the observations in dat).  Narrowing this interval can help 
+##'   speed up convergence of the algorithm, but care must be taken so that 
+##'   possible values are not excluded or that the maximization does not return 
 ##'   a value at an endpoint of this interval.
 ##' @param par2.int the log-scale interval of possible dispersion values
 ##' @param ptiles percentiles of interest
-##' @param dist what distribution to use to fit the data. Default "L" for
+##' @param dist what distribution to use to fit the data. Default "L" for 
 ##'   log-normal. "G" for gamma, and "W" for Weibull. Note: If dist is Gamma (G)
-##'   or Weibull (W), the mu refers to the shape and sigma refers to the scale
+##'   or Weibull (W), the mu refers to the shape and sigma refers to the scale 
 ##'   param.
 ##' @param n.boots number of bootstrap resamples if non-log normal model
 ##' @param ... additional options passed to optim
@@ -37,6 +42,10 @@
 ##' @seealso \code{\link{cd.fit}}
 ##' @export
 ##' @examples
+##' data(fluA.inc.per)
+##' dic.fit(fluA.inc.per, dist="L")
+##' @references Reich NG et al.  Statistics in Medicine.  Estimating incubation periods with coarse data. 2009.  \url{http://www3.interscience.wiley.com/journal/122507367/abstract}
+
 dic.fit <- function(dat,
 		    start.par2=log(2),
 		    opt.method="L-BFGS-B",
@@ -256,7 +265,6 @@ dic.fit <- function(dat,
 ##' @param par2
 ##' @param dat
 ##' @param dist
-##' @return
 pl.par1 <- function(par1, par2, dat, dist){
     loglik(pars=c(par1, par2),dist=dist, dat=dat)
 }
@@ -267,7 +275,6 @@ pl.par1 <- function(par1, par2, dat, dist){
 ##' @param par1
 ##' @param dat
 ##' @param dist
-##' @return
 pl.par2 <- function(par2, par1, dat, dist){
     loglik(pars=c(par1, par2), dist=dist, dat=dat)
 }
@@ -284,7 +291,6 @@ pl.par2 <- function(par2, par1, dat, dist){
 ##' @param par1
 ##' @param par2
 ##' @param dist
-##' @return
 fw1 <- function(t, EL, ER, SL, SR, par1, par2, dist){
     ## function that calculates the first function for the DIC integral
     if (dist=="W"){
@@ -304,7 +310,6 @@ fw1 <- function(t, EL, ER, SL, SR, par1, par2, dist){
 ##' @param par1
 ##' @param par2
 ##' @param dist
-##' @return
 fw3 <- function(t, EL, ER, SL, SR, par1, par2, dist){
     ## function that calculates the third function for the DIC integral
     if (dist == "W"){
@@ -325,7 +330,6 @@ fw3 <- function(t, EL, ER, SL, SR, par1, par2, dist){
 ##' @param SR
 ##' @param type
 ##' @param dist
-##' @return
 lik <- function(par1, par2, EL, ER, SL, SR, type, dist){
     ## returns the right likelihood for the type of data
     ## 0 = DIC, 1=SIC, 2=exact
@@ -343,7 +347,6 @@ lik <- function(par1, par2, EL, ER, SL, SR, type, dist){
 ##' @param SL
 ##' @param SR
 ##' @param dist
-##' @return
 diclik <- function(par1, par2, EL, ER, SL, SR, dist){
 
     ## if symptom window is bigger than exposure window
@@ -404,7 +407,6 @@ diclik <- function(par1, par2, EL, ER, SL, SR, dist){
 ##' @param SL
 ##' @param SR
 ##' @param dist
-##' @return
 diclik2 <- function(par1, par2, EL, ER, SL, SR, dist){
     if(SL>ER) {
         return(diclik(par1, par2, EL, ER, SL, SR, dist))
@@ -424,7 +426,6 @@ diclik2 <- function(par1, par2, EL, ER, SL, SR, dist){
 ##' @param par1
 ##' @param par2
 ##' @param dist
-##' @return
 diclik2.helper1 <- function(x, SL, SR, par1, par2, dist){
     if (dist =="W"){
         pweibull(SR-x, shape=par1, scale=par2) - pweibull(SL-x, shape=par1, scale=par2)
@@ -440,7 +441,6 @@ diclik2.helper1 <- function(x, SL, SR, par1, par2, dist){
 ##' @param par1
 ##' @param par2
 ##' @param dist
-##' @return
 diclik2.helper2 <- function(x, SR, par1, par2, dist){
     if (dist =="W"){
         pweibull(SR-x, shape=par1, scale=par2)
@@ -459,7 +459,6 @@ diclik2.helper2 <- function(x, SR, par1, par2, dist){
 ##' @param SL
 ##' @param SR
 ##' @param dist
-##' @return
 siclik <- function(par1, par2, EL, ER, SL, SR, dist){
     ## calculates the SIC likelihood as the difference in CDFs
     if (dist =="W"){
@@ -478,7 +477,6 @@ siclik <- function(par1, par2, EL, ER, SL, SR, dist){
 ##' @param SL
 ##' @param SR
 ##' @param dist
-##' @return
 exactlik <- function(par1, par2, EL, ER, SL, SR, dist){
     ## calculates the likelihood for an exact observation
 

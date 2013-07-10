@@ -1,67 +1,84 @@
 \name{dic.fit}
 \alias{dic.fit}
-\title{
-Fitting log-normal models to doubly interval-censored data
-}
-\description{
-This function fits a log-normal model to doubly interval-censored survival data.  It was developed with the application to incubation periods in mind.  The data can be a mixture of doubly interval-censored, single interval-censored or exact observations from a single univariate distribution.
-}
+\title{Fits a log-normal, Gamma, Erlang, or Weibull model to doubly interval
+censored survival data}
 \usage{
-dic.fit(dat, 
-        start.log.sigma = log(log(2)), 
-        opt.method = "L-BFGS-B", 
-        mu.int = c(log(0.5), log(13)), 
-        log.sigma.int = c(log(log(1.01)), log(log(5))), 
-        ptiles = c(0.05, 0.95, 0.99), ...)
+  dic.fit(dat, start.par2 = log(2),
+    opt.method = "L-BFGS-B",
+    par1.int = c(log(0.5), log(13)),
+    par2.int = c(log(1.01), log(log(5))),
+    ptiles = c(0.05, 0.95, 0.99), dist = "L", n.boots = 0,
+    ...)
 }
-
 \arguments{
-  \item{dat}{
-a matrix with columns named "EL", "ER", "SL", "SR", corresponding to the left (L) and right (R) endpoints of the windows of possible exposure (E) and symptom onset (S). Also, a "type" column must be specified and have entries with 0, 1, or 2, corresponding to doubly interval-censored, single interval-censored or exact observations, respsectively.
-}
-  \item{start.log.sigma}{
-the log-log-scale starting value for the dispersion, used in a profile likelihood maximization which determines the starting values for the full likelihood maximization routine.
-}
-  \item{opt.method}{
-the optimization method to use in the optim() function 
-}
-  \item{mu.int}{
-the log-scale interval of possible median values (in the same units as the observations in dat).  Narrowing this interval can help speed up convergence of the algorithm, but care must be taken so that possible values are not excluded or that the maximization does not return a value at an endpoint of this interval. 
-}
-  \item{log.sigma.int}{
-the log-log-scale interval of possible dispersion values.  See notes for mu.int above.
-}
-  \item{ptiles}{
-percentiles of the distribution to be estimated in this routine.  Note that the median and dispersion are estimated by default.  See the ests matrix in the returned list below for more information.
-}
-  \item{\dots}{
-other parameters to be passed to optim() which runs the full likelihood maximization. 
-}
-}
-\details{
-See instructions in the arguments above.
+  \item{dat}{a matrix with columns named "EL", "ER", "SL",
+  "SR", corresponding to the left (L) and right (R)
+  endpoints of the windows of possible exposure (E) and
+  symptom onset (S). Also, a "type" column must be
+  specified and have entries with 0, 1, or 2, corresponding
+  to doubly interval-censored, single interval-censored or
+  exact observations, respsectively.}
+
+  \item{start.par2}{starting value for 2nd parameter of
+  desired distribtution}
+
+  \item{opt.method}{method used by optim}
+
+  \item{par1.int}{the log-scale interval of possible median
+  values (in the same units as the observations in dat).
+  Narrowing this interval can help speed up convergence of
+  the algorithm, but care must be taken so that possible
+  values are not excluded or that the maximization does not
+  return a value at an endpoint of this interval.}
+
+  \item{par2.int}{the log-scale interval of possible
+  dispersion values}
+
+  \item{ptiles}{percentiles of interest}
+
+  \item{dist}{what distribution to use to fit the data.
+  Default "L" for log-normal. "G" for gamma, and "W" for
+  Weibull. Note: If dist is Gamma (G) or Weibull (W), the
+  mu refers to the shape and sigma refers to the scale
+  param.}
+
+  \item{n.boots}{number of bootstrap resamples if non-log
+  normal model}
+
+  \item{...}{additional options passed to optim}
+
+  \item{start.sigma}{the log-scale starting value for the
+  dispersion}
 }
 \value{
-A list is returned with elements as follows:
-  \item{ests }{a matrix summarizing the results of fitting the model.  Rows correspond to the median, dispersion and then percentiles specified by the ptiles argument.  Columns correspond to the point estimate, the lower and upper bounds on the 95\% confidence interval and the standard error of the point estimate. If the maximization does not converge, this matrixis filled with NAs.}
-  \item{conv }{A value of 1 indicates successful convergence; 0 indicates unsuccessful convergence. }
-  \item{MSG }{The error message returned from optim() if the routine fails to converge. }
-  \item{Sig.log.scale }{The inverse of the hessian matrix for the likelihood surface at the MLE.  Used to determine the standard errors for the percentiles.}
+  a cd.fit S4 object.
 }
-\references{
-Reich NG et al.  Statistics in Medicine.  Estimating incubation periods with coarse data. 2009.  \url{http://www3.interscience.wiley.com/journal/122507367/abstract}
-
-Lessler J et al.  Lancet Infectious Diseases.  Incubation periods of acute respiratory viral infections: a systematic review.  \url{http://www.thelancet.com/journals/laninf/article/PIIS1473309909700696/abstract}
+\description{
+  \code{dic.fit} fits a parametric accelerated failure time
+  model to survival data.  It was developed with the
+  application to incubation periods in mind. The data can
+  be a mixture of doubly interval-censored, single
+  interval-censored or exact observations from a single
+  univariate distribution. Currently, three distributions
+  are supported: log-normal, gamma, and Weibull. (The
+  Erlang distribution is supported in the
+  \code{dic.fit.mcmc} function, which implements an MCMC
+  version of this code.) We use a consistent (par1, par2)
+  notation for each distribution, they map in the following
+  manner: Log-normal(meanlog=par1, sdlog=par2)
+  Gamma(shape=par1, scale=par2) Weibull(shape=par1,
+  scale=par2)
 }
-\author{
-Nicholas G. Reich
-}
-
 \examples{
 data(fluA.inc.per)
-dic.fit(fluA.inc.per)
+dic.fit(fluA.inc.per, dist="L")
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ survival }
-\keyword{ models }
+\references{
+  Reich NG et al.  Statistics in Medicine.  Estimating
+  incubation periods with coarse data. 2009.
+  \url{http://www3.interscience.wiley.com/journal/122507367/abstract}
+}
+\seealso{
+  \code{\link{cd.fit}}
+}
+
