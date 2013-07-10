@@ -96,7 +96,7 @@ dic.fit <- function(dat,
              })
 
     ## also, to catch a few more errors
-    if(tmp$convergence!=0 | all(tmp$hessian==0) ){
+    if(tmp$convergence!=0 || all(tmp$hessian==0) ){
         msg <- tmp$message
         if(all(tmp$hessian==0)) msg <- paste(msg, "& hessian is singular")
         fail <- TRUE
@@ -436,12 +436,13 @@ loglikhd <- function(pars, dat, dist) {
     n <- nrow(dat)
     totlik <- 0
     for(i in 1:n){
-        totlik <- totlik +
-            log(lik(par1, par2, type=dat[i,"type"],
-                    EL=dat[i,"EL"], ER=dat[i,"ER"],
-                    SL=dat[i,"SL"], SR=dat[i,"SR"],
-                    dist=dist))
+        tmp.loglik <- log(lik(par1, par2, type=dat[i,"type"],
+                              EL=dat[i,"EL"], ER=dat[i,"ER"],
+                              SL=dat[i,"SL"], SR=dat[i,"SR"],
+                              dist=dist))
+        totlik <- totlik + ifelse(tmp.loglik==-Inf,0,tmp.loglik)
     }
+
     return(-totlik) ## NB: NEEDS TO BE -totlik IF WE ARE MAXIMIZING USING OPTIM!
     ## May want to change this name later to reflect that is it negative log lik
 }
@@ -502,9 +503,10 @@ single.boot <- function(par1.s,par2.s,opt.method,dat.tmp,dist,...){
     fail <- FALSE
     pars.transformed <- dist.optim.transform(dist,c(par1.s,par2.s))
     tryCatch(tmp <- optim(par=pars.transformed,
-                          method=opt.method, hessian=FALSE,
-                          lower=c(-10,-10),
-                          fn=loglikhd, dat=dat.tmp,dist=dist,...),
+                          method=opt.method,
+                          hessian=FALSE,
+                          fn=loglikhd,
+                          dat=dat.tmp,dist=dist,...),
              error = function(e) {
                  msg <- e$message
                  fail <- TRUE
@@ -512,20 +514,21 @@ single.boot <- function(par1.s,par2.s,opt.method,dat.tmp,dist,...){
              warning = function(w){
                  msg <- w$message
                  fail <- TRUE
-             },
-             if(tmp$convergence!=0 | all(tmp$hessian==0) ){
-                 msg <- tmp$message
-                 if(all(tmp$hessian==0)) msg <- paste(msg, "& hessian is singular")
-                 fail <- TRUE
              })
+
+    if(tmp$convergence!=0 || all(tmp$hessian==0) ){
+        msg <- tmp$message
+        if(all(tmp$hessian==0)) msg <- paste(msg, "& hessian is singular")
+        fail <- TRUE
+    }
 
     ## transform back to original scale
     ## return NAs if we can't find the min for this param set
     if(is.null(tmp$par)){
         tmp$par <- c(NA,NA)
-        } else {
-            tmp$par <- dist.optim.untransform(dist,tmp$par)
-        }
+    } else {
+        tmp$par <- dist.optim.untransform(dist,tmp$par)
+    }
 
     return(tmp)
 }
