@@ -19,6 +19,7 @@
 ##' @param dist distribution to be used (L for log-normal,W for weibull, G for Gamma, and E for erlang)
 ##' @param ... additional parameters to MCMCmetrop1R
 ##' @return list with (1) ests - a matrix of estimates with columns est (e.g., the median estimate), (2) CIlow (0.025 quantile) and CIhigh (0.975 quantile), and (3) an mcmc object as defined in MCMC pack containing the posterior samples
+##' @export
 dic.fit.mcmc <- function(dat,
                          prior.par1 = c(0,0.001),
                          prior.par2 = c(1000,0.001),
