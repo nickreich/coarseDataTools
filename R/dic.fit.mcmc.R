@@ -179,20 +179,7 @@ dic.fit.mcmc <- function(dat,
                 return(rc)
 
         } else {
-                rc <- new("cd.fit.mcmc",
-                          ests=matrix(NA, nrow=5, ncol=3),
-                          conv = numeric(),
-                          MSG = msg,
-                          loglik=numeric(),
-                          samples = data.frame(),
-                          data=data.frame(dat),
-                          dist=dist,
-                          inv.hessian = matrix(),
-                          est.method = "MCMC",
-                          ci.method = "MCMC"
-                )
-
-                print("Try adjusting the starting parameters init.pars")
-                return(rc)
+            if (msg != "") msg <- paste0("Error: ",msg)
+            stop(sprintf("\n%s\nTry adjusting the starting parameters (init.pars), or changing the optimization method (opt.method).",msg))
         }
-}
+    }

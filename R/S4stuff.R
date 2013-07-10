@@ -54,6 +54,19 @@ setMethod("logLik",
               object@loglik
           })
 
+##' log likelihood of a cd.fit.mcmc object
+##'
+##' returns logliklihood evalauted at the posterior mean of each parameter
+##'
+##' @export
+##' @param object cd.fit.mcmc object
+setMethod("logLik",
+          "cd.fit.mcmc",
+          function(object){
+              cat(sprintf("Likihood evaluated at posterior mean (%.2f,%.2f):\n",object@ests[1,1],object@ests[2,1]))
+              return(-loglikhd(object@ests[1:2,1],object@data,object@dist))
+          })
+
 ##' For now this is going to plot the estimated survival
 ##' function and if bootstrap or mcmc samples are present, it will plot these samples with alpha
 ##' @export
