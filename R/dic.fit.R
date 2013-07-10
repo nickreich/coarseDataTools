@@ -435,11 +435,10 @@ loglikhd <- function(pars, dat, dist) {
     n <- nrow(dat)
     totlik <- 0
     for(i in 1:n){
-        tmp.loglik <- log(lik(par1, par2, type=dat[i,"type"],
-                              EL=dat[i,"EL"], ER=dat[i,"ER"],
-                              SL=dat[i,"SL"], SR=dat[i,"SR"],
-                              dist=dist))
-        totlik <- totlik + ifelse(tmp.loglik==-Inf,0,tmp.loglik)
+        totlik <- totlik + log(lik(par1, par2, type=dat[i,"type"],
+                                       EL=dat[i,"EL"], ER=dat[i,"ER"],
+                                       SL=dat[i,"SL"], SR=dat[i,"SR"],
+                                       dist=dist))
     }
 
     return(-totlik) ## NB: NEEDS TO BE -totlik IF WE ARE MAXIMIZING USING OPTIM!
