@@ -53,15 +53,14 @@ setMethod("logLik",
 ##' For now this is going to plot the estimated survival
 ##' function and if bootstrap or mcmc samples are present, it will plot these samples with alpha
 ##' @export
-##' @param x
-##' @param y
+##' @param x cd.fit object
 ##' @param col.main - color for plotting the main estimate
 ##' @param col.samps - color for the samples (should include some alpha transparency)
 ##' @param plot.n.samps - how many posterior or boostrap samples do you want to plot?
 ##' @param ... - other options to pass to plot
 setMethod("plot",
           "cd.fit",
-          function(x,y,
+          function(x,
                    col.main=rgb(230, 85, 13,maxColorValue=255),
                    col.samps=rgb(99,99,99,10,maxColorValue=255),
                    plot.n.samps=200,

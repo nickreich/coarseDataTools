@@ -1,16 +1,16 @@
 ##' Fits a log-normal, Gamma, Erlang, or Weibull model to doubly interval
 ##' censored survival data
-##' 
-##' \code{dic.fit} fits a parametric accelerated failure time model to survival 
+##'
+##' \code{dic.fit} fits a parametric accelerated failure time model to survival
 ##' data. The data may be specified to have different levels of censoring (see
 ##' Details). Currently, three distributions are supported: log-normal, gamma, and
 ##' Weibull. (The Erlang distribution is supported in the \code{dic.fit.mcmc} function, which implements an MCMC version of this code.) We use a consistent (par1, par2) notation for each distribution, they map in the following manner:
 ##' Log-normal(meanlog=par1, sdlog=par2)
 ##' Gamma(shape=par1, scale=par2)
 ##' Weibull(shape=par1, scale=par2)
-##' 
-##' 
-##' 
+##'
+##'
+##'
 ##' @param dat a matrix with columns named "EL", "ER", "SL", "SR", corresponding
 ##'   to the left (L) and right (R) endpoints of the windows of possible
 ##'   exposure (E) and symptom onset (S). Also, a "type" column must be
@@ -524,14 +524,14 @@ loglik <- function(pars, dat, dist) {
 }
 
 
-## calculates the standard errors for estimates from dic.fit() using delta method (NOTE: only works for Log Normal and Weibull Models at the moment)
-##' @param par1
+## calculates the standard errors for estimates from dic.fit() using delta method (NOTE: only works for Log Normal and weibull models at the moment)
+##' @param par1 parameter 1 from the desired distribution
 ##' @param log.par2 log.scale param 2 (log-log dispersion for log-normal)
-##' @param Sig - var-cov matrix from hessian
-##' @param ptiles - percentiles of interest
-##' @param dist - failure time distribtion
-##' @param dat - data
-##' @param opt.method - optimization method for optim (see ?optim for options)
+##' @param Sig var-cov matrix from hessian
+##' @param ptiles percentiles of interest
+##' @param dist failure time distribtion
+##' @param dat data
+##' @param opt.method optimization method for optim (see ?optim for options)
 ##' @return asymptotic standard errors for Log-Normal or Weibull models
 dic.getSE <- function(par1, log.par2, Sig, ptiles, dist, dat, opt.method){
 
@@ -670,7 +670,6 @@ dist.optim.untransform <- function(dist,pars){
 ##' Issues a stop if the data does not conform with the expected structure
 ##' @param dat data for use in CDT
 ##' @return NULL
-##' @author Andrew Azman
 check.data.structure <- function(dat){
     ## check format of dat
     cnames <- colnames(dat)
