@@ -61,6 +61,7 @@ setMethod("logLik",
 ##' @param col.main - color for plotting the main estimate
 ##' @param col.samps - color for the samples (should include some alpha transparency)
 ##' @param plot.n.samps - how many posterior or boostrap samples do you want to plot?
+##' @param add - will add to exisiting plot
 ##' @param ... - other options to pass to plot
 setMethod("plot",
           "cd.fit",
@@ -68,6 +69,7 @@ setMethod("plot",
                    col.main=rgb(230, 85, 13,maxColorValue=255),
                    col.samps=rgb(99,99,99,10,maxColorValue=255),
                    plot.n.samps=200,
+                   add=F,
                    ...) {
 
               par1 <- x@ests[1,1]
@@ -80,7 +82,7 @@ setMethod("plot",
 
               xlims <- range(x@data)
               xs <-seq(xlims[1],xlims[2],length=100)
-              plot(-100,-100,xlim=xlims,ylim=c(0,1),xlab="Time",ylab="Proportion with Symptoms",...)
+              if (!add) plot(-100,-100,xlim=xlims,ylim=c(0,1),xlab="Time",ylab="Proportion with Symptoms",...)
               if (x@dist == "L"){
                   if (plot.n.samps> 0 & nrow(x@samples) > 0){
                       apply(plot.samples,1,function(y) lines(xs,plnorm(xs,meanlog=y[1],sdlog=y[2]),col=col.samps))
