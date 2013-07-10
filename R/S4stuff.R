@@ -41,7 +41,10 @@ setMethod("show","cd.fit.mcmc",function(object){
 })
 
 
-
+##' log likelihood of a cd.fit object
+##' 
+##' returns the log-likelihood of a cd.fit object
+##' 
 ##' @export
 ##' @param object cd.fit object
 setMethod("logLik",

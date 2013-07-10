@@ -3,12 +3,11 @@
 ##' 
 ##' Similar to \code{dic.fit} but uses MCMC instead of a direct likelihood optimization routine to fit the model. Currently, four distributions are supported: log-normal, gamma, Weibull, and Erlang
 ##' 
-##' The following priors are used:
-##' Survival Model = Log-normal --> $(par1,par2) \sim Gamma()$
-##' Survival Model = Weibull --> $par1 \sim Gamma()$, $par2 \sim Normal()$
-##' Survival Model = Gamma --> $(par1,par2) \sim \frac{1}{\beta}$
-##' Survival Model = Erlang --> $p(par1,par2) \propto 1$
-##' 
+##'   The following priors are used: 
+##'   Survival Model = Log-normal --> $(par1,par2) ~ Gamma()$ 
+##'   Survival Model = Weibull --> $par1 ~ Gamma()$, $par2 ~ Normal()$
+##'   Survival Model = Gamma --> $(par1,par2) ~ 1/beta$ 
+##'   Survival Model = Erlang --> $p(par1,par2) proportionalto 1$
 ##' @param dat the data
 ##' @param prior.par1 vector of first prior parameters
 ##' @param prior.par2 vector of second prior parameters
@@ -51,7 +50,7 @@ dic.fit.mcmc <- function(dat,
                 
                 if (dist == "L"){
                         ## default gamma on scale param and (inproper) uniform on location
-                        ll <- tryCatch(-loglik(pars,dat,dist) +
+                        ll <- tryCatch(-loglikhd(pars,dat,dist) +
                                                ## dgamma(pars.untrans[2],shape=par.prior.param1[2],
                                                ## rate=par.prior.param2[2],log=T),
                                                sum(dnorm(pars.untrans,
@@ -65,7 +64,7 @@ dic.fit.mcmc <- function(dat,
                 } else if (dist == "W"){
                         ## using normal prior on the first param and gamma on second
                         ll <- tryCatch(
-                                -loglik(pars,dat,dist) +
+                                -loglikhd(pars,dat,dist) +
                                         dnorm(pars.untrans[1],
                                               prior.par1[1],
                                               prior.par2[1],log=T) +
@@ -78,7 +77,7 @@ dic.fit.mcmc <- function(dat,
                                 })
                 } else if (dist == "G"){
                         ## using "non-informative" prior 1/scale for the joint prior \pi(a,b) \propto \frac{1}{\beta}
-                        ll <- tryCatch(-loglik(pars,dat,dist) + log(1/pars.untrans[2]),
+                        ll <- tryCatch(-loglikhd(pars,dat,dist) + log(1/pars.untrans[2]),
                                        error=function(e) {
                                                warning("Loglik failure, returning -Inf")
                                                return(-Inf)
@@ -86,7 +85,7 @@ dic.fit.mcmc <- function(dat,
                         
                 } else if (dist == "E"){ # for Erlang
                         ## Erlang is just a gamma so we are going to use this trick
-                        ll <- tryCatch(-loglik(pars,dat,dist="G"),
+                        ll <- tryCatch(-loglikhd(pars,dat,dist="G"),
                                        # no priors for now will add later
                                        error=function(e) {
                                                warning("Loglik failure, returning -Inf")
