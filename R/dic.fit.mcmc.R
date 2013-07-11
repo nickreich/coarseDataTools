@@ -2,21 +2,21 @@
 ##' as implemented in MCMCpack.
 ##'
 ##' Similar to \code{dic.fit} but uses MCMC instead of a direct likelihood optimization routine to fit the model. Currently, four distributions are supported: log-normal, gamma, Weibull, and Erlang. See Details for prior specification.
-##' 
+##'
 ##' The following models are used:
-##' \deqn{Log-normal model: f(x) = \frac{1}{x*\sigma \sqrt{2 * \pi}} exp\{-\frac{(\log x - \mu)^2}{2 * \sigma^2}\}}  
-##' \deqn{Log-normal Default Prior: \mu ~ N( 0, 1000), \sigma ~ N(0,1000)}  
+##' \deqn{Log-normal model: f(x) = \frac{1}{x*\sigma \sqrt{2 * \pi}} exp\{-\frac{(\log x - \mu)^2}{2 * \sigma^2}\}}
+##' \deqn{Log-normal Default Prior: \mu ~ N( 0, 1000), \sigma ~ N(0,1000)}
 ##' \deqn{Weibull model: f(x) = \frac{\alpha}{\beta}(\frac{x}{\beta})^{\alpha-1} exp\{-(\frac{x}{\beta})^{\alpha}\}}
 ##' \deqn{Weibull Default Prior Specification: \alpha ~ N( 0, 1000), \beta ~ Gamma(0.001,0.001)}
 ##' \deqn{Gamma model: f(x) = \frac{1}{\theta^k \Gamma(k)} x^{k-1} exp\{-\frac{x}{\theta}\}}
 ##' \deqn{Gamma Default Prior Specification: p(k,\theta) \propto \frac{1}{\theta}}
 ##' \deqn{Erlang model: f(x) = \frac{1}{\theta^k (k-1)!} x^{k-1} exp\{-\frac{x}{\theta}\}}
 ##' \deqn{Erlang Default Prior Specification: p(k,\theta) \propto 1}
-##'   
+##'
 ##' @param dat the data
 ##' @param prior.par1 vector of first prior parameters
 ##' @param prior.par2 vector of second prior parameters
-##' @param init.pars the initial parameters, defaults to par.prior.par1
+##' @param init.pars the initial parameters on the transformed (estimation) scale
 ##' @param ptiles what percentiles of the incubation period to return estimates for
 ##' @param verbose how often do you want a print out from MCMCpack on iteration number and MH acceptance rate
 ##' @param burnin number of burnin samples
@@ -83,7 +83,12 @@ dic.fit.mcmc <- function(dat,
                                 })
                 } else if (dist == "G"){
                         ## using "non-informative" prior 1/scale for the joint prior \pi(a,b) \propto \frac{1}{\beta}
-                        ll <- tryCatch(-loglikhd(pars,dat,dist) + log(1/pars.untrans[2]),
+                    print(                                       log(1/pars.untrans[2]*sqrt(pars.untrans[1]*trigamma(pars.untrans[1])-1))
+)
+                        ll <- tryCatch(-loglikhd(pars,dat,dist)
+                                       +
+                                       log(1/pars.untrans[2]*sqrt(pars.untrans[1]*trigamma(pars.untrans[1])-1))
+                                       ,
                                        error=function(e) {
                                                warning("Loglik failure, returning -Inf")
                                                return(-Inf)
@@ -110,6 +115,8 @@ dic.fit.mcmc <- function(dat,
         fail <- FALSE
 
         ## run the MCMC chains
+        init.pars.untrans <- dist.optim.untransform(dist,init.pars)
+
         tryCatch(mcmc.run <- MCMCmetrop1R(fun=local.ll,
                                           theta.init=init.pars,
                                           burnin = burnin,
