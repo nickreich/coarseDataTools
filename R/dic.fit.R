@@ -10,9 +10,9 @@
 ##' \code{dic.fit.mcmc} function, which implements an MCMC version of this
 ##' code.) We use a consistent (par1, par2) notation for each distribution, they
 ##' map in the following manner:
-##' Log-normal(meanlog=par1, sdlog=par2)
-##' Gamma(shape=par1, scale=par2)
-##' Weibull(shape=par1, scale=par2)
+##' \deqn{Log-normal(meanlog=par1, sdlog=par2)}
+##' \deqn{Gamma(shape=par1, scale=par2)}
+##' \deqn{Weibull(shape=par1, scale=par2)}
 ##'
 ##'
 ##'
@@ -583,3 +583,4 @@ check.data.structure <- function(dat){
     if (any(is.na(dat[,c("EL","ER","SL","SR","type")]))) stop("Missing (NA) values not permitted")
     NULL
 }
+
