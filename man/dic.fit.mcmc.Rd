@@ -36,11 +36,7 @@ as implemented in MCMCpack.}
   \item{...}{additional parameters to MCMCmetrop1R}
 }
 \value{
-  list with (1) ests - a matrix of estimates with columns
-  est (e.g., the median estimate), (2) CIlow (0.025
-  quantile) and CIhigh (0.975 quantile), and (3) an mcmc
-  object as defined in MCMC pack containing the posterior
-  samples
+  a cd.fit.mcmc S4 object
 }
 \description{
   Similar to \code{dic.fit} but uses MCMC instead of a
@@ -50,9 +46,20 @@ as implemented in MCMCpack.}
   specification.
 }
 \details{
-  The following priors are used: \deqn{Log-normal: (par1,
-  par2) ~ Gamma()} \deqn{Weibull: par1 ~ Gamma(), par2 ~
-  Normal()} \deqn{Gamma: (par1,par2) ~ 1/beta}
-  \deqn{Erlang: p(par1,par2) \propto 1}
+  The following models are used: \deqn{Log-normal model:
+  f(x) = \frac{1}{x*\sigma \sqrt{2 * \pi}}
+  exp\{-\frac{(\log x - \mu)^2}{2 * \sigma^2}\}}
+  \deqn{Log-normal Default Prior: \mu ~ N( 0, 1000), \sigma
+  ~ N(0,1000)} \deqn{Weibull model: f(x) =
+  \frac{\alpha}{\beta}(\frac{x}{\beta})^{\alpha-1}
+  exp\{-(\frac{x}{\beta})^{\alpha}\}} \deqn{Weibull Default
+  Prior Specification: \alpha ~ N( 0, 1000), \beta ~
+  Gamma(0.001,0.001)} \deqn{Gamma model: f(x) =
+  \frac{1}{\theta^k \Gamma(k)} x^{k-1}
+  exp\{-\frac{x}{\theta}\}} \deqn{Gamma Default Prior
+  Specification: p(k,\theta) \propto \frac{1}{\theta}}
+  \deqn{Erlang model: f(x) = \frac{1}{\theta^k (k-1)!}
+  x^{k-1} exp\{-\frac{x}{\theta}\}} \deqn{Erlang Default
+  Prior Specification: p(k,\theta) \propto 1}
 }
 
