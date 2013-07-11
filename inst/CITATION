@@ -6,6 +6,16 @@ vers <- paste("R package version", meta$Version)
 
 citHeader("To cite the R package 'coarseDataTools' in publications use:")
 
+citEntry(entry  = "Article",
+         title = "Estimating incubation periods with coarse data.",
+         author= c(person(c("Nicholas G"), "Reich"),
+                   person(c("Justin"), "Lessler"),
+                   person(c("Derek AT"), "Cummings"),
+                   person(c("Ron"), "Brookmeyer")),
+         journal = "Statistics in Medicine",
+         year = 2009,
+         textVersion = "Reich NG, Lessler J, Cummings DAT, Brookmeyer R. (2009). Estimating incubation periods with coarse data. Statistics in Medicine. 28(22):2769--2784.")
+
 citEntry(entry  = "Manual",
          title = "coarseDataTools: A collection of functions to help with analysis of coarsely observed data",
          author= c(person(c("Nicholas G"), "Reich"),
