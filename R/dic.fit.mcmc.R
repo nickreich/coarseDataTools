@@ -21,7 +21,7 @@
 ##' @return list with (1) ests - a matrix of estimates with columns est (e.g., the median estimate), (2) CIlow (0.025 quantile) and CIhigh (0.975 quantile), and (3) an mcmc object as defined in MCMC pack containing the posterior samples
 ##' @export
 dic.fit.mcmc <- function(dat,
-                         prior.par1 = c(0,0.001),
+                         prior.par1 = if (dist == "L") {c(0,0)} else {c(0,0.001)},
                          prior.par2 = if (dist == "L") {c(1000,1000)} else {c(1000,0.001)},
                          init.pars = c(1,1),
                          ptiles = c(0.05,0.95,0.99),
