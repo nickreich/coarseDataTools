@@ -11,11 +11,14 @@ Depends:
     survival,
     MCMCpack,
     methods
-Description: This package contains functions to analyze coarse data. Specifically, it contains functions to (1) fit parametric accelerated failure time models to interval-censored survival time data, and (2) estimate the case-fatality ratio in scenarios with underreporting.  Its
-    This package's development was motivated by applications to infectious disease: in
-    particular, problems with estimating the incubation period and the case
-    fatality ratio of a given disease.  Sample data files are included in the
-    package.
+Description: This package contains functions to analyze coarse data.
+    Specifically, it contains functions to (1) fit parametric accelerated
+    failure time models to interval-censored survival time data, and (2)
+    estimate the case-fatality ratio in scenarios with underreporting.  Its
+    This package's development was motivated by applications to infectious
+    disease: in particular, problems with estimating the incubation period and
+    the case fatality ratio of a given disease.  Sample data files are included
+    in the package.
 Collate:
     'CFR_estimation.R'
     'dic.fit.mcmc.R'
@@ -23,3 +26,4 @@ Collate:
     'get.obs.type.R'
     'S4stuff.R'
     'sampleSizeSimulation.R'
+    'coarseDataTools-package.R'

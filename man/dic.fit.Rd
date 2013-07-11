@@ -46,9 +46,6 @@ censored survival data}
   normal model}
 
   \item{...}{additional options passed to optim}
-
-  \item{start.sigma}{the log-scale starting value for the
-  dispersion}
 }
 \value{
   a cd.fit S4 object.
@@ -65,9 +62,9 @@ censored survival data}
   \code{dic.fit.mcmc} function, which implements an MCMC
   version of this code.) We use a consistent (par1, par2)
   notation for each distribution, they map in the following
-  manner: Log-normal(meanlog=par1, sdlog=par2)
-  Gamma(shape=par1, scale=par2) Weibull(shape=par1,
-  scale=par2)
+  manner: \deqn{Log-normal(meanlog=par1, sdlog=par2)}
+  \deqn{Gamma(shape=par1, scale=par2)}
+  \deqn{Weibull(shape=par1, scale=par2)}
 }
 \examples{
 data(fluA.inc.per)

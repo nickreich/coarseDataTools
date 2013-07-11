@@ -4,7 +4,8 @@
 as implemented in MCMCpack.}
 \usage{
   dic.fit.mcmc(dat, prior.par1 = c(0, 0.001),
-    prior.par2 = c(1000, 0.001), init.pars = c(1, 1),
+    prior.par2 = if (dist == "L") {     c(1000, 1000)
+    } else {     c(1000, 0.001) }, init.pars = c(1, 1),
     ptiles = c(0.05, 0.95, 0.99), verbose = 1000,
     burnin = 3000, n.samples = 5000, dist = "L", ...)
 }
@@ -45,13 +46,13 @@ as implemented in MCMCpack.}
   Similar to \code{dic.fit} but uses MCMC instead of a
   direct likelihood optimization routine to fit the model.
   Currently, four distributions are supported: log-normal,
-  gamma, Weibull, and Erlang
+  gamma, Weibull, and Erlang. See Details for prior
+  specification.
 }
 \details{
-  The following priors are used: Survival Model =
-  Log-normal --> $(par1,par2) ~ Gamma()$ Survival Model =
-  Weibull --> $par1 ~ Gamma()$, $par2 ~ Normal()$ Survival
-  Model = Gamma --> $(par1,par2) ~ 1/beta$ Survival Model =
-  Erlang --> $p(par1,par2) proportionalto 1$
+  The following priors are used: \deqn{Log-normal: (par1,
+  par2) ~ Gamma()} \deqn{Weibull: par1 ~ Gamma(), par2 ~
+  Normal()} \deqn{Gamma: (par1,par2) ~ 1/beta}
+  \deqn{Erlang: p(par1,par2) \propto 1}
 }
 

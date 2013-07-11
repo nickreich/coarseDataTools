@@ -1,13 +1,14 @@
 ##' Fits the distribution to the passed-in data using MCMC
 ##' as implemented in MCMCpack.
 ##'
-##' Similar to \code{dic.fit} but uses MCMC instead of a direct likelihood optimization routine to fit the model. Currently, four distributions are supported: log-normal, gamma, Weibull, and Erlang
-##'
-##'   The following priors are used:
-##'   Survival Model = Log-normal --> $(par1,par2) ~ Gamma()$
-##'   Survival Model = Weibull --> $par1 ~ Gamma()$, $par2 ~ Normal()$
-##'   Survival Model = Gamma --> $(par1,par2) ~ 1/beta$
-##'   Survival Model = Erlang --> $p(par1,par2) proportionalto 1$
+##' Similar to \code{dic.fit} but uses MCMC instead of a direct likelihood optimization routine to fit the model. Currently, four distributions are supported: log-normal, gamma, Weibull, and Erlang. See Details for prior specification.
+##' 
+##' The following priors are used:
+##'   \deqn{Log-normal: (par1, par2) ~ Gamma()}
+##'   \deqn{Weibull: par1 ~ Gamma(), par2 ~ Normal()}
+##'   \deqn{Gamma: (par1,par2) ~ 1/beta}
+##'   \deqn{Erlang: p(par1,par2) \propto 1}
+##'   
 ##' @param dat the data
 ##' @param prior.par1 vector of first prior parameters
 ##' @param prior.par2 vector of second prior parameters
