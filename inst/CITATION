@@ -1,0 +1,17 @@
+# Grab the version and date from the DESCRIPTION file
+if(!exists("meta") || is.null(meta)) meta <- packageDescription("survival")
+year <- sub(".*(2[[:digit:]]{3})-.*", "\\1", meta$Date)
+vers <- paste("R package version", meta$Version)
+
+
+citHeader("To cite the R package 'coarseDataTools' in publications use:")
+
+citEntry(entry  = "Manual",
+         title = "coarseDataTools: A collection of functions to help with analysis of coarsely observed data",
+         author= c(person(c("Nicholas G"), "Reich"),
+                   person(c("Justin"), "Lessler"),
+                   person(c("Andrew S"), "Azman")),
+         year = year,
+         note = vers,
+         url = meta$URL,
+         textVersion = paste0("Reich NG, Lessler J, Azman AS. (", year, "). coarseDataTools: A collection of functions to help with analysis of coarsely observed data. <", meta$URL, ">. ", vers, "."))

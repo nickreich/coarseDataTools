@@ -1,12 +1,12 @@
 Package: coarseDataTools
 Version: 0.6
 Date: 2013-07-08
-Title: A collection of functions to help with analysis of coarse infectious
-    disease data
+Title: A collection of functions to help with analysis of coarsely observed data
 Author: Nicholas G. Reich <nick@schoolph.umass.edu>, Justin Lessler
     <jlessler@jhsph.edu>, Andrew Azman <andrewazman@gmail.com>
 Maintainer: Nicholas G. Reich <nick@schoolph.umass.edu>
 License: GPL (>= 2)
+URL: http://cran.r-project.org/package=coarseDataTools
 Depends:
     survival,
     MCMCpack,
