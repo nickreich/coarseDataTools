@@ -1,0 +1,31 @@
+\docType{data}
+\name{simulated.outbreak.deaths}
+\alias{simulated.outbreak.deaths}
+\title{Simulated case and death reports from a fictional outbreak}
+\format{\describe{
+            \item{\code{time}}{time, t,  after start of outbreak}
+            \item{\code{grp}}{an categorical variable indicating membership in one of two groups of a covariate, j}
+            \item{\code{R}}{number of recovered cases reported at the given t and j}
+            \item{\code{D}}{number of deaths reported at the given t and j}
+            \item{\code{N}}{total number of cases and deaths reported at t and j, or D+R}
+            }}
+\source{
+  Reich NG, Lessler J, Cummings DAT, Brookmeyer R.
+  Estimating case fatality ratios from infectious disease
+  surveillance data. Biometrics. 2012. 68(2): 598-606.
+}
+\description{
+  This dataset provides reported counts of cases and deaths
+  occuring at different time points across a simulated
+  outbreak. Details of the data simulation algorithm are
+  provided in the manuscript "Estimating case fatality
+  ratios from infectious disease surveillance data" (Reich
+  et al., under review, available upon request).
+}
+\examples{
+data(simulated.outbreak.deaths)
+head(simulated.outbreak.deaths)
+plot(simulated.outbreak.deaths[simulated.outbreak.deaths[,"grp"]==1,"D"], type="l")
+}
+\keyword{datasets}
+

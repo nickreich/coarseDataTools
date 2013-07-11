@@ -1,4 +1,3 @@
-
 ##' Fits a log-normal, Gamma, Erlang, or Weibull model to doubly interval
 ##' censored survival data
 ##'
