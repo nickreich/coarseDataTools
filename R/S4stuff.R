@@ -1,5 +1,6 @@
 #' An S4 Class that stores a fitted coarse data object
 ##' @rdname cd.fit
+##' @param ests matrix of params
 ##' @export
 setClass("cd.fit",
          representation(ests = "matrix",
