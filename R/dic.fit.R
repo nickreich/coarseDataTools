@@ -1,16 +1,16 @@
-##' Fits a log-normal, Gamma, Erlang, or Weibull model to doubly interval 
+##' Fits a log-normal, Gamma, Erlang, or Weibull model to doubly interval
 ##' censored survival data
-##' 
-##' \code{dic.fit} fits a parametric accelerated failure time model to survival 
+##'
+##' \code{dic.fit} fits a parametric accelerated failure time model to survival
 ##' data.   It was developed with the application to incubation periods in mind.
-##' The data can be a mixture of doubly interval-censored, single 
-##' interval-censored or exact observations from a single univariate 
-##' distribution. Currently, three distributions are supported: log-normal, 
-##' gamma, and Weibull. (The Erlang distribution is supported in the 
-##' \code{dic.fit.mcmc} function, which implements an MCMC version of this 
+##' The data can be a mixture of doubly interval-censored, single
+##' interval-censored or exact observations from a single univariate
+##' distribution. Currently, three distributions are supported: log-normal,
+##' gamma, and Weibull. (The Erlang distribution is supported in the
+##' \code{dic.fit.mcmc} function, which implements an MCMC version of this
 ##' code.) We use a consistent (par1, par2) notation for each distribution, they
-##' map in the following manner: \deqn{Log-normal(meanlog=par1, sdlog=par2)} 
-##' \deqn{Gamma(shape=par1, scale=par2)} \deqn{Weibull(shape=par1, scale=par2)} 
+##' map in the following manner: \deqn{Log-normal(meanlog=par1, sdlog=par2)}
+##' \deqn{Gamma(shape=par1, scale=par2)} \deqn{Weibull(shape=par1, scale=par2)}
 ##' Standard errors of parameters can be computed using closed-form asymptotic
 ##' formulae or using a bootstrap routine for log-normal and gamma models.
 ##' Currently, bootstrap SEs are the only option for the gamma models, which do
@@ -19,26 +19,26 @@
 ##' 0. To compute bootstrap SEs, just set \code{n.boots} to be greater than
 ##' zero. \code{\link{dic.fit.mcmc()}} also allows for Markov Chain Monte Carlo
 ##' fitting of these three parametric models and Erlang models as well.
-##' 
-##' 
+##'
+##'
 ##' @param dat a matrix with columns named "EL", "ER", "SL", "SR", corresponding
-##'   to the left (L) and right (R) endpoints of the windows of possible 
-##'   exposure (E) and symptom onset (S). Also, a "type" column must be 
-##'   specified and have entries with 0, 1, or 2, corresponding to doubly 
-##'   interval-censored, single interval-censored or exact observations, 
+##'   to the left (L) and right (R) endpoints of the windows of possible
+##'   exposure (E) and symptom onset (S). Also, a "type" column must be
+##'   specified and have entries with 0, 1, or 2, corresponding to doubly
+##'   interval-censored, single interval-censored or exact observations,
 ##'   respsectively.
 ##' @param start.par2 starting value for 2nd parameter of desired distribtution
 ##' @param opt.method method used by optim
-##' @param par1.int the log-scale interval of possible median values (in the 
-##'   same units as the observations in dat).  Narrowing this interval can help 
-##'   speed up convergence of the algorithm, but care must be taken so that 
-##'   possible values are not excluded or that the maximization does not return 
+##' @param par1.int the log-scale interval of possible median values (in the
+##'   same units as the observations in dat).  Narrowing this interval can help
+##'   speed up convergence of the algorithm, but care must be taken so that
+##'   possible values are not excluded or that the maximization does not return
 ##'   a value at an endpoint of this interval.
 ##' @param par2.int the log-scale interval of possible dispersion values
 ##' @param ptiles percentiles of interest
-##' @param dist what distribution to use to fit the data. Default "L" for 
+##' @param dist what distribution to use to fit the data. Default "L" for
 ##'   log-normal. "G" for gamma, and "W" for Weibull. Note: If dist is Gamma (G)
-##'   or Weibull (W), the mu refers to the shape and sigma refers to the scale 
+##'   or Weibull (W), the mu refers to the shape and sigma refers to the scale
 ##'   param.
 ##' @param n.boots number of bootstrap resamples
 ##' @param ... additional options passed to optim
@@ -49,7 +49,7 @@
 ##' data(fluA.inc.per)
 ##' dic.fit(fluA.inc.per, dist="L")
 ##' @references Reich NG et al.  Statistics in Medicine.  Estimating incubation
-##'   periods with coarse data. 2009. 
+##'   periods with coarse data. 2009.
 ##'   \url{http://www3.interscience.wiley.com/journal/122507367/abstract}
 
 dic.fit <- function(dat,
@@ -241,7 +241,7 @@ dic.fit <- function(dat,
                 data=data.frame(dat),
                 dist=dist,
                 inv.hessian = Sig,
-                est.method = "Maximum Likihood - optim",
+                est.method = "Maximum Likelihood - optim",
                 ci.method = ci.method
                 )
             )
@@ -258,7 +258,7 @@ dic.fit <- function(dat,
                 data=data.frame(dat),
                 dist=dist,
                 inv.hessian = NULL,
-                est.method = "Maximum Likihood - optim",
+                est.method = "Maximum Likelihood - optim",
                 ci.method = ci.method
                 )
             )
@@ -432,17 +432,17 @@ exactlik <- function(par1, par2, EL, ER, SL, SR, dist){
 ##' @param pars vector of the transformed parameters
 ##' @param dat a dataset, as in \code{dic.fit}
 ##' @param dist a distribution, as in \code{dic.fit}
-##'   
-##' @details This package uses two versions of each parameter, the estimation 
-##'   scale, or the scale that is used for numerical optimization, and the 
-##'   reporting scale, or the natural scale of the parameters. For all 
-##'   likelihood calculations, this \code{loglikhd} function expects parameters 
+##'
+##' @details This package uses two versions of each parameter, the estimation
+##'   scale, or the scale that is used for numerical optimization, and the
+##'   reporting scale, or the natural scale of the parameters. For all
+##'   likelihood calculations, this \code{loglikhd} function expects parameters
 ##'   that are on the estimation scale, i.e. have range \eqn{(-\infty, \infty)}.
-##'   Specifically, this translates into all parameters for all distributions 
-##'   being log-transformed except for the meanlog (i.e. "par1") for the 
+##'   Specifically, this translates into all parameters for all distributions
+##'   being log-transformed except for the meanlog (i.e. "par1") for the
 ##'   log-normal distribution.
-##'   
-##' @return negative log-likelihood for a given dataset, parameters, and 
+##'
+##' @return negative log-likelihood for a given dataset, parameters, and
 ##'   distribution.
 ##' @export
 loglikhd <- function(pars, dat, dist) {
