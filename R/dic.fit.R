@@ -471,7 +471,11 @@ loglikhd <- function(pars, dat, dist) {
 }
 
 
-## calculates the standard errors for estimates from dic.fit() using delta method (NOTE: only works for Log Normal and Weibull Models at the moment)
+## calculates the standard errors for estimates from dic.fit() using delta method (NOTE: only works for log-normal and Weibull Models at the moment)
+## this function calculates the asymptotic standard errors based on the delta method
+## the var/cov matrix has been calculated on the log(par1) and log(par2) scale
+## the df objects below represent the gradient matrix of the transformations, 
+##    for on each distribution, from the parameters on the estimation scale 
 dic.getSE <- function(par1, log.par2, Sig, ptiles, dist, dat, opt.method){
 
         cat(sprintf("Computing Asymtotic Confidence Intervals \n"))
@@ -483,10 +487,8 @@ dic.getSE <- function(par1, log.par2, Sig, ptiles, dist, dat, opt.method){
                            0, par2, qnorms * exp(par1 + qnorms*par2 + log.par2)),
                          nrow=2, ncol=2+length(ptiles), byrow=TRUE)
         } else if (dist == "W"){
-            df <- matrix(c(par1,0,
-                           -(par2*(-log(1-ptiles))^(1/par1)*log(-log(1-ptiles)))/par1^2, #d/dmu
-                           0,par2,
-                           (-log(1-ptiles))^(1/par1)), #d/ds
+            df <- matrix(c(par1, 0, par1*(-log(1-ptiles))^(1/par2), #d/d log(par1)
+                           0, par2, -par1/par2*(-log(1-ptiles)^(1/par2))*log(-log(1-ptiles))), #d/d log(par2)
                          nrow=2, ncol=2+length(ptiles), byrow=TRUE)
         }
         ses <- sqrt(diag(t(df)%*%Sig%*%df))

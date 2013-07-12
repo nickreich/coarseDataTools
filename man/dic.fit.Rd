@@ -1,6 +1,6 @@
 \name{dic.fit}
 \alias{dic.fit}
-\title{Fits a log-normal, Gamma, Erlang, or Weibull model to doubly interval
+\title{Fits a log-normal, gamma, Erlang, or Weibull model to doubly interval
 censored survival data}
 \usage{
   dic.fit(dat, start.par2 = log(2),
@@ -51,18 +51,19 @@ censored survival data}
 }
 \description{
   \code{dic.fit} fits a parametric accelerated failure time
-  model to survival data.  It was developed with the
-  application to incubation periods in mind. The data can
-  be a mixture of doubly interval-censored, single
-  interval-censored or exact observations from a single
-  univariate distribution. Currently, three distributions
-  are supported: log-normal, gamma, and Weibull. (The
-  Erlang distribution is supported in the
-  \code{dic.fit.mcmc} function, which implements an MCMC
-  version of this code.) We use a consistent (par1, par2)
-  notation for each distribution, they map in the following
-  manner: \deqn{Log-normal(meanlog=par1, sdlog=par2)}
-  \deqn{Gamma(shape=par1, scale=par2)}
+  model to survival data. It was developed with the
+  application to estimating incubation periods of
+  infectious diseases in mind but is applicable to many
+  general problems. The data can be a mixture of doubly
+  interval-censored, single interval-censored or exact
+  observations from a single univariate distribution.
+  Currently, three distributions are supported: log-normal,
+  gamma, and Weibull. (The Erlang distribution is supported
+  in the \code{dic.fit.mcmc} function, which implements an
+  MCMC version of this code.) We use a consistent (par1,
+  par2) notation for each distribution, they map in the
+  following manner: \deqn{Log-normal(meanlog=par1,
+  sdlog=par2)} \deqn{Gamma(shape=par1, scale=par2)}
   \deqn{Weibull(shape=par1, scale=par2)} Standard errors of
   parameters can be computed using closed-form asymptotic
   formulae or using a bootstrap routine for log-normal and

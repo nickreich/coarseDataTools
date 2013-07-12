@@ -1,10 +1,10 @@
 ##' An S4 Class that stores a fitted coarse data object
 ##'
 ##'
-##' This is the output from \code{dic.fit()}, which contains the important bits of information about the model fit and key options used.
+##' @description This is the output from \code{dic.fit()}, which contains the important bits of information about the model fit and key options used.
 ##'
 ##'
-##'@section Slots:
+##' @section Slots:
 ##'  \describe{
 ##'    \item{\code{ests}:}{Matrix of class \code{"numeric"}. This matrix summarizes the results of fitting the model. Rows correspond to the first parameter , the second parameter and then percentiles specified by the ptiles argument. Columns correspond to the point estimate, the lower and upper bounds on the 95\% confidence interval and the standard error of the point estimate. If the maximization does not converge, this matrix is filled with NAs.}
 ##'    \item{\code{conv}:}{Object of class \code{"numeric"}. A value of 1 indicates successful convergence; 0 indicates unsuccessful convergence.}
@@ -55,8 +55,8 @@ setClass("cd.fit",
 ##'    \item{\code{ci.method}:}{Object of class \code{"character"}. Method used for estimation of confidence/credible intervals.}
 ##'  }
 ##'
-##' @name cd.fit
-##' @rdname cd.fit
+##' @name cd.fit.mcmc
+##' @rdname cd.fit.mcmc
 ##' @aliases cd.fit-class
 ##' @exportClass cd.fit
 setClass("cd.fit.mcmc",
