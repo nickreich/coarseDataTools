@@ -1,8 +1,9 @@
-##' Fits a log-normal, Gamma, Erlang, or Weibull model to doubly interval
+##' Fits a log-normal, gamma, Erlang, or Weibull model to doubly interval
 ##' censored survival data
 ##'
 ##' \code{dic.fit} fits a parametric accelerated failure time model to survival
-##' data.   It was developed with the application to incubation periods in mind.
+##' data. It was developed with the application to estimating incubation periods of infectious diseases 
+##' in mind but is applicable to many general problems.
 ##' The data can be a mixture of doubly interval-censored, single
 ##' interval-censored or exact observations from a single univariate
 ##' distribution. Currently, three distributions are supported: log-normal,
