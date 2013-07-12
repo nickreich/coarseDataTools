@@ -3,7 +3,8 @@
 \title{Fits the distribution to the passed-in data using MCMC
 as implemented in MCMCpack.}
 \usage{
-  dic.fit.mcmc(dat, prior.par1 = c(0, 0.001),
+  dic.fit.mcmc(dat, prior.par1 = if (dist == "L") {
+        c(0, 0) } else {     c(0, 0.001) },
     prior.par2 = if (dist == "L") {     c(1000, 1000)
     } else {     c(1000, 0.001) }, init.pars = c(1, 1),
     ptiles = c(0.05, 0.95, 0.99), verbose = 1000,
@@ -16,8 +17,8 @@ as implemented in MCMCpack.}
 
   \item{prior.par2}{vector of second prior parameters}
 
-  \item{init.pars}{the initial parameters, defaults to
-  par.prior.par1}
+  \item{init.pars}{the initial parameter values (vector
+  length = 2 )}
 
   \item{ptiles}{what percentiles of the incubation period
   to return estimates for}
@@ -56,10 +57,15 @@ as implemented in MCMCpack.}
   Prior Specification: \alpha ~ N( 0, 1000), \beta ~
   Gamma(0.001,0.001)} \deqn{Gamma model: f(x) =
   \frac{1}{\theta^k \Gamma(k)} x^{k-1}
-  exp\{-\frac{x}{\theta}\}} \deqn{Gamma Default Prior
-  Specification: p(k,\theta) \propto \frac{1}{\theta}}
-  \deqn{Erlang model: f(x) = \frac{1}{\theta^k (k-1)!}
-  x^{k-1} exp\{-\frac{x}{\theta}\}} \deqn{Erlang Default
-  Prior Specification: p(k,\theta) \propto 1}
+  exp\{-\frac{x}{\theta}\}}
+
+  \deqn{Gamma Default Prior Specification: p(k,\theta)
+  \propto \frac{1}{\theta} * \sqrt{k*TriGamma(k)-1}} (Note:
+  this is Jeffery's Prior when both parameters are unknown,
+  and \eqn{Trigamma(x) = \frac{\partial}{\partial x^2}
+  ln(\Gamma(x))}.) \deqn{Erlang model: f(x) =
+  \frac{1}{\theta^k (k-1)!} x^{k-1}
+  exp\{-\frac{x}{\theta}\}} \deqn{Erlang Default Prior
+  Specification: p(k,\theta) \propto 1}
 }
 

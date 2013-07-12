@@ -42,8 +42,7 @@ censored survival data}
   mu refers to the shape and sigma refers to the scale
   param.}
 
-  \item{n.boots}{number of bootstrap resamples if non-log
-  normal model}
+  \item{n.boots}{number of bootstrap resamples}
 
   \item{...}{additional options passed to optim}
 }
@@ -64,7 +63,18 @@ censored survival data}
   notation for each distribution, they map in the following
   manner: \deqn{Log-normal(meanlog=par1, sdlog=par2)}
   \deqn{Gamma(shape=par1, scale=par2)}
-  \deqn{Weibull(shape=par1, scale=par2)}
+  \deqn{Weibull(shape=par1, scale=par2)} Standard errors of
+  parameters can be computed using closed-form asymptotic
+  formulae or using a bootstrap routine for log-normal and
+  gamma models. Currently, bootstrap SEs are the only
+  option for the gamma models, which do not have a closed
+  form for the percentiles. \code{dic.fit()} calculates
+  asymptotic SEs by default, or whenever the \code{n.boots}
+  option is set to 0. To compute bootstrap SEs, just set
+  \code{n.boots} to be greater than zero.
+  \code{\link{dic.fit.mcmc()}} also allows for Markov Chain
+  Monte Carlo fitting of these three parametric models and
+  Erlang models as well.
 }
 \examples{
 data(fluA.inc.per)
@@ -76,6 +86,6 @@ dic.fit(fluA.inc.per, dist="L")
   \url{http://www3.interscience.wiley.com/journal/122507367/abstract}
 }
 \seealso{
-  \code{\link{cd.fit}}
+  \code{\link{cd.fit}}, \code{\link{dic.fit.mcmc}}
 }
 

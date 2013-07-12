@@ -9,7 +9,9 @@
 ##' \deqn{Weibull model: f(x) = \frac{\alpha}{\beta}(\frac{x}{\beta})^{\alpha-1} exp\{-(\frac{x}{\beta})^{\alpha}\}}
 ##' \deqn{Weibull Default Prior Specification: \alpha ~ N( 0, 1000), \beta ~ Gamma(0.001,0.001)}
 ##' \deqn{Gamma model: f(x) = \frac{1}{\theta^k \Gamma(k)} x^{k-1} exp\{-\frac{x}{\theta}\}}
-##' \deqn{Gamma Default Prior Specification: p(k,\theta) \propto \frac{1}{\theta}}
+##' 
+##' \deqn{Gamma Default Prior Specification: p(k,\theta) \propto \frac{1}{\theta} * \sqrt{k*TriGamma(k)-1}}
+##' (Note: this is Jeffery's Prior when both parameters are unknown, and \eqn{Trigamma(x) = \frac{\partial}{\partial x^2} ln(\Gamma(x))}.)
 ##' \deqn{Erlang model: f(x) = \frac{1}{\theta^k (k-1)!} x^{k-1} exp\{-\frac{x}{\theta}\}}
 ##' \deqn{Erlang Default Prior Specification: p(k,\theta) \propto 1}
 ##'
