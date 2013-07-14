@@ -1,6 +1,6 @@
 \name{cd.fit.mcmc}
-\alias{cd.fit-class}
 \alias{cd.fit.mcmc}
+\alias{cd.fit.mcmc-class}
 \title{An S4 Class that stores a MCMC fit coarse data object}
 \description{
   This is the output from \code{dic.fit.mcmc()}, which
