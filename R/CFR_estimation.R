@@ -1,6 +1,74 @@
 ### function defining the EM algorithm for the CFR estimates
 
-
+##' A function to estimate the relative case fatality ratio when reporting rates are time-varying and deaths are lagged because of survival time.  
+##' 
+##' This function implements an EM algorithm to estimate the relative case fatality ratio between two groups when reporting rates are time-varying and deaths are lagged because of survival time.
+##' @usage EMforCFR(assumed.nu, alpha.start.values, full.data, max.iter = 50, 
+##'      verb = FALSE, tol = 1e-10, SEM.var = TRUE)
+##'      
+##' @param assumed.nu  a vector of probabilities corresponding to the survival distribution, i.e. nu[i]=Pr(surviving i days | fatal case)
+##' @param alpha.start.values a vector starting values for the reporting rate parameter of the GLM model. This must have length which corresponds to one less than the number of unique integer values of full.dat[,"new.times"].
+##' @param full.data  A matrix of observed data. See description below.
+##' @param max.iter The maximum number of iterations for the EM algorithm and the accompanying SEM algorithm (if used). 
+##' @param verb An indicator for whether the function should print results as it runs. 
+##' @param tol A tolerance to use to test for convergence of the EM algorithm. 
+##' @param SEM.var If TRUE, the SEM algorithm will be run in addition to the EM algorithm to calculate the variance of the parameter estimates. 
+##' 
+##' @details The data matrix full.data must have the following columns:
+##' \describe{
+##'     \item{grp}{a 1 or a 2 indicating which of the two groups, j,  the observation is for.}
+##'     \item{new.times}{an integer value representing the time, t, of observation.}
+##'     \item{R}{the count of recovered cases with onset at time t in group j.}
+##'     \item{D}{the count of deaths which occured at time t in groupo j (note that these deaths did not have disease onset at time t but rather died at time t).}
+##'     \item{N}{the total cases at t, j, or the sum of R and D columns.}
+##' }
+##'     
+##' @return A list with the following elements
+##' \describe{
+##'    \item{naive.rel.cfr }{the naive estimate of the relative case fatality ratio}
+##'    \item{glm.rel.cfr }{the reporting-rate-adjusted estimate of the relative case fatality ratio}
+##'    \item{EM.rel.cfr }{the lag-adjusted estimate of the relative case fatality ratio}
+##'    \item{EM.re.cfr.var }{the variance for the log-scale lag-adjusted estimator taken from the final M-step}
+##'    \item{EM.rel.cfr.var.SEM }{ the Supplemented EM algorithm variance for the log-scale lag-adjusted estimator}
+##'    \item{EM.rel.cfr.chain }{a vector of the EM algorithm iterates of the lag-adjusted relative CFR estimates}
+##'    \item{EMiter}{the number of iterations needed for the EM algorithm to converge}
+##'    \item{EMconv}{indicator for convergence of the EM algorithm.  0 indicates all paramters converged within max.iter iterations.  1 indicates that the estimate of the relative case fatality ratio converged but other did not.  2 indicates that the relative case fatality ratio did not converge.}
+##'    \item{SEMconv}{indicator for convergence of SEM algorithm.  Same scheme as EMconv.}  
+##'    \item{ests}{ the coefficient estimates for the model }
+##'    \item{ests.chain}{ a matrix with all of the coefficient estimates, at each EM iteration}
+##'    \item{DM}{the DM matrix from the SEM algorithm}
+##'    \item{DMiter}{a vector showing how many iterations it took for the variance component to converge in the SEM algorithm}
+##'  }
+##'  @examples        
+##'     ## This is code from the CFR vignette provided in the documentation.
+##'        
+##' data(simulated.outbreak.deaths)
+##' min.cases <- 10 
+##' N.1 <- simulated.outbreak.deaths[1:60, "N"] 
+##' N.2 <- simulated.outbreak.deaths[61:120, "N"] 
+##' first.t <- min(which(N.1 > min.cases & N.2 > min.cases)) 
+##' last.t <- max(which(N.1 > min.cases & N.2 > min.cases)) 
+##' idx.for.Estep <- first.t:last.t 
+##' new.times <- 1:length(idx.for.Estep) 
+##' simulated.outbreak.deaths <- cbind(simulated.outbreak.deaths, new.times = NA) 
+##' simulated.outbreak.deaths[c(idx.for.Estep, idx.for.Estep + 60), "new.times"] <- rep(new.times, + 2)
+##' assumed.nu = c(0, 0.3, 0.4, 0.3)
+##' alpha.start <- rep(0, 22)
+##'        
+##' ## caution! this next line may take several minutes (5-10, depanding on 
+##' ##    the speed of your machine) to run.
+##' \dontrun{cfr.ests <- EMforCFR(assumed.nu = assumed.nu, 
+##'                               alpha.start.values = alpha.start, 
+##'                               full.data = simulated.outbreak.deaths, 
+##'                               verb = FALSE, 
+##'                               SEM.var = TRUE, 
+##'                               max.iter = 500, 
+##'                               tol = 1e-05)}
+##' @keywords coarse data 
+##' @keywords incomplete data 
+##' @keywords case fatality ratio 
+##' @keywords infectious disease 
+##' @export
 EMforCFR <- function(assumed.nu, alpha.start.values, full.data,
 		     max.iter=50, verb=FALSE, tol=1e-10, SEM.var=TRUE){
 	## full.data is the data output from the observe.epidemic() function
@@ -161,6 +229,25 @@ EMforCFR <- function(assumed.nu, alpha.start.values, full.data,
 
 }
 
+
+## This function is meant to be run only through the function EMforCFR() 
+##   and is used to calculate the variance via the Supplemented EM 
+##   algorithm (see Meng and Rubin, 1991)
+
+## params:
+##   \item{full.data}{ A matrix of observed data. See description in EMforCFR helpfile.}
+##   \item{dat}{A data frame.}
+##   \item{phi}{ A vector of fitted parameters from the final EM iteration.}
+##   \item{max.iter}{ The maximum number of iterations for SEM algorithm. }
+##   \item{tol}{ A tolerance to use to test for convergence of the EM algorithm. }
+##   \item{nlag}{ The number of time units for lagged data.  Corresponds to length(assumed.nu).}  
+##   \item{alpha.start.values}{ a vector starting values for the reporting rate parameter of the GLM model. This must have length which corresponds to one less than the number of unique integer values of full.dat[,"new.times"].}
+##   \item{assumed.nu}{ a vector of probabilities corresponding to the survival distribution, i.e. nu[i]=Pr(surviving i days | fatal case) }
+
+## returned list:
+##    \item{DM}{The estimate of the variance-covariance matrix for the model parameters.  Only converged rows are returned.}
+##    \item{DMiter}{A vector whose ith entry is the number of iterations needed for convergence of the ith row of the DM matrix.}
+##    \item{loop.idx}{If not NULL, the values correspond to the original indices of DM which have been omitted because of lack of convergence.}
 SEM.variance <- function(full.data, dat, phi, max.iter, tol, nlag,
 			 alpha.start.values, assumed.nu){
 	## algorithm parameters
@@ -225,10 +312,22 @@ SEM.variance <- function(full.data, dat, phi, max.iter, tol, nlag,
 	if(length(loop.idx)>0)	DM <- DM[-loop.idx, -loop.idx]
 
 	DM.out <- list(DM=DM, DMiter=DMiter, loop.idx=loop.idx)
-
+	
 	return(DM.out)
 }
 
+
+## E-step of the EM algorithm.
+
+# \arguments{
+#  \item{alpha}{Current estimates of the alpha parameters from the GLM model.}
+#  \item{full.data}{ A matrix of observed data. See description in EMforCFR helpfile.}
+#  \item{nlag}{ The number of time units for lagged data.  Corresponds to length(assumed.nu).}  
+#  \item{assumed.nu}{ a vector of probabilities corresponding to the survival distribution, i.e. nu[i]=Pr(surviving i days | fatal case) }
+# }
+
+# \value{ A data matrix with the same format as full.data from the EMforCFR() documentation.
+# }
 
 run.Estep <- function(alpha, full.data, nlag, assumed.nu){
 
@@ -279,6 +378,18 @@ run.Estep <- function(alpha, full.data, nlag, assumed.nu){
 		     N=full.data[,"N"])
 	return(dat)
 }
+
+
+## the M-step
+
+# \arguments{
+#  \item{dat}{data matrix passed from EMforCFR().}
+# }
+
+# \value{ A list with two components
+#         \item{phi }{fitted vector of parameters}
+#         \item{Var }{variance-covariance matrix from the fitted model}
+# }
 
 run.Mstep <- function(dat){
 	subset <- which(dat[,"N"]>0)
