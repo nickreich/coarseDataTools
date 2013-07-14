@@ -1,4 +1,4 @@
-##' @name exp.win.lengths.rda 
+##' @name exp.win.lengths
 ##' @title Exposure window lengths from an influenza outbreak at a NYC school
 ##' @description A numeric vector of exposure window lengths taken from a dataset of doubly interval-censored incubation period observations.  All observations came from a NYC public school.  The outbreak has been described in full in Lessler et al. (see citation below). 
 ##' @docType data
@@ -8,7 +8,7 @@
 ##' @source Lessler J et al.  New England Journal of Medicine. Outbreak of 2009 Pandemic Influenza A (H1N1) at a New York City School. 2009. 361(27):2628-2636. \url{http://content.nejm.org/cgi/content/full/361/27/2628}
 ##' 
 ##' @examples
-##' data(exp.win.lengthsab)
+##' data(exp.win.lengths)
 ##' summary(exp.win.lengths)
 ##' hist(exp.win.lengths)
 ##' @keywords datasets

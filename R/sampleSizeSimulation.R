@@ -74,8 +74,7 @@ precision.simulation <- function(N,
 		stop("% of data that is type A must be between 0 and 1.")
 	if(is.null(exp.win.dat)){
 		if(verb) message("NYC exposure window data used")
-		#data("exp.win.lengths")
-		exp.win.dat <- get(data("exp.win.lengths"))
+		exp.win.dat <- get(data(exp.win.lengths, envir = environment()))
 	}
 
 	## TODO: add default exp.win.dat to package and load if NULL

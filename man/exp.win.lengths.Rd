@@ -1,6 +1,6 @@
 \docType{data}
-\name{exp.win.lengths.rda}
-\alias{exp.win.lengths.rda}
+\name{exp.win.lengths}
+\alias{exp.win.lengths}
 \title{Exposure window lengths from an influenza outbreak at a NYC school}
 \format{A numeric vector with 134 positive values.  Each value represents an exposure window length from an observation of the incubation period for that individual.  The exposure window length is the length of time during which exposure could have occured.  For example, if an individual could have been exposed anytime between 6am on Monday to 6am on Wednesday, her exposure window length would be 2 days.}
 \source{
@@ -17,7 +17,7 @@
   Lessler et al. (see citation below).
 }
 \examples{
-data(exp.win.lengthsab)
+data(exp.win.lengths)
 summary(exp.win.lengths)
 hist(exp.win.lengths)
 }

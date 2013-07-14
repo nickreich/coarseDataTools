@@ -18,7 +18,7 @@
 ##' not have a closed form for the percentiles. \code{dic.fit()} calculates
 ##' asymptotic SEs by default, or whenever the \code{n.boots} option is set to
 ##' 0. To compute bootstrap SEs, just set \code{n.boots} to be greater than
-##' zero. \code{\link{dic.fit.mcmc()}} also allows for Markov Chain Monte Carlo
+##' zero. \code{\link{dic.fit.mcmc}} also allows for Markov Chain Monte Carlo
 ##' fitting of these three parametric models and Erlang models as well.
 ##'
 ##'
