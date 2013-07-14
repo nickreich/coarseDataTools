@@ -217,7 +217,8 @@ dic.fit <- function(dat,
             ## get percentile estimates
             cis.ptiles <- apply(boot.funcs,1,function(x) quantile(x,c(.025,.975)))
             sds.ptiles <- apply(boot.funcs,1,sd)
-            quant.matrix <- matrix(c(untransformed.fit.params,ests,cis.params[1,],cis.ptiles[1,],cis.params[2,],cis.ptiles[2,],sds.params,sds.ptiles), nrow=2+1+length(ptiles), byrow=FALSE)
+            
+            quant.matrix <- matrix(c(untransformed.fit.params,ests,cis.params[1,],cis.ptiles[1,],cis.params[2,],cis.ptiles[2,],sds.params,sds.ptiles), nrow=2+length(ptiles.appended), byrow=FALSE)
             ## deal with row and column names
             ptiles.names <- paste0("p", 100*ptiles.appended)
             rownames(quant.matrix) <- c(param1.name, param2.name, ptiles.names)
