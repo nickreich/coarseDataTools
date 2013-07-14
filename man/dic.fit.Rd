@@ -1,6 +1,6 @@
 \name{dic.fit}
 \alias{dic.fit}
-\title{Fits a log-normal, gamma, Erlang, or Weibull model to doubly interval
+\title{Fits a log-normal, gamma, or Weibull model to doubly interval
 censored survival data}
 \usage{
   dic.fit(dat, start.par2 = log(2),

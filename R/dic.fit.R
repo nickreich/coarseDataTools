@@ -1,4 +1,4 @@
-##' Fits a log-normal, gamma, Erlang, or Weibull model to doubly interval
+##' Fits a log-normal, gamma, or Weibull model to doubly interval
 ##' censored survival data
 ##'
 ##' \code{dic.fit} fits a parametric accelerated failure time model to survival
