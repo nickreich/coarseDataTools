@@ -57,7 +57,7 @@ setClass("cd.fit",
 ##'
 ##' @name cd.fit.mcmc
 ##' @rdname cd.fit.mcmc
-##' @aliases cd.fit-class
+##' @aliases cd.fit.mcmc-class
 ##' @exportClass cd.fit
 setClass("cd.fit.mcmc",
          contains="cd.fit")
@@ -91,8 +91,8 @@ setMethod("show","cd.fit.mcmc",function(object){
 ##'
 ##' returns the log-likelihood of a cd.fit object
 ##'
-##' @export
-##' @param object cd.fit object
+##' @rdname logLik-methods
+##' @aliases logLik,character,character-method
 setMethod("logLik",
           "cd.fit",
           function(object){
@@ -103,13 +103,13 @@ setMethod("logLik",
 ##'
 ##' returns logliklihood evalauted at the posterior mean of each parameter
 ##'
-##' @export
-##' @param object cd.fit.mcmc object
+##' @rdname logLik-methods
+##' @aliases logLik,character,character-method
 setMethod("logLik",
           "cd.fit.mcmc",
           function(object){
               cat(sprintf("Likihood evaluated at posterior mean (%.2f,%.2f):\n",object@ests[1,1],object@ests[2,1]))
-              return(-loglikhd(object@ests[1:2,1],object@data,object@dist))
+              return(objct@loglik)
           })
 
 ##' For now this is going to plot the estimated survival
