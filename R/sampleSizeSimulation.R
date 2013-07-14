@@ -14,6 +14,50 @@
 ## pct.type.A = percent type A data, will be rounded up to nearest integer
 ## exp.win.dat = a vector of exposure window lengths to sample from
 ## verb = whether to print 10 iteration counts during the course of the sim
+
+
+##' @name precision.simulation
+##' @aliases precision.simulation.exact
+##' @aliases precision.simulation.coarse
+##' @aliases generate.coarse.data
+##'   
+##' @title Simulate incubation period analyses with coarse data
+##'   
+##' @description These functions simulate coarse incubation period data sets and
+##'   analyze them.  The goal is for these simulations to provide evidence for
+##'   how much information a given dataset contains about a characteristic of
+##'   the incubation period distribution.
+##'   
+##' @param N Overall sample size for the datasets to be simulated.
+##' @param med Median for the assumed log normal distribution of the incubation
+##'   periods.
+##' @param disp Dispersion for the assumed log normal distribution of the
+##'   incubation periods.
+##' @param percentile Percentile of the incubation period distribution which we
+##'   want to estimate.
+##' @param nsim Number of datasets to analyze in the simulation.
+##' @param exact.data Either TRUE/FALSE.  Incidates whether the data generated
+##'   should be coarsened at all.  If TRUE, pct.type.A and exp.win.dat are
+##'   ignored.
+##' @param pct.type.A Percent of the N observations that are assumed to be type
+##'   A data.  If N*pct.type.A is not an integer, it will be rounded to the
+##'   nearest integer.
+##' @param exp.win.dat A vector of exposure window lengths.  Defaults to the
+##'   observed window lengths from Lessler et al. (see below).
+##' @param verb If TRUE, a message with the system time and iteration number
+##'   will be printed ten times during the simulation run.
+##'   
+##'   
+##' @rdname precision.simulation
+##' @return The \code{precision.simulation} functions return a matrix with four
+##'   columns and nsim rows.  The "ests" column gives the estimated percentiles
+##'   for the incubation period distribution.  The "SE" column gives the
+##'   standard error for the estimate.  The "conv" column is 1 if the doubly
+##'   interval-censored likelihood maximization converged.  Otherwise, it is 0.
+##'   The "bias" column gives the estimated percentile - true percentile. The
+##'   \code{generate.coarse.data} function returns a matrix with data suitable
+##'   for analysis by the \code{dic.fit} function.
+##' @export
 precision.simulation <- function(N,
 			       med=2,
 			       disp=1.3,
@@ -61,7 +105,8 @@ precision.simulation <- function(N,
 	return(out)
 }
 
-
+##' @rdname precision.simulation
+##' @export
 precision.simulation.exact <- function(N,
                                        med,
                                        disp,
@@ -98,7 +143,8 @@ precision.simulation.exact <- function(N,
     return(storage)
 }
 
-
+##' @rdname precision.simulation
+##' @export
 precision.simulation.coarse <- function(N,
 				      med,
 				      disp,
@@ -135,7 +181,8 @@ precision.simulation.coarse <- function(N,
 }
 
 
-
+##' @rdname precision.simulation
+##' @export
 generate.coarse.data <- function(N, med, disp, pct.type.A, exp.win.dat) {
 
  	n.type.A <- round(N*pct.type.A)

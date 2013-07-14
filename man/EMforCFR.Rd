@@ -1,6 +1,7 @@
 \name{EMforCFR}
 \alias{EMforCFR}
-\title{A function to estimate the relative case fatality ratio when reporting rates are time-varying and deaths are lagged because of survival time.}
+\title{A function to estimate the relative case fatality ratio when reporting rates
+are time-varying and deaths are lagged because of survival time.}
 \usage{
   EMforCFR(assumed.nu, alpha.start.values, full.data,
     max.iter = 50, verb = FALSE, tol = 1e-10, SEM.var =

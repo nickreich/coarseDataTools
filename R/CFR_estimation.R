@@ -1,44 +1,57 @@
 ### function defining the EM algorithm for the CFR estimates
 
-##' A function to estimate the relative case fatality ratio when reporting rates are time-varying and deaths are lagged because of survival time.  
+##' A function to estimate the relative case fatality ratio when reporting rates
+##' are time-varying and deaths are lagged because of survival time.
 ##' 
-##' This function implements an EM algorithm to estimate the relative case fatality ratio between two groups when reporting rates are time-varying and deaths are lagged because of survival time.
+##' This function implements an EM algorithm to estimate the relative case
+##' fatality ratio between two groups when reporting rates are time-varying and
+##' deaths are lagged because of survival time.
 ##' @usage EMforCFR(assumed.nu, alpha.start.values, full.data, max.iter = 50, 
-##'      verb = FALSE, tol = 1e-10, SEM.var = TRUE)
-##'      
-##' @param assumed.nu  a vector of probabilities corresponding to the survival distribution, i.e. nu[i]=Pr(surviving i days | fatal case)
-##' @param alpha.start.values a vector starting values for the reporting rate parameter of the GLM model. This must have length which corresponds to one less than the number of unique integer values of full.dat[,"new.times"].
+##'   verb = FALSE, tol = 1e-10, SEM.var = TRUE)
+##'   
+##' @param assumed.nu  a vector of probabilities corresponding to the survival
+##'   distribution, i.e. nu[i]=Pr(surviving i days | fatal case)
+##' @param alpha.start.values a vector starting values for the reporting rate
+##'   parameter of the GLM model. This must have length which corresponds to one
+##'   less than the number of unique integer values of full.dat[,"new.times"].
 ##' @param full.data  A matrix of observed data. See description below.
-##' @param max.iter The maximum number of iterations for the EM algorithm and the accompanying SEM algorithm (if used). 
-##' @param verb An indicator for whether the function should print results as it runs. 
-##' @param tol A tolerance to use to test for convergence of the EM algorithm. 
-##' @param SEM.var If TRUE, the SEM algorithm will be run in addition to the EM algorithm to calculate the variance of the parameter estimates. 
-##' 
-##' @details The data matrix full.data must have the following columns:
-##' \describe{
-##'     \item{grp}{a 1 or a 2 indicating which of the two groups, j,  the observation is for.}
-##'     \item{new.times}{an integer value representing the time, t, of observation.}
-##'     \item{R}{the count of recovered cases with onset at time t in group j.}
-##'     \item{D}{the count of deaths which occured at time t in groupo j (note that these deaths did not have disease onset at time t but rather died at time t).}
-##'     \item{N}{the total cases at t, j, or the sum of R and D columns.}
-##' }
-##'     
-##' @return A list with the following elements
-##' \describe{
-##'    \item{naive.rel.cfr }{the naive estimate of the relative case fatality ratio}
-##'    \item{glm.rel.cfr }{the reporting-rate-adjusted estimate of the relative case fatality ratio}
-##'    \item{EM.rel.cfr }{the lag-adjusted estimate of the relative case fatality ratio}
-##'    \item{EM.re.cfr.var }{the variance for the log-scale lag-adjusted estimator taken from the final M-step}
-##'    \item{EM.rel.cfr.var.SEM }{ the Supplemented EM algorithm variance for the log-scale lag-adjusted estimator}
-##'    \item{EM.rel.cfr.chain }{a vector of the EM algorithm iterates of the lag-adjusted relative CFR estimates}
-##'    \item{EMiter}{the number of iterations needed for the EM algorithm to converge}
-##'    \item{EMconv}{indicator for convergence of the EM algorithm.  0 indicates all paramters converged within max.iter iterations.  1 indicates that the estimate of the relative case fatality ratio converged but other did not.  2 indicates that the relative case fatality ratio did not converge.}
-##'    \item{SEMconv}{indicator for convergence of SEM algorithm.  Same scheme as EMconv.}  
-##'    \item{ests}{ the coefficient estimates for the model }
-##'    \item{ests.chain}{ a matrix with all of the coefficient estimates, at each EM iteration}
-##'    \item{DM}{the DM matrix from the SEM algorithm}
-##'    \item{DMiter}{a vector showing how many iterations it took for the variance component to converge in the SEM algorithm}
-##'  }
+##' @param max.iter The maximum number of iterations for the EM algorithm and
+##'   the accompanying SEM algorithm (if used).
+##' @param verb An indicator for whether the function should print results as it
+##'   runs.
+##' @param tol A tolerance to use to test for convergence of the EM algorithm.
+##' @param SEM.var If TRUE, the SEM algorithm will be run in addition to the EM
+##'   algorithm to calculate the variance of the parameter estimates.
+##'   
+##' @details The data matrix full.data must have the following columns: 
+##'   \describe{ \item{grp}{a 1 or a 2 indicating which of the two groups, j, 
+##'   the observation is for.} \item{new.times}{an integer value representing
+##'   the time, t, of observation.} \item{R}{the count of recovered cases with
+##'   onset at time t in group j.} \item{D}{the count of deaths which occured at
+##'   time t in groupo j (note that these deaths did not have disease onset at
+##'   time t but rather died at time t).} \item{N}{the total cases at t, j, or
+##'   the sum of R and D columns.} }
+##'   
+##' @return A list with the following elements \describe{ \item{naive.rel.cfr
+##'   }{the naive estimate of the relative case fatality ratio} 
+##'   \item{glm.rel.cfr }{the reporting-rate-adjusted estimate of the relative
+##'   case fatality ratio} \item{EM.rel.cfr }{the lag-adjusted estimate of the
+##'   relative case fatality ratio} \item{EM.re.cfr.var }{the variance for the
+##'   log-scale lag-adjusted estimator taken from the final M-step} 
+##'   \item{EM.rel.cfr.var.SEM }{ the Supplemented EM algorithm variance for the
+##'   log-scale lag-adjusted estimator} \item{EM.rel.cfr.chain }{a vector of the
+##'   EM algorithm iterates of the lag-adjusted relative CFR estimates} 
+##'   \item{EMiter}{the number of iterations needed for the EM algorithm to
+##'   converge} \item{EMconv}{indicator for convergence of the EM algorithm.  0
+##'   indicates all paramters converged within max.iter iterations.  1 indicates
+##'   that the estimate of the relative case fatality ratio converged but other
+##'   did not.  2 indicates that the relative case fatality ratio did not
+##'   converge.} \item{SEMconv}{indicator for convergence of SEM algorithm. 
+##'   Same scheme as EMconv.} \item{ests}{ the coefficient estimates for the
+##'   model } \item{ests.chain}{ a matrix with all of the coefficient estimates,
+##'   at each EM iteration} \item{DM}{the DM matrix from the SEM algorithm} 
+##'   \item{DMiter}{a vector showing how many iterations it took for the
+##'   variance component to converge in the SEM algorithm} }
 ##'  @examples        
 ##'     ## This is code from the CFR vignette provided in the documentation.
 ##'        
@@ -64,10 +77,10 @@
 ##'                               SEM.var = TRUE, 
 ##'                               max.iter = 500, 
 ##'                               tol = 1e-05)}
-##' @keywords coarse data 
-##' @keywords incomplete data 
-##' @keywords case fatality ratio 
-##' @keywords infectious disease 
+##' @keywords coarse data
+##' @keywords incomplete data
+##' @keywords case fatality ratio
+##' @keywords infectious disease
 ##' @export
 EMforCFR <- function(assumed.nu, alpha.start.values, full.data,
 		     max.iter=50, verb=FALSE, tol=1e-10, SEM.var=TRUE){
