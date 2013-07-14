@@ -58,7 +58,7 @@ setClass("cd.fit",
 ##' @name cd.fit.mcmc
 ##' @rdname cd.fit.mcmc
 ##' @aliases cd.fit.mcmc-class
-##' @exportClass cd.fit
+##' @exportClass cd.fit.mcmc
 setClass("cd.fit.mcmc",
          contains="cd.fit")
 
@@ -86,44 +86,40 @@ setMethod("show","cd.fit.mcmc",function(object){
     cat(sprintf("Note: please check that the MCMC converged on the target distribution by running multiple chains. MCMC samples are available in the mcmc slot (e.g. my.fit@mcmc) \n"))
 })
 
-
-##' log likelihood of a cd.fit object
-##'
-##' returns the log-likelihood of a cd.fit object
-##'
-##' @rdname logLik-methods
-##' @aliases logLik,character,character-method
+#' Get the log-likelihood value of a \code{cd.fit} or \code{cd.fit.mcmc} object
+#'
+#' @param object A \code{cd.fit} or \code{cd.fit.mcmc} object.
+#'
+#' @return log-likelihood value
+#'
+#' @rdname logLik-methods
+#' @aliases logLik logLik,cd.fit-method
+#' @export
 setMethod("logLik",
           "cd.fit",
           function(object){
               object@loglik
           })
 
-##' log likelihood of a cd.fit.mcmc object
-##'
-##' returns logliklihood evalauted at the posterior mean of each parameter
-##'
-##' @rdname logLik-methods
-##' @aliases logLik,character,character-method
-setMethod("logLik",
-          "cd.fit.mcmc",
-          function(object){
-              cat(sprintf("Likihood evaluated at posterior mean (%.2f,%.2f):\n",object@ests[1,1],object@ests[2,1]))
-              return(objct@loglik)
-          })
-
-##' For now this is going to plot the estimated survival
-##' function and if bootstrap or mcmc samples are present, it will plot these samples with alpha
+##' Plots the estimated survival function with an option to plot the posterior draws or bootstraps behind the fit
+##' 
+##' @param x \code{cd.fit} or \code{cd.fit.mcmc} object
+##' 
+##' @param col.main color for plotting the main estimate
+##' 
+##' @param col.samps color for the samples (should include some alpha transparency)
+##' 
+##' @param plot.n.samps how many posterior or boostrap samples do you want to plot?
+##' 
+##' @param add will add to exisiting plot
+##' 
+##' @param ... other options to pass to plot
+##' @rdname plot-methods
+##' @aliases plot plot,cd.fit-method
 ##' @export
-##' @param x cd.fit object
-##' @param col.main - color for plotting the main estimate
-##' @param col.samps - color for the samples (should include some alpha transparency)
-##' @param plot.n.samps - how many posterior or boostrap samples do you want to plot?
-##' @param add - will add to exisiting plot
-##' @param ... - other options to pass to plot
 setMethod("plot",
           "cd.fit",
-          function(x,
+          function(x,y,
                    col.main=rgb(230, 85, 13,maxColorValue=255),
                    col.samps=rgb(99,99,99,10,maxColorValue=255),
                    plot.n.samps=200,

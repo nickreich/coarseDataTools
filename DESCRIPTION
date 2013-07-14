@@ -10,7 +10,8 @@ URL: http://cran.r-project.org/package=coarseDataTools
 Depends:
     survival,
     MCMCpack,
-    methods
+    methods,
+    graphics
 Description: This package contains functions to analyze coarse data.
     Specifically, it contains functions to (1) fit parametric accelerated
     failure time models to interval-censored survival time data, and (2)
