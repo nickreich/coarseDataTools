@@ -13,38 +13,40 @@ as implemented in MCMCpack.}
 \arguments{
   \item{dat}{the data}
 
-  \item{prior.par1}{vector of first prior parameters}
+  \item{prior.par1}{vector of first prior parameters for
+  each model parameter}
 
-  \item{prior.par2}{vector of second prior parameters}
+  \item{prior.par2}{vector of second prior parameters for
+  each model parameter}
 
   \item{init.pars}{the initial parameter values (vector
   length = 2 )}
 
-  \item{ptiles}{what percentiles of the incubation period
-  to return estimates for}
+  \item{ptiles}{returned percentiles of the survival
+  survival distrbution}
 
   \item{verbose}{how often do you want a print out from
-  MCMCpack on iteration number and MH acceptance rate}
+  MCMCpack on iteration number and M-H acceptance rate}
 
   \item{burnin}{number of burnin samples}
 
   \item{n.samples}{number of samples to draw from the
-  posterior}
+  posterior (after the burnin)}
 
   \item{dist}{distribution to be used (L for log-normal,W
   for weibull, G for Gamma, and E for erlang)}
 
-  \item{...}{additional parameters to MCMCmetrop1R}
+  \item{...}{additional parameters to \link{MCMCmetrop1R}}
 }
 \value{
   a cd.fit.mcmc S4 object
 }
 \description{
-  Similar to \code{dic.fit} but uses MCMC instead of a
-  direct likelihood optimization routine to fit the model.
-  Currently, four distributions are supported: log-normal,
-  gamma, Weibull, and Erlang. See Details for prior
-  specification.
+  Similar to \code{\link{dic.fit}} but uses MCMC instead of
+  a direct likelihood optimization routine to fit the
+  model. Currently, four distributions are supported:
+  log-normal, gamma, Weibull, and Erlang. See Details for
+  prior specification.
 }
 \details{
   The following models are used: \deqn{Log-normal model:

@@ -1,7 +1,7 @@
 ##' Fits the distribution to the passed-in data using MCMC
 ##' as implemented in MCMCpack.
 ##'
-##' Similar to \code{dic.fit} but uses MCMC instead of a direct likelihood optimization routine to fit the model. Currently, four distributions are supported: log-normal, gamma, Weibull, and Erlang. See Details for prior specification.
+##' Similar to \code{\link{dic.fit}} but uses MCMC instead of a direct likelihood optimization routine to fit the model. Currently, four distributions are supported: log-normal, gamma, Weibull, and Erlang. See Details for prior specification.
 ##'
 ##' The following models are used:
 ##' \deqn{Log-normal model: f(x) = \frac{1}{x*\sigma \sqrt{2 * \pi}} exp\{-\frac{(\log x - \mu)^2}{2 * \sigma^2}\}}
@@ -16,15 +16,15 @@
 ##' \deqn{Erlang Default Prior Specification: p(k,\theta) \propto 1}
 ##'
 ##' @param dat the data
-##' @param prior.par1 vector of first prior parameters
-##' @param prior.par2 vector of second prior parameters
+##' @param prior.par1 vector of first prior parameters for each model parameter 
+##' @param prior.par2 vector of second prior parameters for each model parameter
 ##' @param init.pars the initial parameter values (vector length = 2 )
-##' @param ptiles what percentiles of the incubation period to return estimates for
-##' @param verbose how often do you want a print out from MCMCpack on iteration number and MH acceptance rate
+##' @param ptiles returned percentiles of the survival survival distrbution
+##' @param verbose how often do you want a print out from MCMCpack on iteration number and M-H acceptance rate
 ##' @param burnin number of burnin samples
-##' @param n.samples number of samples to draw from the posterior
+##' @param n.samples number of samples to draw from the posterior (after the burnin)
 ##' @param dist distribution to be used (L for log-normal,W for weibull, G for Gamma, and E for erlang)
-##' @param ... additional parameters to MCMCmetrop1R
+##' @param ... additional parameters to \link{MCMCmetrop1R}
 ##' @return a cd.fit.mcmc S4 object
 ##' @export
 dic.fit.mcmc <- function(dat,

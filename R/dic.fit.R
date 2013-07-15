@@ -38,10 +38,8 @@
 ##' @param par2.int the log-scale interval of possible dispersion values
 ##' @param ptiles percentiles of interest
 ##' @param dist what distribution to use to fit the data. Default "L" for
-##'   log-normal. "G" for gamma, and "W" for Weibull. Note: If dist is Gamma (G)
-##'   or Weibull (W), the mu refers to the shape and sigma refers to the scale
-##'   param.
-##' @param n.boots number of bootstrap resamples
+##'   log-normal. "G" for gamma, and "W" for Weibull. 
+##' @param n.boots number of bootstrap resamples (0 means that asymptotic results are desired)
 ##' @param ... additional options passed to optim
 ##' @return a cd.fit S4 object.
 ##' @seealso \code{\link{cd.fit}}, \code{\link{dic.fit.mcmc}}

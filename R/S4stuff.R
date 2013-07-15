@@ -111,7 +111,7 @@ setMethod("logLik",
 ##' 
 ##' @param plot.n.samps how many posterior or boostrap samples do you want to plot?
 ##' 
-##' @param add will add to exisiting plot
+##' @param add add to exisiting plot?
 ##' 
 ##' @param ... other options to pass to plot
 ##' @rdname plot-methods

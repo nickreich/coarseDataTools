@@ -6,7 +6,8 @@ distribution and its parameters.}
   loglikhd(pars, dat, dist)
 }
 \arguments{
-  \item{pars}{vector of the transformed parameters}
+  \item{pars}{vector of the transformed (estimation scale)
+  parameters}
 
   \item{dat}{a dataset, as in \code{dic.fit}}
 

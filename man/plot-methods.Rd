@@ -13,7 +13,7 @@
   \item{plot.n.samps}{how many posterior or boostrap
   samples do you want to plot?}
 
-  \item{add}{will add to exisiting plot}
+  \item{add}{add to exisiting plot?}
 
   \item{...}{other options to pass to plot}
 }
