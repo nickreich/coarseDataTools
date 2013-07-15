@@ -179,8 +179,8 @@ dic.fit.mcmc <- function(dat,
                 est.pars[3:nrow(est.pars),1:3] <- cis.ptiles
 
                 ## finally get the loglikelihood evaluated at the mean posterior for each parameter
-                ll <- -loglikhd(est.pars[1:2,1],data.frame(dat),dist)                                
-                
+                ll <- -loglikhd(pars=dist.optim.transform(dist=dist,est.pars[1:2,1]),dat=data.frame(dat),dist=dist)                                
+
                 rc <- new("cd.fit.mcmc",
                           ests=round(est.pars,3),
                           conv = numeric(),
