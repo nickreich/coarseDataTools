@@ -431,7 +431,7 @@ exactlik <- function(par1, par2, EL, ER, SL, SR, dist){
 
 ##' Negative log likelihood for a dataset of interval-censored data, given a
 ##' distribution and its parameters.
-##' @param pars vector of the transformed parameters
+##' @param pars vector of the transformed (estimation scale) parameters
 ##' @param dat a dataset, as in \code{dic.fit}
 ##' @param dist a distribution, as in \code{dic.fit}
 ##'

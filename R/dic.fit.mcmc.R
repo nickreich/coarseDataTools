@@ -178,7 +178,8 @@ dic.fit.mcmc <- function(dat,
                 cis.ptiles <- t(apply(mcmc.quantiles,1,function(x) quantile(x,c(0.5,.025,.975))))
                 est.pars[3:nrow(est.pars),1:3] <- cis.ptiles
 
-                ## finally get the loglikelihood evaluated at the mean posterior for each parameter
+                ## finally get the loglikelihood evaluated at the mean posterior for each parameter 
+                ## a bit sloppy since the loglikhd function expects the parameters on the estimation scale not the reporting scale
                 ll <- -loglikhd(pars=dist.optim.transform(dist=dist,est.pars[1:2,1]),dat=data.frame(dat),dist=dist)                                
 
                 rc <- new("cd.fit.mcmc",
