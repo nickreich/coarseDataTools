@@ -1,0 +1,38 @@
+\name{mcmc.erlang}
+\alias{mcmc.erlang}
+\title{Does a metropolis hastings for the Erlang distribution}
+\usage{
+  mcmc.erlang(dat, prior.par1, prior.par2, init.pars,
+    verbose, burnin, n.samples, sds = c(1, 1))
+}
+\arguments{
+  \item{dat}{the data to fit}
+
+  \item{prior.par1}{mean of priors. A negative binomial
+  (for shape) and a normal for log(scale)}
+
+  \item{prior.par2}{dispersion parameters for priors,
+  dispersion for negative binomial, log scale sd for
+  normal}
+
+  \item{init.pars}{the starting parameters on the reporting
+  scale}
+
+  \item{verbose}{how often to print an update}
+
+  \item{burnin}{how many burnin iterations to do}
+
+  \item{n.samples}{the number of samples to keep and report
+  back}
+
+  \item{sds}{the standard deviations for the proposal
+  distribution}
+}
+\value{
+  a matrix of n.samples X 2 parameters, on the estimation
+  scale
+}
+\description{
+  Does a metropolis hastings for the Erlang distribution
+}
+
