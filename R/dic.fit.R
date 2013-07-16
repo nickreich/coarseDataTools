@@ -462,8 +462,12 @@ exactlik <- function(par1, par2, EL, ER, SL, SR, dist){
 ##'   distribution.
 ##' @export
 loglikhd <- function(pars, dat, dist) {
+  
+    #if the distribution is erlanf transform correctly for gamma
+    if (dist=="E") {return(loglikhd(c(log(pars[1]),pars[2]),dat,dist="G"))}
+    
     ## calculates the log-likelihood of DIC data
-    ## dat must have EL, ER, SL, SR and type columns
+    ## dat must have EL, ER, SL, SR and type columns  
 
     ## expecting transformed params from optimiztion
     ## e.g. for log-normal expecting c(meanlog,log(sdlog))
@@ -582,7 +586,8 @@ dist.optim.transform <- function(dist,pars){
     } else if (dist == "W"){
         return(log(pars)) # for shape and scale
     } else if (dist == "E"){
-        return(log(pars))
+        #shape not transformed, logged
+        return(c(pars[1],log(pars[2])))
     } else if (dist == "L"){
         return(c(pars[1],log(pars[2]))) # for meanlog, sdlog
     } else {
@@ -598,10 +603,8 @@ dist.optim.untransform <- function(dist,pars){
     } else if (dist == "W"){
         return(exp(pars)) # for shape and scale
     } else if (dist == "E"){
-        ## we want shape to be restricted to integers
-        tmp <- exp(pars)
-        tmp[1] <- round(tmp[1],0)
-        return(tmp)
+        #shape identity, scale logged in estimation scale        
+        return(c(pars[1],exp(pars[2])))
     } else if (dist == "L"){
         return(c(pars[1],exp(pars[2]))) # for meanlog, sdlog
     } else {

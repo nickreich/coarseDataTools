@@ -46,69 +46,8 @@ dic.fit.mcmc <- function(dat,
         ## check to make sure distribution is supported
         if(!dist %in% c("G","W","L","E")) stop("Please use one of the following distributions Log-Normal (L) , Weibull (W), Gamma (G), or Erlang (E)")
 
-        ## log liklihood function to pass to MCMCpack sampler
-        local.ll <- function(pars,
-                             dat,
-                             prior.par1,
-                             prior.par2,
-                             dist) {
-
-                ## get parameters on untransformed scale
-                pars.untrans <- dist.optim.untransform(dist,pars)
-
-                if (dist == "L"){
-                        ## default gamma on scale param and (inproper) uniform on location
-                        ll <- tryCatch(-loglikhd(pars,dat,dist) +
-                                               ## dgamma(pars.untrans[2],shape=par.prior.param1[2],
-                                               ## rate=par.prior.param2[2],log=T),
-                                               sum(dnorm(pars.untrans,
-                                                         prior.par1,
-                                                         prior.par2,log=T)),
-                                       error=function(e) {
-                                               warning("Loglik failure, returning -Inf")
-                                               return(-Inf)
-                                       })
-
-                } else if (dist == "W"){
-                        ## using normal prior on the first param and gamma on second
-                        ll <- tryCatch(
-                                -loglikhd(pars,dat,dist) +
-                                        dnorm(pars.untrans[1],
-                                              prior.par1[1],
-                                              prior.par2[1],log=T) +
-                                        dgamma(pars.untrans[2],
-                                               shape=prior.par1[2],
-                                               rate=prior.par2[2],log=T),
-                                error=function(e) {
-                                        warning("Loglik failure, returning -Inf")
-                                        return(-Inf)
-                                })
-                } else if (dist == "G"){
-                        ## using "non-informative" prior 1/scale for the joint prior \pi(a,b) \propto \frac{1}{\beta})
-                    ll <- tryCatch(-loglikhd(pars,dat,dist)
-                                       +
-                                   log(1/pars.untrans[2]*sqrt(pars.untrans[1]*trigamma(pars.untrans[1])-1))
-                                   ,
-                                   error=function(e) {
-                                       warning("Loglik failure, returning -Inf")
-                                       return(-Inf)
-                                   })
-
-                } else if (dist == "E"){ # for Erlang
-                        ## Erlang is just a gamma so we are going to use this trick
-                        ll <- tryCatch(-loglikhd(pars,dat,dist="G"),
-                                       # no priors for now will add later
-                                       error=function(e) {
-                                               warning("Loglik failure, returning -Inf")
-                                               return(-Inf)
-                                       })
-
-                } else {
-                        stop("Sorry, unknown distribution type. Check the 'dist' option.")
-                }
-                return(ll)
-        }
-
+        
+              
         cat(sprintf("Running %.0f MCMC iterations \n",n.samples+burnin))
 
         msg <- NULL
@@ -118,9 +57,12 @@ dic.fit.mcmc <- function(dat,
 
         ## initial parameters set on reporting scale not estimation scale
         init.pars.trans <- dist.optim.transform(dist,init.pars)
-
-        tryCatch(
-            mcmc.run <- MCMCmetrop1R(fun=local.ll,
+  
+      
+        if (dist!="E") {
+          #use MCMC pack for effieciency for distibutions with 2 continuous parameters
+          tryCatch(            
+              mcmc.run <- MCMCmetrop1R(fun=mcmcpack.ll,
                                           theta.init=init.pars.trans,
                                           burnin = burnin,
                                           mcmc=n.samples,
@@ -139,6 +81,19 @@ dic.fit.mcmc <- function(dat,
                          msg <<- w$message
                          fail <<- TRUE
                  })
+        } else {
+          #Use the custom metropolis hastings algorithm for erlang
+          mcmc.run <- mcmc.erlang(dat, 
+                                  prior.par1,
+                                  prior.par2,
+                                  init.pars, 
+                                  verbose,
+                                  burnin,
+                                  n.samples,
+                                  ...)
+        }
+        
+        
 
         if (!fail){
                 ## untransform MCMC parameter draws to natural scale
@@ -173,15 +128,14 @@ dic.fit.mcmc <- function(dat,
                 colnames(est.pars) <- c("est","CIlow", "CIhigh")
                 rownames(est.pars) <- c(par1.name,par2.name,paste0("p", 100*ptiles.appended))
 
+                #making the matrix with the actual estimates.
                 est.pars[1,] <- quantile(untrans.mcmcs[,1], c(0.5,0.025,0.975))
                 est.pars[2,] <- quantile(untrans.mcmcs[,2], c(0.5,0.025,0.975))
                 cis.ptiles <- t(apply(mcmc.quantiles,1,function(x) quantile(x,c(0.5,.025,.975))))
                 est.pars[3:nrow(est.pars),1:3] <- cis.ptiles
 
-                ## finally get the log-likelihood evaluated at the mean posterior for each parameter 
-                ## a bit sloppy since the loglikhd function expects the parameters on the estimation scale not the reporting scale
-                dist.tmp <- ifelse(dist == "E","G",dist) # we need to trick the likelihood function for Erlang
-                ll <- -loglikhd(pars=dist.optim.transform(dist=dist,est.pars[1:2,1]),dat=data.frame(dat),dist=dist.tmp)                                
+                ## finally get tbhe log-likelihood evaluated at the mean posterior for each parameter                            
+                ll <- -loglikhd(pars=dist.optim.transform(dist=dist,est.pars[1:2,1]),dat=data.frame(dat),dist=dist)                                
 
                 rc <- new("cd.fit.mcmc",
                           ests=round(est.pars,3),
@@ -203,3 +157,177 @@ dic.fit.mcmc <- function(dat,
             stop(sprintf("\n%s\nTry adjusting the starting parameters (init.pars), or changing the optimization method (opt.method).",msg))
         }
     }
+
+
+
+
+
+
+##' posterior log likelihood function to pass to MCMCpack sampler
+##'
+##' @param pars the parameters to calculate the ll at
+##' @param dat the date to base it on
+##' @param prior.par1 first parameter of each prior
+##' @param prior.par2 second parameter of each prior
+##' @param dist the distribution the likelihood is being calculated for  
+##' 
+##' @return the posterior log likelihood
+mcmcpack.ll <- function(pars,
+                     dat,
+                     prior.par1,
+                     prior.par2,
+                     dist) {
+  
+  
+  
+  ## get parameters on untransformed scale
+  pars.untrans <- dist.optim.untransform(dist,pars)
+  
+  
+  
+  if (dist == "L"){
+    ## default gamma on scale param and (inproper) uniform on location
+    ll <- tryCatch(-loglikhd(pars,dat,dist) +
+                     ## dgamma(pars.untrans[2],shape=par.prior.param1[2],
+                     ## rate=par.prior.param2[2],log=T),
+                     sum(dnorm(pars.untrans,
+                               prior.par1,
+                               prior.par2,log=T)),
+                   error=function(e) {
+                     warning("Loglik failure, returning -Inf")
+                     return(-Inf)
+                   })
+    
+  } else if (dist == "W"){
+    ## using normal prior on the first param and gamma on second
+    ll <- tryCatch(
+      -loglikhd(pars,dat,dist) +
+        dnorm(pars.untrans[1],
+              prior.par1[1],
+              prior.par2[1],log=T) +
+        dgamma(pars.untrans[2],
+               shape=prior.par1[2],
+               rate=prior.par2[2],log=T),
+      error=function(e) {
+        warning("Loglik failure, returning -Inf")
+        return(-Inf)
+      })
+  } else if (dist == "G"){
+    ## using Jeffery's prior
+    ll <- tryCatch(-loglikhd(pars,dat,dist)
+                   +
+                     log(1/pars.untrans[2]*sqrt(pars.untrans[1]*trigamma(pars.untrans[1])-1))
+                   ,
+                   error=function(e) {
+                     warning("Loglik failure, returning -Inf")
+                     return(-Inf)
+                   })
+    
+  } else {
+    stop("Sorry, unknown distribution type. Check the 'dist' option.")
+  }
+  return(ll)
+}
+
+##' Does a metropolis hastings for the Erlang distribution 
+##' 
+##' @param dat the data to fit
+##' @param prior.par1 mean of priors. A negative binomial (for shape) and a normal for log(scale)
+##' @param prior.par2 dispersion parameters for priors, dispersion for negative binomial, log scale sd for normal
+##' @param init.pars the starting parameters on the reporting scale
+##' @param verbose how often to print an update
+##' @param burnin how many burnin iterations to do
+##' @param n.samples the number of samples to keep and report back
+##' @param sds the standard deviations for the proposal distribution
+##' 
+##' @return a matrix of n.samples X 2 parameters, on the estimation scale
+##' 
+mcmc.erlang <- function (dat, prior.par1, prior.par2, 
+                         init.pars, verbose, burnin, n.samples, sds=c(1,1)) {
+
+  #make a logging return matrix
+  states <- matrix(nrow=burnin+n.samples, ncol=4)
+  colnames(states) <- c("shape", "scale", "ll", "accept")
+  
+  #calculate the LL for the initial parameters. 
+  shape.cur <- init.pars[1]
+  scale.cur <- log(init.pars[2])
+  ll.cur <- -loglikhd(c(log(shape.cur),scale.cur), dat, dist="G") +
+      dnbinom(shape.cur, mu=prior.par1[1], size=prior.par2[1], log=T) +
+        dnorm(scale.cur, prior.par1[2], prior.par2[2], log=T)
+  
+  states[1,] <- c(shape.cur, scale.cur, ll.cur, 1)
+  
+  for (i in 2:(burnin+n.samples)) {
+    #propose new parameters
+    shape.prop <- shape.cur + round(rnorm(1,0,sds[1])) #discretized normal
+    scale.prop <- scale.cur + rnorm(1,0,sds[2])
+    
+    #calculate the liklihood using the new parameters...go ahead and do -Inf if shape is -
+    if (shape.prop<0) {
+      ll.prop <- -Inf
+    } else {
+      ll.prop <- -loglikhd(c(log(shape.prop),scale.prop), dat, dist="G") +
+        dnbinom(shape.prop, mu=prior.par1[1], size=prior.par2[1], log=T) +
+        dnorm(scale.prop, prior.par1[2], prior.par2[2], log=T)
+    }
+  
+    #accept or reject
+    l.alpha <- log(runif(1))
+    
+    
+    if ((ll.prop-ll.cur)>l.alpha) {
+      #accept
+      shape.cur <- shape.prop
+      scale.cur <- scale.prop
+      ll.cur <- ll.prop
+      states[i,] <- c(shape.cur, scale.cur, ll.cur, 1)
+    } else {
+      #reject
+      states[i,] <- c(shape.cur, scale.cur, ll.cur, 0)
+    }
+  
+    if (verbose !=0 & i%%verbose == 0) {
+        cat("Erlang MCMC iteration ",i," of ", burnin+n.samples,"\n")
+        cat("LL = ", ll.cur, "\n")
+        cat("theta = ", c(shape.cur, scale.cur),"\n")
+        cat("acceptance rate = ",sum(states[1:i,4])/i,"\n")
+    }
+  
+  }
+
+  rc <- states[(burnin+1):(burnin+n.samples),1:2]
+  return(rc)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
