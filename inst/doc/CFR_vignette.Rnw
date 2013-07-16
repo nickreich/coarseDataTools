@@ -16,7 +16,7 @@
 \section{Introduction to the data}
 
 The goal of this vignette is to provide a tutorial for implementing the
-case fatality ratio estimation methods available in the coarseDat%aTools R package.  To illustrate the methods, we will estimate a
+case fatality ratio estimation methods available in the coarseDataTools R package.  To illustrate the methods, we will estimate a
 relative case fatality ratio from a simulated outbreak dataset.
 
 
