@@ -82,23 +82,33 @@ dic.fit <- function(dat,
                            par2=start.par2, dat=dat,dist=dist)$min
     start.par2 <- optimize(f=pl.par2, interval=par2.int, par1=start.par1,
                            dat=dat,dist=dist)$min
+    
+    #cat("start.par1:", start.par1, " start.par2", start.par2, "\n") ##DEBUG
 
     ## find MLEs for doubly censored data using optim
     tmp <- list(convergence=1)
     msg <- NULL
     fail <- FALSE
-    tryCatch(tmp <- optim(par=c(start.par1, start.par2),
-                          method=opt.method, hessian=TRUE,
-                         # lower=c(log(0.5), log(log(1.04))),
-                          fn=loglikhd, dat=dat,dist=dist, ...),
-             error = function(e) {
-                 msg <<- e$message
-                 fail <<- TRUE
-             },
-             warning = function(w){
-                 msg <<- w$message
-                 fail <<- TRUE
-             })
+    
+    tmp <- optim(par=c(start.par1, start.par2),
+                 method=opt.method, hessian=TRUE,
+                 # lower=c(log(0.5), log(log(1.04))),
+                 fn=loglikhd, dat=dat,dist=dist, ...)
+    
+# LEADS TO BETTER ERROR MESSAGES    
+#     tryCatch(tmp <- optim(par=c(start.par1, start.par2),
+#                           method=opt.method, hessian=TRUE,
+#                          # lower=c(log(0.5), log(log(1.04))),
+#                           fn=loglikhd, dat=dat,dist=dist, ...),
+#              error = function(e) {
+#                print(e)
+#                  msg <<- e$message
+#                  fail <<- TRUE
+#              },
+#              warning = function(w){
+#                  msg <<- w$message
+#                  fail <<- TRUE
+#              })
 
     ## also, to catch a few more errors
     if(tmp$convergence!=0 || all(tmp$hessian==0) ){
@@ -107,12 +117,13 @@ dic.fit <- function(dat,
         fail <- TRUE
     }
 
-    ## back transform optim fit
-    untransformed.fit.params <- dist.optim.untransform(dist,tmp$par)
-
+        
     ## check if optimaization went well
     if(!fail){
-
+        ## back transform optim fit
+        untransformed.fit.params <- dist.optim.untransform(dist,tmp$par)
+      
+        
         ## always going to report median even if not requested
         ptiles.appended <- sort(union(0.5,ptiles))
 
@@ -253,13 +264,13 @@ dic.fit <- function(dat,
                 ests=matrix(NA, nrow=5, ncol=4),
                 conv = 0,
                 MSG = msg,
-                loglik=-tmp$value,
+                loglik=numeric(0),
                 samples = data.frame(),
                 data=data.frame(dat),
                 dist=dist,
-                inv.hessian = NULL,
+                inv.hessian = matrix(),
                 est.method = "Maximum Likelihood - optim",
-                ci.method = ci.method
+                ci.method = ""
                 )
             )
     }
@@ -462,6 +473,7 @@ exactlik <- function(par1, par2, EL, ER, SL, SR, dist){
 ##'   distribution.
 ##' @export
 loglikhd <- function(pars, dat, dist) {
+      
   
     #if the distribution is erlanf transform correctly for gamma
     if (dist=="E") {return(loglikhd(c(log(pars[1]),pars[2]),dat,dist="G"))}
@@ -479,11 +491,14 @@ loglikhd <- function(pars, dat, dist) {
     n <- nrow(dat)
     totlik <- 0
     for(i in 1:n){
+      #cat(i,"start\n") ##DEBUG
         totlik <- totlik + log(lik(par1, par2, type=dat[i,"type"],
                                        EL=dat[i,"EL"], ER=dat[i,"ER"],
                                        SL=dat[i,"SL"], SR=dat[i,"SR"],
                                        dist=dist))
+      #cat(i,"end = ", totlik, "\n") ##DEBUG
     }
+    
 
     return(-totlik) ## NB: NEEDS TO BE -totlik IF WE ARE MAXIMIZING USING OPTIM!
     ## May want to change this name later to reflect that is it negative log lik

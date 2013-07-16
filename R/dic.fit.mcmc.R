@@ -256,6 +256,10 @@ mcmc.erlang <- function (dat, prior.par1, prior.par2,
       dnbinom(shape.cur, mu=prior.par1[1], size=prior.par2[1], log=T) +
         dnorm(scale.cur, prior.par1[2], prior.par2[2], log=T)
   
+  if(ll.cur==-Inf) {
+    stop("zero starting likelihood. check priors are appropriate for Erlang distribution")
+  }
+  
   states[1,] <- c(shape.cur, scale.cur, ll.cur, 1)
   
   for (i in 2:(burnin+n.samples)) {
