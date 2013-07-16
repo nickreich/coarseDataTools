@@ -286,8 +286,10 @@ fw1 <- function(t, EL, ER, SL, SR, par1, par2, dist){
         (ER-SL+t) * dweibull(x=t,shape=par1,scale=par2)
     } else if (dist=="G") {
         (ER-SL+t) * dgamma(x=t, shape=par1, scale=par2)
-    } else {
+    } else if (dist =="L"){
         (ER-SL+t) * dlnorm(x=t, meanlog=par1, sdlog=par2)
+    } else {
+        stop("distribution not supported")
     }
 }
 
@@ -298,8 +300,10 @@ fw3 <- function(t, EL, ER, SL, SR, par1, par2, dist){
 	(SR-EL-t) * dweibull(x=t, shape=par1, scale=par2)
     } else if (dist == "G"){
     	(SR-EL-t) * dgamma(x=t, shape=par1, scale=par2)
-    } else {
+    } else if (dist == "L") {
         (SR-EL-t) * dlnorm(x=t, meanlog=par1, sdlog=par2)
+    } else {
+        stop("distribution not supported")
     }
 }
 
@@ -329,9 +333,11 @@ diclik <- function(par1, par2, EL, ER, SL, SR, dist){
         } else if (dist == "G"){
             dic2 <- (ER-EL)*
                 (pgamma(SR-ER, shape=par1, scale=par2) - pgamma(SL-EL, shape=par1, scale=par2))
-        } else {
+        } else if (dist == "L") {
             dic2 <- (ER-EL)*
                 (plnorm(SR-ER, par1, par2) - plnorm(SL-EL, par1, par2))
+        } else {
+            stop("distribution not supported")
         }
         dic3 <- integrate(fw3, lower=SR-ER, upper=SR-EL,
                           subdivisions=10,
@@ -353,9 +359,11 @@ diclik <- function(par1, par2, EL, ER, SL, SR, dist){
         } else if (dist == "G"){
             dic2 <- (SR-SL)*
                 (pgamma(SL-EL, shape=par1, scale=par2) - pgamma(SR-ER, shape=par1, scale=par2))
-        } else {
+        } else if (dist == "L"){
             dic2 <- (SR-SL)*
                 (plnorm(SL-EL, par1, par2) - plnorm(SR-ER, par1, par2))
+        } else {
+            stop("distribution not supported")
         }
         dic3 <- integrate(fw3, lower=SL-EL, upper=SR-EL,
                           subdivisions=10,
@@ -385,8 +393,10 @@ diclik2.helper1 <- function(x, SL, SR, par1, par2, dist){
         pweibull(SR-x, shape=par1, scale=par2) - pweibull(SL-x, shape=par1, scale=par2)
     } else if (dist =="G") {
         pgamma(SR-x, shape=par1, scale=par2) - pgamma(SL-x, shape=par1, scale=par2)
-    } else {
+    } else if (dist == "L"){
         plnorm(SR-x, par1, par2) - plnorm(SL-x, par1, par2)
+    } else {
+     stop("distribution not supported")     
     }
 }
 
@@ -395,8 +405,10 @@ diclik2.helper2 <- function(x, SR, par1, par2, dist){
         pweibull(SR-x, shape=par1, scale=par2)
     } else if (dist =="G") {
         pgamma(SR-x, shape=par1, scale=par2)
+    } else if (dist=="L"){
+	       plnorm(SR-x, par1, par2)
     } else {
-	plnorm(SR-x, par1, par2)
+        stop("distribution not supported")     
     }
 }
 
@@ -407,8 +419,10 @@ siclik <- function(par1, par2, EL, ER, SL, SR, dist){
         pweibull(SR-EL, shape=par1, scale=par2) - pweibull(SL-ER, shape=par1, scale=par2)
     } else if (dist =="G") {
         pgamma(SR-EL, shape=par1, scale=par2) - pgamma(SL-ER, shape=par1, scale=par2)
-    } else {
+    } else if (dist == "L"){
         plnorm(SR-EL, par1, par2) - plnorm(SL-ER, par1, par2)
+    } else {
+       stop("distribution not supported")
     }
 }
 
@@ -421,8 +435,10 @@ exactlik <- function(par1, par2, EL, ER, SL, SR, dist){
         dweibull(SR-EL, shape=par1, scale=par2)
     } else if (dist =="G") {
         dgamma(SR-EL, shape=par1, scale=par2)
-    } else {
+    } else if (dist == "L") {
         dlnorm(SR-EL, par1, par2)
+    } else {
+        stop("distribution not supported")     
     }
 }
 
@@ -477,7 +493,7 @@ loglikhd <- function(pars, dat, dist) {
 ##    for on each distribution, from the parameters on the estimation scale 
 dic.getSE <- function(par1, log.par2, Sig, ptiles, dist, dat, opt.method){
 
-        cat(sprintf("Computing Asymtotic Confidence Intervals \n"))
+        cat(sprintf("Computing Asymptotic Confidence Intervals \n"))
         par2 <- exp(log.par2) # log.par2 input historically so I kept it as is
 
         if (dist == "L"){
@@ -487,7 +503,7 @@ dic.getSE <- function(par1, log.par2, Sig, ptiles, dist, dat, opt.method){
                          nrow=2, ncol=2+length(ptiles), byrow=TRUE)
         } else if (dist == "W"){
             df <- matrix(c(par1, 0, par1*(-log(1-ptiles))^(1/par2), #d/d log(par1)
-                           0, par2, -par1/par2*(-log(1-ptiles)^(1/par2))*log(-log(1-ptiles))), #d/d log(par2)
+                           0, par2, -par1/par2*(-log(1-ptiles))^(1/par2)*log(-log(1-ptiles))), #d/d log(par2)
                          nrow=2, ncol=2+length(ptiles), byrow=TRUE)
         }
         ses <- sqrt(diag(t(df)%*%Sig%*%df))
@@ -562,13 +578,13 @@ single.boot <- function(par1.s,par2.s,opt.method,dat.tmp,dist,...){
 ## returns vector of transformed parameters
 dist.optim.transform <- function(dist,pars){
     if (dist == "G"){
-        log(pars) # for shape and scale
+        return(log(pars)) # for shape and scale
     } else if (dist == "W"){
-        log(pars) # for shape and scale
+        return(log(pars)) # for shape and scale
     } else if (dist == "E"){
-        log(pars)
+        return(log(pars))
     } else if (dist == "L"){
-        c(pars[1],log(pars[2])) # for meanlog, sdlog
+        return(c(pars[1],log(pars[2]))) # for meanlog, sdlog
     } else {
         stop(sprintf("Distribtion (%s) not supported",dist))
     }
@@ -578,16 +594,16 @@ dist.optim.transform <- function(dist,pars){
 ## returns vector of untransformed parameters
 dist.optim.untransform <- function(dist,pars){
     if (dist == "G"){
-        exp(pars) # for shape and scale
+        return(exp(pars)) # for shape and scale
     } else if (dist == "W"){
-        exp(pars) # for shape and scale
+        return(exp(pars)) # for shape and scale
     } else if (dist == "E"){
         ## we want shape to be restricted to integers
         tmp <- exp(pars)
         tmp[1] <- round(tmp[1],0)
-        tmp
+        return(tmp)
     } else if (dist == "L"){
-        c(pars[1],exp(pars[2])) # for meanlog, sdlog
+        return(c(pars[1],exp(pars[2]))) # for meanlog, sdlog
     } else {
         stop(sprintf("Distribtion (%s) not supported",dist))
     }
@@ -607,6 +623,6 @@ check.data.structure <- function(dat){
         stop("values in type column must be either 0, 1 or 2.")
 
     if (any(is.na(dat[,c("EL","ER","SL","SR","type")]))) stop("Missing (NA) values not permitted")
-    NULL
+    return(NULL)
 }
 
