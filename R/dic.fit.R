@@ -70,6 +70,9 @@ dic.fit <- function(dat,
     ## no asymptotic results for gamma disribution at the moment so will need bootstrap to be larger tha 0 if dist != "L"
     if(dist %in% c("G") & n.boots <=0) stop("You must use bootstraping with this distrbution at the moment.  Please increase n.boots to something larger than 0")
 
+    ## check if ptiles are valid
+    if (any(ptiles >=1) | any(ptiles <= 0)) stop("Sorry the percentiles you are requesting are not valid.")
+    
     ## fix sample size
     n <- nrow(dat)
 

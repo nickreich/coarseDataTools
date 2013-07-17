@@ -42,13 +42,16 @@ dic.fit.mcmc <- function(dat,
         
         ## check to make sure data is well formed for CDT use:
         check.data.structure(dat)
-        
+                       
         ## check to make sure distribution is supported
         if(!dist %in% c("G","W","L","E")) stop("Please use one of the following distributions Log-Normal (L) , Weibull (W), Gamma (G), or Erlang (E)")
         
         ## don't need MCMCpack for Erlang
         if (dist != "E") require(MCMCpack)       
          
+        ## check that percentiles are valid
+        if (any(ptiles >=1) | any(ptiles <= 0)) stop("Sorry the percentiles you are requesting are not valid.")
+        
         ## default prior parameters if none specified
         if (is.null(prior.par1)){
            if (dist == "L") {
