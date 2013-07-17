@@ -15,6 +15,9 @@
 
   \item{add}{add to exisiting plot?}
 
+  \item{xlim}{xlim for plot, defaults to the range of the
+  data slot in x}
+
   \item{...}{other options to pass to plot}
 }
 \description{

@@ -113,6 +113,8 @@ setMethod("logLik",
 ##' 
 ##' @param add add to exisiting plot?
 ##' 
+##' @param xlim xlim for plot, defaults to the range of the data slot in x
+##' 
 ##' @param ... other options to pass to plot
 ##' @rdname plot-methods
 ##' @aliases plot plot,cd.fit-method
@@ -123,7 +125,7 @@ setMethod("plot",
                    col.main=rgb(230, 85, 13,maxColorValue=255),
                    col.samps=rgb(99,99,99,10,maxColorValue=255),
                    plot.n.samps=200,
-                   add=F,
+                   add=F, xlim=range(x@data),
                    ...) {
 
               par1 <- x@ests[1,1]
@@ -134,9 +136,8 @@ setMethod("plot",
                   plot.samples <- x@samples[sample(nrow(x@samples),min(plot.n.samps,nrow(x@samples))),]
               }
 
-              xlims <- range(x@data)
-              xs <-seq(xlims[1],xlims[2],length=100)
-              if (!add) plot(-100,-100,xlim=xlims,ylim=c(0,1),...)
+              xs <-seq(xlim[1],xlim[2],length=100)
+              if (!add) plot(-100,-100,xlim=xlim,ylim=c(0,1),...)
               if (x@dist == "L"){
                   if (plot.n.samps> 0 & nrow(x@samples) > 0){
                       apply(plot.samples,1,function(y) lines(xs,plnorm(xs,meanlog=y[1],sdlog=y[2]),col=col.samps))
