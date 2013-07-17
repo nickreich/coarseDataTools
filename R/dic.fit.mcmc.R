@@ -5,19 +5,20 @@
 ##'
 ##' The following models are used:
 ##' \deqn{Log-normal model: f(x) = \frac{1}{x*\sigma \sqrt{2 * \pi}} exp\{-\frac{(\log x - \mu)^2}{2 * \sigma^2}\}}
-##' \deqn{Log-normal Default Prior: \mu ~ N( 0, 1000), \sigma ~ N(0,1000)}
+##' \deqn{Log-normal Default Prior: \mu ~ N(0, 1000), log(\sigma) ~ N(0,1000)}
 ##' \deqn{Weibull model: f(x) = \frac{\alpha}{\beta}(\frac{x}{\beta})^{\alpha-1} exp\{-(\frac{x}{\beta})^{\alpha}\}}
-##' \deqn{Weibull Default Prior Specification: \alpha ~ N( 0, 1000), \beta ~ Gamma(0.001,0.001)}
+##' \deqn{Weibull Default Prior Specification: log(\alpha) ~ N( 0, 1000), \beta ~ Gamma(0.001,0.001)}
 ##' \deqn{Gamma model: f(x) = \frac{1}{\theta^k \Gamma(k)} x^{k-1} exp\{-\frac{x}{\theta}\}}
 ##' 
 ##' \deqn{Gamma Default Prior Specification: p(k,\theta) \propto \frac{1}{\theta} * \sqrt{k*TriGamma(k)-1}}
 ##' (Note: this is Jeffery's Prior when both parameters are unknown, and \eqn{Trigamma(x) = \frac{\partial}{\partial x^2} ln(\Gamma(x))}.)
 ##' \deqn{Erlang model: f(x) = \frac{1}{\theta^k (k-1)!} x^{k-1} exp\{-\frac{x}{\theta}\}}
-##' \deqn{Erlang Default Prior Specification: p(k,\theta) \propto 1}
+##' \deqn{Erlang Default Prior Specification: k \sim NBinom(100,1), log(\theta) \sim N(0,1000)}
+##' (Note: parameters in the negative binomial distribution above represent mean and size, respectivley)
 ##'
 ##' @param dat the data
-##' @param prior.par1 vector of first prior parameters for each model parameter 
-##' @param prior.par2 vector of second prior parameters for each model parameter
+##' @param prior.par1 vector of first prior parameters for each model parameter. If \code{NULL} then default parameters are used (as described in Details section).
+##' @param prior.par2 vector of second prior parameters for each model parameter. If \code{NULL} then default parameters are used (as described in Details section).
 ##' @param init.pars the initial parameter values (vector length = 2 )
 ##' @param ptiles returned percentiles of the survival survival distrbution
 ##' @param verbose how often do you want a print out from MCMCpack on iteration number and M-H acceptance rate
@@ -28,8 +29,8 @@
 ##' @return a cd.fit.mcmc S4 object
 ##' @export
 dic.fit.mcmc <- function(dat,
-                         prior.par1 = if (dist == "L") {c(0,0)} else {c(0,0.001)},
-                         prior.par2 = if (dist == "L") {c(1000,1000)} else {c(1000,0.001)},
+                         prior.par1 = NULL,
+                         prior.par2 = NULL,
                          init.pars = c(1,1),
                          ptiles = c(0.05,0.95,0.99),
                          verbose=1000,#how often to print update
@@ -38,15 +39,36 @@ dic.fit.mcmc <- function(dat,
                          dist = "L",
                          ...){
 
-        require(MCMCpack)
-
+        
         ## check to make sure data is well formed for CDT use:
         check.data.structure(dat)
-
+        
         ## check to make sure distribution is supported
         if(!dist %in% c("G","W","L","E")) stop("Please use one of the following distributions Log-Normal (L) , Weibull (W), Gamma (G), or Erlang (E)")
-
         
+        ## don't need MCMCpack for Erlang
+        if (dist != "E") require(MCMCpack)       
+         
+        ## default prior parameters if none specified
+        if (is.null(prior.par1)){
+           if (dist == "L") {
+            prior.par1 <- c(0,0)
+           } else if (dist == "W" | dist == "G"){
+            prior.par1 <- c(0,0.001)
+           } else if (dist == "E"){
+            prior.par1 <- c(100,0)          
+         }}
+        
+        ## default prior parameters if none specified        
+        if (is.null(prior.par2)){
+         if (dist == "L") {
+          prior.par2 <- c(1000,1000)
+         } else if (dist == "W" | dist == "G"){
+          prior.par2 <- c(1000,0.001)
+         } else if (dist == "E"){
+          prior.par2 <- c(1,1000)          
+         }
+        }
               
         cat(sprintf("Running %.0f MCMC iterations \n",n.samples+burnin))
 
@@ -160,9 +182,6 @@ dic.fit.mcmc <- function(dat,
 
 
 
-
-
-
 ##' posterior log likelihood function to pass to MCMCpack sampler
 ##'
 ##' @param pars the parameters to calculate the ll at
@@ -190,7 +209,7 @@ mcmcpack.ll <- function(pars,
     ll <- tryCatch(-loglikhd(pars,dat,dist) +
                      ## dgamma(pars.untrans[2],shape=par.prior.param1[2],
                      ## rate=par.prior.param2[2],log=T),
-                     sum(dnorm(pars.untrans,
+                     sum(dnorm(pars,
                                prior.par1,
                                prior.par2,log=T)),
                    error=function(e) {
@@ -199,10 +218,10 @@ mcmcpack.ll <- function(pars,
                    })
     
   } else if (dist == "W"){
-    ## using normal prior on the first param and gamma on second
+    ## using normal prior on the log-shape param and gamma on scale
     ll <- tryCatch(
       -loglikhd(pars,dat,dist) +
-        dnorm(pars.untrans[1],
+        dnorm(pars[1],
               prior.par1[1],
               prior.par2[1],log=T) +
         dgamma(pars.untrans[2],
