@@ -15,7 +15,7 @@ Depends:
 Description: This package contains functions to analyze coarse data.
     Specifically, it contains functions to (1) fit parametric accelerated
     failure time models to interval-censored survival time data, and (2)
-    estimate the case-fatality ratio in scenarios with underreporting.
+    estimate the case-fatality ratio in scenarios with under-reporting.
     This package's development was motivated by applications to infectious
     disease: in particular, problems with estimating the incubation period and
     the case fatality ratio of a given disease.  Sample data files are included
