@@ -95,6 +95,7 @@ setMethod("show","cd.fit.mcmc",function(object){
 #' @rdname logLik-methods
 #' @aliases logLik logLik,cd.fit-method
 #' @export
+#' @importFrom stats logLik
 setMethod("logLik",
           "cd.fit",
           function(object){
@@ -118,7 +119,8 @@ setMethod("logLik",
 ##' @param ... other options to pass to plot
 ##' @rdname plot-methods
 ##' @aliases plot plot,cd.fit-method
-##' @export
+##' @importFrom graphics plot
+##' @exportMethod plot
 setMethod("plot",
           "cd.fit",
           function(x,y,
