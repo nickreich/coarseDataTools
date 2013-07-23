@@ -28,6 +28,7 @@
 ##' @param dist distribution to be used (L for log-normal,W for weibull, G for Gamma, and E for erlang)
 ##' @param ... additional parameters to \link{MCMCmetrop1R}
 ##' @return a cd.fit.mcmc S4 object
+##' @importFrom MCMCpack MCMCmetrop1R
 ##' @export
 dic.fit.mcmc <- function(dat,
                          prior.par1 = NULL,
@@ -47,8 +48,8 @@ dic.fit.mcmc <- function(dat,
         ## check to make sure distribution is supported
         if(!dist %in% c("G","W","L","E")) stop("Please use one of the following distributions Log-Normal (L) , Weibull (W), Gamma (G), or Erlang (E)")
         
-        ## don't need MCMCpack for Erlang
-        if (dist != "E") require(MCMCpack)       
+##        ## don't need MCMCpack for Erlang
+##        if (dist != "E") require(MCMCpack)       
          
         ## check that percentiles are valid
         if (any(ptiles >=1) | any(ptiles <= 0)) stop("Sorry the percentiles you are requesting are not valid.")

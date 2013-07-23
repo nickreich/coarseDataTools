@@ -7,11 +7,11 @@ Author: Nicholas G. Reich <nick@schoolph.umass.edu>, Justin Lessler
 Maintainer: Nicholas G. Reich <nick@schoolph.umass.edu>
 License: GPL (>= 2)
 URL: http://cran.r-project.org/package=coarseDataTools
-Depends:
+Imports:
     survival,
     MCMCpack,
-    methods,
-    graphics
+    graphics,
+    methods
 Description: This package contains functions to analyze coarse data.
     Specifically, it contains functions to (1) fit parametric accelerated
     failure time models to interval-censored survival time data, and (2)
