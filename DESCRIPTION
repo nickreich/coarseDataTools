@@ -1,6 +1,6 @@
 Package: coarseDataTools
-Version: 0.6-1
-Date: 2013-07-20
+Version: 0.6-2
+Date: 2013-08-04
 Title: A collection of functions to help with analysis of coarsely observed data
 Author: Nicholas G. Reich <nick@schoolph.umass.edu>, Justin Lessler
     <jlessler@jhsph.edu>, Andrew Azman <andrewazman@gmail.com>
@@ -8,10 +8,10 @@ Maintainer: Nicholas G. Reich <nick@schoolph.umass.edu>
 License: GPL (>= 2)
 URL: http://cran.r-project.org/package=coarseDataTools
 Imports:
-    survival,
     MCMCpack,
     graphics,
-    stats
+    stats,
+    methods
 Description: This package contains functions to analyze coarse data.
     Specifically, it contains functions to (1) fit parametric accelerated
     failure time models to interval-censored survival time data, and (2)
