@@ -14,3 +14,12 @@ exportMethods(plot)
 importFrom(graphics,plot)
 importFrom(MCMCpack,MCMCmetrop1R)
 importFrom(stats,logLik)
+importFrom("grDevices", "rgb")
+importFrom("graphics", "lines")
+importFrom("methods", "new")
+importFrom("stats", "coef", "dgamma", "dlnorm", "dnbinom", "dnorm",
+           "dweibull", "glm", "integrate", "optim", "optimize",
+           "pgamma", "plnorm", "poisson", "pweibull", "qgamma",
+           "qlnorm", "qnorm", "qt", "quantile", "qweibull", "rlnorm",
+           "rnorm", "runif", "sd", "vcov")
+importFrom("utils", "data", "setTxtProgressBar", "txtProgressBar")
