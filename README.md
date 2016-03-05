@@ -11,3 +11,12 @@ This package contains functions to analyze coarsely observed data.
     disease: in particular, problems with estimating the incubation period and
     the case fatality ratio of a given disease. Sample data files are included
     in the package.
+
+
+As of March 2016, coarseDataTools imports functions from the MCMCpack package, which in turn imports functions from the graph and Rgraphviz packages. Both of these packages have been removed from CRAN, but can be installed from Bioconductor using the following code:
+
+```
+source("https://bioconductor.org/biocLite.R")
+biocLite("graph")
+biocLite("Rgraphviz")
+```

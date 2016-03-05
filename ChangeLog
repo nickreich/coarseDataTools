@@ -13,3 +13,5 @@ v0.5 - added get.obs.type() function to easily generate observation types for da
 v0.5.1 - changed code to eliminate NOTE message in R CMD CHECK.
 
 v0.6 - added Azman/Lessler contributions: MCMC estimation functions, ability to fit Weibull and Gamma distributions, and bootstrap confidence intervals.
+
+v06.3 - minor modifications to address NAMESPACE issues.
