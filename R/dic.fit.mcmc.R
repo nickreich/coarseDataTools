@@ -25,7 +25,7 @@
 ##' @param verbose how often do you want a print out from MCMCpack on iteration number and M-H acceptance rate
 ##' @param burnin number of burnin samples
 ##' @param n.samples number of samples to draw from the posterior (after the burnin)
-##' @param dist distribution to be used (L for log-normal,W for weibull, G for Gamma, and E for erlang)
+##' @param dist distribution to be used (L for log-normal,W for weibull, G for Gamma, and E for erlang, off1G for 1 day right shifted gamma)
 ##' @param ... additional parameters to \link{MCMCmetrop1R}
 ##' @return a cd.fit.mcmc S4 object
 ##' @importFrom MCMCpack MCMCmetrop1R
@@ -46,7 +46,7 @@ dic.fit.mcmc <- function(dat,
         check.data.structure(dat)
                        
         ## check to make sure distribution is supported
-        if(!dist %in% c("G","W","L","E")) stop("Please use one of the following distributions Log-Normal (L) , Weibull (W), Gamma (G), or Erlang (E)")
+        if(!dist %in% c("G","W","L","E","off1G")) stop("Please use one of the following distributions Log-Normal (L) , Weibull (W), Gamma (G), or Erlang (E), offset Gamma (off1G)")
         
 ##        ## don't need MCMCpack for Erlang
 ##        if (dist != "E") require(MCMCpack)       
@@ -58,7 +58,7 @@ dic.fit.mcmc <- function(dat,
         if (is.null(prior.par1)){
            if (dist == "L") {
             prior.par1 <- c(0,0)
-           } else if (dist == "W" | dist == "G"){
+           } else if (dist == "W" | dist == "G" | dist=="off1G"){
             prior.par1 <- c(0,0.001)
            } else if (dist == "E"){
             prior.par1 <- c(100,0)          
@@ -68,7 +68,7 @@ dic.fit.mcmc <- function(dat,
         if (is.null(prior.par2)){
          if (dist == "L") {
           prior.par2 <- c(1000,1000)
-         } else if (dist == "W" | dist == "G"){
+         } else if (dist == "W" | dist == "G" | dist=="off1G"){
           prior.par2 <- c(1000,0.001)
          } else if (dist == "E"){
           prior.par2 <- c(1,1000)          
@@ -99,7 +99,7 @@ dic.fit.mcmc <- function(dat,
                                           verbose=verbose,
                                           dist=dist,
                                           logfun=TRUE,
-                                          ...),
+                                           ...),
                  error=function(e){
                          msg <<- e$message
                          fail <<- TRUE
@@ -138,6 +138,10 @@ dic.fit.mcmc <- function(dat,
                         par1.name <- "shape"
                         par2.name <- "scale"
                         mcmc.quantiles <- apply(untrans.mcmcs,1,function(x) qgamma(ptiles.appended,shape=x[1],scale=x[2]))
+                } else if (dist == "off1G"){
+                        par1.name <- "shape"
+                        par2.name <- "scale"
+                        mcmc.quantiles <- apply(untrans.mcmcs,1,function(x) {qgamma(ptiles.appended,shape=x[1],scale=x[2])+1})
                 } else if (dist == "W"){
                         par1.name <- "shape"
                         par2.name <- "scale"
@@ -236,7 +240,7 @@ mcmcpack.ll <- function(pars,
         warning("Loglik failure, returning -Inf")
         return(-Inf)
       })
-  } else if (dist == "G"){
+  } else if (dist == "G" || dist=="off1G"){
     ## using Jeffery's prior
     ll <- tryCatch(-loglikhd(pars,dat,dist)
                    +

@@ -1,4 +1,3 @@
-##' Fits a log-normal, gamma, or Weibull model to doubly interval
 ##' censored survival data
 ##'
 ##' \code{dic.fit} fits a parametric accelerated failure time model to survival
@@ -300,6 +299,8 @@ fw1 <- function(t, EL, ER, SL, SR, par1, par2, dist){
         (ER-SL+t) * dweibull(x=t,shape=par1,scale=par2)
     } else if (dist=="G") {
         (ER-SL+t) * dgamma(x=t, shape=par1, scale=par2)
+    } else if (dist=="off1G") {
+      (ER-SL+t) * dgammaOff1(x=t, shape=par1, scale=par2)
     } else if (dist =="L"){
         (ER-SL+t) * dlnorm(x=t, meanlog=par1, sdlog=par2)
     } else {
@@ -311,10 +312,12 @@ fw1 <- function(t, EL, ER, SL, SR, par1, par2, dist){
 fw3 <- function(t, EL, ER, SL, SR, par1, par2, dist){
     ## function that calculates the third function for the DIC integral
     if (dist == "W"){
-	(SR-EL-t) * dweibull(x=t, shape=par1, scale=par2)
+    	(SR-EL-t) * dweibull(x=t, shape=par1, scale=par2)
     } else if (dist == "G"){
     	(SR-EL-t) * dgamma(x=t, shape=par1, scale=par2)
-    } else if (dist == "L") {
+    }  else if (dist == "off1G"){
+      (SR-EL-t) * dgammaOff1(x=t, shape=par1, scale=par2)
+    }else if (dist == "L") {
         (SR-EL-t) * dlnorm(x=t, meanlog=par1, sdlog=par2)
     } else {
         stop("distribution not supported")
@@ -333,7 +336,7 @@ lik <- function(par1, par2, EL, ER, SL, SR, type, dist){
 
 ## calculates the DIC likelihood by integration
 diclik <- function(par1, par2, EL, ER, SL, SR, dist){
-
+  
     ## if symptom window is bigger than exposure window
     if(SR-SL>ER-EL){
         dic1 <- integrate(fw1, lower=SL-ER, upper=SL-EL,
@@ -347,6 +350,9 @@ diclik <- function(par1, par2, EL, ER, SL, SR, dist){
         } else if (dist == "G"){
             dic2 <- (ER-EL)*
                 (pgamma(SR-ER, shape=par1, scale=par2) - pgamma(SL-EL, shape=par1, scale=par2))
+        } else if (dist == "off1G"){
+          dic2 <- (ER-EL)*
+            (pgammaOff1(SR-ER, shape=par1, scale=par2) - pgammaOff1(SL-EL, shape=par1, scale=par2))
         } else if (dist == "L") {
             dic2 <- (ER-EL)*
                 (plnorm(SR-ER, par1, par2) - plnorm(SL-EL, par1, par2))
@@ -373,6 +379,9 @@ diclik <- function(par1, par2, EL, ER, SL, SR, dist){
         } else if (dist == "G"){
             dic2 <- (SR-SL)*
                 (pgamma(SL-EL, shape=par1, scale=par2) - pgamma(SR-ER, shape=par1, scale=par2))
+        } else if (dist == "off1G"){
+          dic2 <- (SR-SL)*
+            (pgammaOff1(SL-EL, shape=par1, scale=par2) - pgammaOff1(SR-ER, shape=par1, scale=par2))
         } else if (dist == "L"){
             dic2 <- (SR-SL)*
                 (plnorm(SL-EL, par1, par2) - plnorm(SR-ER, par1, par2))
@@ -391,8 +400,10 @@ diclik <- function(par1, par2, EL, ER, SL, SR, dist){
 ## this dic likelihood is designed for data that has overlapping intervals
 diclik2 <- function(par1, par2, EL, ER, SL, SR, dist){
     if(SL>ER) {
+
         return(diclik(par1, par2, EL, ER, SL, SR, dist))
     } else {
+
         lik1 <- integrate(diclik2.helper1, lower=EL, upper=SL,
                           SL=SL, SR=SR, par1=par1, par2=par2, dist=dist)$value
         lik2 <- integrate(diclik2.helper2, lower=SL, upper=ER,
@@ -407,6 +418,8 @@ diclik2.helper1 <- function(x, SL, SR, par1, par2, dist){
         pweibull(SR-x, shape=par1, scale=par2) - pweibull(SL-x, shape=par1, scale=par2)
     } else if (dist =="G") {
         pgamma(SR-x, shape=par1, scale=par2) - pgamma(SL-x, shape=par1, scale=par2)
+    } else if (dist=="off1G"){
+       pgammaOff1(SR-x, shape=par1, scale=par2) - pgammaOff1(SL-x, shape=par1, scale=par2)
     } else if (dist == "L"){
         plnorm(SR-x, par1, par2) - plnorm(SL-x, par1, par2)
     } else {
@@ -419,6 +432,8 @@ diclik2.helper2 <- function(x, SR, par1, par2, dist){
         pweibull(SR-x, shape=par1, scale=par2)
     } else if (dist =="G") {
         pgamma(SR-x, shape=par1, scale=par2)
+    } else if (dist =="off1G") {
+       pgammaOff1(SR-x, shape=par1, scale=par2)
     } else if (dist=="L"){
 	       plnorm(SR-x, par1, par2)
     } else {
@@ -431,6 +446,8 @@ siclik <- function(par1, par2, EL, ER, SL, SR, dist){
     ## calculates the SIC likelihood as the difference in CDFs
     if (dist =="W"){
         pweibull(SR-EL, shape=par1, scale=par2) - pweibull(SL-ER, shape=par1, scale=par2)
+    } else if (dist=="off1G") {
+       pgammaOff1(SR-EL, shape=par1, scale=par2) - pgammaOff1(SL-ER, shape=par1, scale=par2)
     } else if (dist =="G") {
         pgamma(SR-EL, shape=par1, scale=par2) - pgamma(SL-ER, shape=par1, scale=par2)
     } else if (dist == "L"){
@@ -447,6 +464,8 @@ exactlik <- function(par1, par2, EL, ER, SL, SR, dist){
     ##     so it doesn't matter which pair we use in the forpar1la below.
     if (dist =="W"){
         dweibull(SR-EL, shape=par1, scale=par2)
+    } else if (dist=="off1G") {
+        dgammaOff1(SR-EL, shape=par1, scale=par2)
     } else if (dist =="G") {
         dgamma(SR-EL, shape=par1, scale=par2)
     } else if (dist == "L") {
@@ -493,6 +512,7 @@ loglikhd <- function(pars, dat, dist) {
     ## cat(sprintf("par1 = %.2f, par2 = %.2f \n",par1, par2))  ## for debugging
     n <- nrow(dat)
     totlik <- 0
+    
     for(i in 1:n){
       #cat(i,"start\n") ##DEBUG
         totlik <- totlik + log(lik(par1, par2, type=dat[i,"type"],
@@ -599,7 +619,7 @@ single.boot <- function(par1.s,par2.s,opt.method,dat.tmp,dist,...){
 ## Transforms parameters of a specific distriution for unbounded optimization
 ## returns vector of transformed parameters
 dist.optim.transform <- function(dist,pars){
-    if (dist == "G"){
+    if (dist == "G" || dist == "off1G"){
         return(log(pars)) # for shape and scale
     } else if (dist == "W"){
         return(log(pars)) # for shape and scale
@@ -616,7 +636,7 @@ dist.optim.transform <- function(dist,pars){
 ## Untransforms parameters before entering likelihood
 ## returns vector of untransformed parameters
 dist.optim.untransform <- function(dist,pars){
-    if (dist == "G"){
+    if (dist == "G" || dist=="off1G"){
         return(exp(pars)) # for shape and scale
     } else if (dist == "W"){
         return(exp(pars)) # for shape and scale
@@ -647,3 +667,39 @@ check.data.structure <- function(dat){
     return(NULL)
 }
 
+
+##' Function that calculates pgamma with a offset of 1 (i.e., 1 is equivlaent to 0)
+##' 
+##' @param x value to calculate pgamma at
+##' @param replace0 should we replace 0 with episilon
+##' @param ... other parameters to pgamma
+##'
+##' @return pgamma offset
+##' 
+pgammaOff1 <- function(x, replace0 = FALSE, ...) {
+  rc <- pgamma(x-1, ...)
+  if (replace0 && sum(rc<=0)>0) {
+  
+    rc[which(rc<=0)] <- 10^-8
+  }
+  return(rc)
+}
+
+
+##' Function that calculates dgamma with a offset of 1 (i.e., 1 is equivlaent to 0)
+##' 
+##' @param x value to calculate dgamma at
+##' @param replace0 should we replace 0 with episilon
+##' @param ... other parameters to dgamma
+##'
+##' @return dgamma offset
+##' 
+dgammaOff1 <- function(x, replace0 = FALSE, ...) {
+  rc <- dgamma(x-1, ...)
+
+  if (replace0 && rc<=0) {
+
+    rc <- 10^-8
+  }
+  return(rc)
+}
