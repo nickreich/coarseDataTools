@@ -46,7 +46,7 @@ dic.fit.mcmc <- function(dat,
         check.data.structure(dat)
                        
         ## check to make sure distribution is supported
-        if(!dist %in% c("G","W","L","E","off1G")) stop("Please use one of the following distributions Log-Normal (L) , Weibull (W), Gamma (G), or Erlang (E), offset Gamma (off1G)")
+        if(!dist %in% c("G","W","L","E","off1G","off1W","off1L","off1E")) stop("Please use one of the following distributions Log-Normal (L) , Weibull (W), Gamma (G), Erlang (E), offset Log-Normal (off1L), offset Weibull (off1W), offset Gamma (off1G) or offset Erlang (off1E)")
         
 ##        ## don't need MCMCpack for Erlang
 ##        if (dist != "E") require(MCMCpack)       
@@ -56,21 +56,21 @@ dic.fit.mcmc <- function(dat,
         
         ## default prior parameters if none specified
         if (is.null(prior.par1)){
-           if (dist == "L") {
+           if (dist == "L" | dist == "off1L") {
             prior.par1 <- c(0,0)
-           } else if (dist == "W" | dist == "G" | dist=="off1G"){
+           } else if (dist == "W" | dist == "off1W" | dist == "G" | dist=="off1G"){
             prior.par1 <- c(0,0.001)
-           } else if (dist == "E"){
+           } else if (dist == "E" | dist == "off1E"){
             prior.par1 <- c(100,0)          
          }}
         
         ## default prior parameters if none specified        
         if (is.null(prior.par2)){
-         if (dist == "L") {
+         if (dist == "L" | dist == "off1L") {
           prior.par2 <- c(1000,1000)
-         } else if (dist == "W" | dist == "G" | dist=="off1G"){
+         } else if (dist == "W" | dist == "off1W" | dist == "G" | dist=="off1G"){
           prior.par2 <- c(1000,0.001)
-         } else if (dist == "E"){
+         } else if (dist == "E" | dist == "off1E"){
           prior.par2 <- c(1,1000)          
          }
         }
@@ -86,7 +86,7 @@ dic.fit.mcmc <- function(dat,
         init.pars.trans <- dist.optim.transform(dist,init.pars)
   
       
-        if (dist!="E") {
+        if (dist!="E" && dist!="off1E") {
           #use MCMC pack for effieciency for distibutions with 2 continuous parameters
           tryCatch(            
               mcmc.run <- MCMCmetrop1R(fun=mcmcpack.ll,
@@ -134,6 +134,10 @@ dic.fit.mcmc <- function(dat,
                         par1.name <- "meanlog"
                         par2.name <- "sdlog"
                         mcmc.quantiles <- apply(untrans.mcmcs,1,function(x) qlnorm(ptiles.appended,meanlog=x[1],sdlog=x[2]))
+                } else if (dist == "off1L"){
+                  par1.name <- "meanlog"
+                  par2.name <- "sdlog"
+                  mcmc.quantiles <- apply(untrans.mcmcs,1,function(x) {qlnorm(ptiles.appended,meanlog=x[1],sdlog=x[2])+1})
                 } else if (dist == "G"){
                         par1.name <- "shape"
                         par2.name <- "scale"
@@ -146,10 +150,18 @@ dic.fit.mcmc <- function(dat,
                         par1.name <- "shape"
                         par2.name <- "scale"
                         mcmc.quantiles <- apply(untrans.mcmcs,1,function(x) qweibull(ptiles.appended,shape=x[1],scale=x[2]))
+                } else if (dist == "off1W"){
+                  par1.name <- "shape"
+                  par2.name <- "scale"
+                  mcmc.quantiles <- apply(untrans.mcmcs,1,function(x) {qweibull(ptiles.appended,shape=x[1],scale=x[2])+1})
                 } else if (dist == "E"){
                         par1.name <- "shape"
                         par2.name <- "scale"
                         mcmc.quantiles <- apply(untrans.mcmcs,1,function(x) qgamma(ptiles.appended,shape=x[1],scale=x[2]))
+                } else if (dist == "off1E"){
+                  par1.name <- "shape"
+                  par2.name <- "scale"
+                  mcmc.quantiles <- apply(untrans.mcmcs,1,function(x) {qgamma(ptiles.appended,shape=x[1],scale=x[2])+1})
                 } else {
                         stop("Sorry, unknown distribution type. Check the 'dist' option.")
                         ## not actually needed but just in case
@@ -213,7 +225,7 @@ mcmcpack.ll <- function(pars,
   
   
   
-  if (dist == "L"){
+  if (dist == "L" || dist == "off1L"){
     ## default gamma on scale param and (inproper) uniform on location
     ll <- tryCatch(-loglikhd(pars,dat,dist) +
                      ## dgamma(pars.untrans[2],shape=par.prior.param1[2],
@@ -226,7 +238,7 @@ mcmcpack.ll <- function(pars,
                      return(-Inf)
                    })
     
-  } else if (dist == "W"){
+  } else if (dist == "W" || dist == "off1W"){
     ## using normal prior on the log-shape param and gamma on scale
     ll <- tryCatch(
       -loglikhd(pars,dat,dist) +
