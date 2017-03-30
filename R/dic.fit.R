@@ -534,7 +534,7 @@ loglikhd <- function(pars, dat, dist) {
       
   
     #if the distribution is erlanf transform correctly for gamma
-    if(dist %in% c("E","off1E")) {return(loglikhd(c(log(pars[1]),pars[2]),dat,dist="G"))}
+    if(dist %in% c("E")) {return(loglikhd(c(log(pars[1]),pars[2]),dat,dist="G"))}
     
     ## calculates the log-likelihood of DIC data
     ## dat must have EL, ER, SL, SR and type columns  
@@ -659,7 +659,7 @@ dist.optim.transform <- function(dist,pars){
         return(log(pars)) # for shape and scale
     } else if (dist == "W" || dist == "off1W"){
         return(log(pars)) # for shape and scale
-    } else if (dist == "E" || dist == "off1E"){
+    } else if (dist == "E"){
         #shape not transformed, logged
         return(c(pars[1],log(pars[2])))
     } else if (dist == "L" || dist == "off1L"){
@@ -676,7 +676,7 @@ dist.optim.untransform <- function(dist,pars){
         return(exp(pars)) # for shape and scale
     } else if (dist == "W" || dist == "off1W"){
         return(exp(pars)) # for shape and scale
-    } else if (dist == "E" || dist == "off1E"){
+    } else if (dist == "E"){
         #shape identity, scale logged in estimation scale        
         return(c(pars[1],exp(pars[2])))
     } else if (dist == "L" || dist == "off1L"){

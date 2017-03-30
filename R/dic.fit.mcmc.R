@@ -46,7 +46,7 @@ dic.fit.mcmc <- function(dat,
         check.data.structure(dat)
                        
         ## check to make sure distribution is supported
-        if(!dist %in% c("G","W","L","E","off1G","off1W","off1L","off1E")) stop("Please use one of the following distributions Log-Normal (L) , Weibull (W), Gamma (G), Erlang (E), offset Log-Normal (off1L), offset Weibull (off1W), offset Gamma (off1G) or offset Erlang (off1E)")
+        if(!dist %in% c("G","W","L","E","off1G","off1W","off1L")) stop("Please use one of the following distributions Log-Normal (L) , Weibull (W), Gamma (G), Erlang (E), offset Log-Normal (off1L), offset Weibull (off1W) or offset Gamma (off1G)")
         
 ##        ## don't need MCMCpack for Erlang
 ##        if (dist != "E") require(MCMCpack)       
@@ -60,7 +60,7 @@ dic.fit.mcmc <- function(dat,
             prior.par1 <- c(0,0)
            } else if (dist == "W" | dist == "off1W" | dist == "G" | dist=="off1G"){
             prior.par1 <- c(0,0.001)
-           } else if (dist == "E" | dist == "off1E"){
+           } else if (dist == "E"){
             prior.par1 <- c(100,0)          
          }}
         
@@ -70,7 +70,7 @@ dic.fit.mcmc <- function(dat,
           prior.par2 <- c(1000,1000)
          } else if (dist == "W" | dist == "off1W" | dist == "G" | dist=="off1G"){
           prior.par2 <- c(1000,0.001)
-         } else if (dist == "E" | dist == "off1E"){
+         } else if (dist == "E"){
           prior.par2 <- c(1,1000)          
          }
         }
@@ -86,7 +86,7 @@ dic.fit.mcmc <- function(dat,
         init.pars.trans <- dist.optim.transform(dist,init.pars)
   
       
-        if(!dist %in% c("E","off1E")) {
+        if(!dist %in% c("E")) {
           #use MCMC pack for effieciency for distibutions with 2 continuous parameters
           tryCatch(            
               mcmc.run <- MCMCmetrop1R(fun=mcmcpack.ll,
@@ -158,10 +158,6 @@ dic.fit.mcmc <- function(dat,
                         par1.name <- "shape"
                         par2.name <- "scale"
                         mcmc.quantiles <- apply(untrans.mcmcs,1,function(x) qgamma(ptiles.appended,shape=x[1],scale=x[2]))
-                } else if (dist == "off1E"){
-                  par1.name <- "shape"
-                  par2.name <- "scale"
-                  mcmc.quantiles <- apply(untrans.mcmcs,1,function(x) {qgamma(ptiles.appended,shape=x[1],scale=x[2])+1})
                 } else {
                         stop("Sorry, unknown distribution type. Check the 'dist' option.")
                         ## not actually needed but just in case
