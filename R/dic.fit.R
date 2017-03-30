@@ -534,7 +534,7 @@ loglikhd <- function(pars, dat, dist) {
       
   
     #if the distribution is erlanf transform correctly for gamma
-    if (dist=="E" || dist=="off1E") {return(loglikhd(c(log(pars[1]),pars[2]),dat,dist="G"))}
+    if(dist %in% c("E","off1E")) {return(loglikhd(c(log(pars[1]),pars[2]),dat,dist="G"))}
     
     ## calculates the log-likelihood of DIC data
     ## dat must have EL, ER, SL, SR and type columns  
