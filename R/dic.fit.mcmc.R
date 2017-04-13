@@ -26,6 +26,7 @@
 ##' @param burnin number of burnin samples
 ##' @param n.samples number of samples to draw from the posterior (after the burnin)
 ##' @param dist distribution to be used (L for log-normal,W for weibull, G for Gamma, and E for erlang, off1G for 1 day right shifted gamma)
+##' @param seed seed for the random number generator for MCMC
 ##' @param ... additional parameters to \link{MCMCmetrop1R}
 ##' @return a cd.fit.mcmc S4 object
 ##' @importFrom MCMCpack MCMCmetrop1R
@@ -39,6 +40,7 @@ dic.fit.mcmc <- function(dat,
                          burnin = 3000,
                          n.samples = 5000,
                          dist = "L",
+												 seed = NULL,
                          ...){
 
         
@@ -75,6 +77,12 @@ dic.fit.mcmc <- function(dat,
          }
         }
               
+				## random seed based off current time if none specified
+				if (is.null(seed)){
+					t <- as.numeric(Sys.time())
+					seed <- 1e8 * (t - floor(t))
+				}
+
         cat(sprintf("Running %.0f MCMC iterations \n",n.samples+burnin))
 
         msg <- NULL
@@ -99,6 +107,7 @@ dic.fit.mcmc <- function(dat,
                                           verbose=verbose,
                                           dist=dist,
                                           logfun=TRUE,
+																					seed=seed,
                                            ...),
                  error=function(e){
                          msg <<- e$message
