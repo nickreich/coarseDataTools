@@ -297,12 +297,16 @@ fw1 <- function(t, EL, ER, SL, SR, par1, par2, dist){
     ## function that calculates the first function for the DIC integral
     if (dist=="W"){
         (ER-SL+t) * dweibull(x=t,shape=par1,scale=par2)
+    } else if (dist=="off1W") {
+      (ER-SL+t) * dweibullOff1(x=t,shape=par1,scale=par2)
     } else if (dist=="G") {
         (ER-SL+t) * dgamma(x=t, shape=par1, scale=par2)
     } else if (dist=="off1G") {
       (ER-SL+t) * dgammaOff1(x=t, shape=par1, scale=par2)
     } else if (dist =="L"){
         (ER-SL+t) * dlnorm(x=t, meanlog=par1, sdlog=par2)
+    } else if (dist =="off1L"){
+      (ER-SL+t) * dlnormOff1(x=t, meanlog=par1, sdlog=par2)
     } else {
         stop("distribution not supported")
     }
@@ -313,12 +317,16 @@ fw3 <- function(t, EL, ER, SL, SR, par1, par2, dist){
     ## function that calculates the third function for the DIC integral
     if (dist == "W"){
     	(SR-EL-t) * dweibull(x=t, shape=par1, scale=par2)
-    } else if (dist == "G"){
+    } else if (dist == "off1W"){
+      (SR-EL-t) * dweibullOff1(x=t, shape=par1, scale=par2)
+    }  else if (dist == "G"){
     	(SR-EL-t) * dgamma(x=t, shape=par1, scale=par2)
     }  else if (dist == "off1G"){
       (SR-EL-t) * dgammaOff1(x=t, shape=par1, scale=par2)
-    }else if (dist == "L") {
+    } else if (dist == "L") {
         (SR-EL-t) * dlnorm(x=t, meanlog=par1, sdlog=par2)
+    } else if (dist == "off1L"){
+      (SR-EL-t) * dlnormOff1(x=t, meanlog=par1, sdlog=par2)
     } else {
         stop("distribution not supported")
     }
@@ -347,6 +355,9 @@ diclik <- function(par1, par2, EL, ER, SL, SR, dist){
         if (dist == "W"){
             dic2 <- (ER-EL)*
                 (pweibull(SR-ER, shape=par1, scale=par2) - pweibull(SL-EL, shape=par1, scale=par2))
+        } else if (dist == "off1W"){
+          dic2 <- (ER-EL)*
+            (pweibullOff1(SR-ER, shape=par1, scale=par2) - pweibullOff1(SL-EL, shape=par1, scale=par2))
         } else if (dist == "G"){
             dic2 <- (ER-EL)*
                 (pgamma(SR-ER, shape=par1, scale=par2) - pgamma(SL-EL, shape=par1, scale=par2))
@@ -356,6 +367,9 @@ diclik <- function(par1, par2, EL, ER, SL, SR, dist){
         } else if (dist == "L") {
             dic2 <- (ER-EL)*
                 (plnorm(SR-ER, par1, par2) - plnorm(SL-EL, par1, par2))
+        } else if (dist == "off1L") {
+          dic2 <- (ER-EL)*
+            (plnormOff1(SR-ER, par1, par2) - plnormOff1(SL-EL, par1, par2))
         } else {
             stop("distribution not supported")
         }
@@ -376,6 +390,9 @@ diclik <- function(par1, par2, EL, ER, SL, SR, dist){
         if (dist == "W"){
             dic2 <- (SR-SL)*
                 (pweibull(SL-EL, shape=par1, scale=par2) - pweibull(SR-ER, shape=par1, scale=par2))
+        } else if (dist == "off1W"){
+          dic2 <- (SR-SL)*
+            (pweibullOff1(SL-EL, shape=par1, scale=par2) - pweibullOff1(SR-ER, shape=par1, scale=par2))
         } else if (dist == "G"){
             dic2 <- (SR-SL)*
                 (pgamma(SL-EL, shape=par1, scale=par2) - pgamma(SR-ER, shape=par1, scale=par2))
@@ -385,6 +402,9 @@ diclik <- function(par1, par2, EL, ER, SL, SR, dist){
         } else if (dist == "L"){
             dic2 <- (SR-SL)*
                 (plnorm(SL-EL, par1, par2) - plnorm(SR-ER, par1, par2))
+        } else if (dist == "off1L"){
+          dic2 <- (SR-SL)*
+            (plnormOff1(SL-EL, par1, par2) - plnormOff1(SR-ER, par1, par2))
         } else {
             stop("distribution not supported")
         }
@@ -416,12 +436,16 @@ diclik2 <- function(par1, par2, EL, ER, SL, SR, dist){
 diclik2.helper1 <- function(x, SL, SR, par1, par2, dist){
     if (dist =="W"){
         pweibull(SR-x, shape=par1, scale=par2) - pweibull(SL-x, shape=par1, scale=par2)
+    } else if (dist =="off1W") {
+      pweibullOff1(SR-x, shape=par1, scale=par2) - pweibullOff1(SL-x, shape=par1, scale=par2)
     } else if (dist =="G") {
         pgamma(SR-x, shape=par1, scale=par2) - pgamma(SL-x, shape=par1, scale=par2)
     } else if (dist=="off1G"){
        pgammaOff1(SR-x, shape=par1, scale=par2) - pgammaOff1(SL-x, shape=par1, scale=par2)
     } else if (dist == "L"){
         plnorm(SR-x, par1, par2) - plnorm(SL-x, par1, par2)
+    } else if (dist == "off1L"){
+      plnormOff1(SR-x, par1, par2) - plnormOff1(SL-x, par1, par2)
     } else {
      stop("distribution not supported")     
     }
@@ -430,12 +454,16 @@ diclik2.helper1 <- function(x, SL, SR, par1, par2, dist){
 diclik2.helper2 <- function(x, SR, par1, par2, dist){
     if (dist =="W"){
         pweibull(SR-x, shape=par1, scale=par2)
+    } else if (dist =="off1W") {
+      pweibullOff1(SR-x, shape=par1, scale=par2)
     } else if (dist =="G") {
         pgamma(SR-x, shape=par1, scale=par2)
     } else if (dist =="off1G") {
        pgammaOff1(SR-x, shape=par1, scale=par2)
     } else if (dist=="L"){
 	       plnorm(SR-x, par1, par2)
+    } else if (dist=="off1L"){
+      plnormOff1(SR-x, par1, par2)
     } else {
         stop("distribution not supported")     
     }
@@ -446,12 +474,16 @@ siclik <- function(par1, par2, EL, ER, SL, SR, dist){
     ## calculates the SIC likelihood as the difference in CDFs
     if (dist =="W"){
         pweibull(SR-EL, shape=par1, scale=par2) - pweibull(SL-ER, shape=par1, scale=par2)
+    } else if (dist=="off1W") {
+      pweibullOff1(SR-EL, shape=par1, scale=par2) - pweibullOff1(SL-ER, shape=par1, scale=par2)
     } else if (dist=="off1G") {
        pgammaOff1(SR-EL, shape=par1, scale=par2) - pgammaOff1(SL-ER, shape=par1, scale=par2)
     } else if (dist =="G") {
         pgamma(SR-EL, shape=par1, scale=par2) - pgamma(SL-ER, shape=par1, scale=par2)
     } else if (dist == "L"){
         plnorm(SR-EL, par1, par2) - plnorm(SL-ER, par1, par2)
+    } else if (dist=="off1L") {
+      plnormOff1(SR-EL, par1, par2) - plnormOff1(SL-ER, par1, par2)
     } else {
        stop("distribution not supported")
     }
@@ -464,12 +496,16 @@ exactlik <- function(par1, par2, EL, ER, SL, SR, dist){
     ##     so it doesn't matter which pair we use in the forpar1la below.
     if (dist =="W"){
         dweibull(SR-EL, shape=par1, scale=par2)
+    } else if (dist=="off1W") {
+      dweibullOff1(SR-EL, shape=par1, scale=par2)
     } else if (dist=="off1G") {
         dgammaOff1(SR-EL, shape=par1, scale=par2)
     } else if (dist =="G") {
         dgamma(SR-EL, shape=par1, scale=par2)
     } else if (dist == "L") {
         dlnorm(SR-EL, par1, par2)
+    } else if (dist == "off1L") {
+      dlnormOff1(SR-EL, par1, par2)
     } else {
         stop("distribution not supported")     
     }
@@ -498,7 +534,7 @@ loglikhd <- function(pars, dat, dist) {
       
   
     #if the distribution is erlanf transform correctly for gamma
-    if (dist=="E") {return(loglikhd(c(log(pars[1]),pars[2]),dat,dist="G"))}
+    if(dist %in% c("E")) {return(loglikhd(c(log(pars[1]),pars[2]),dat,dist="G"))}
     
     ## calculates the log-likelihood of DIC data
     ## dat must have EL, ER, SL, SR and type columns  
@@ -621,12 +657,12 @@ single.boot <- function(par1.s,par2.s,opt.method,dat.tmp,dist,...){
 dist.optim.transform <- function(dist,pars){
     if (dist == "G" || dist == "off1G"){
         return(log(pars)) # for shape and scale
-    } else if (dist == "W"){
+    } else if (dist == "W" || dist == "off1W"){
         return(log(pars)) # for shape and scale
     } else if (dist == "E"){
         #shape not transformed, logged
         return(c(pars[1],log(pars[2])))
-    } else if (dist == "L"){
+    } else if (dist == "L" || dist == "off1L"){
         return(c(pars[1],log(pars[2]))) # for meanlog, sdlog
     } else {
         stop(sprintf("Distribtion (%s) not supported",dist))
@@ -638,12 +674,12 @@ dist.optim.transform <- function(dist,pars){
 dist.optim.untransform <- function(dist,pars){
     if (dist == "G" || dist=="off1G"){
         return(exp(pars)) # for shape and scale
-    } else if (dist == "W"){
+    } else if (dist == "W" || dist == "off1W"){
         return(exp(pars)) # for shape and scale
     } else if (dist == "E"){
         #shape identity, scale logged in estimation scale        
         return(c(pars[1],exp(pars[2])))
-    } else if (dist == "L"){
+    } else if (dist == "L" || dist == "off1L"){
         return(c(pars[1],exp(pars[2]))) # for meanlog, sdlog
     } else {
         stop(sprintf("Distribtion (%s) not supported",dist))
@@ -685,6 +721,26 @@ pgammaOff1 <- function(x, replace0 = FALSE, ...) {
   return(rc)
 }
 
+plnormOff1 <- function(x, replace0 = FALSE, ...) {
+  rc <- plnorm(x-1, ...)
+  if (replace0 && sum(rc<=0)>0) {
+    
+    rc[which(rc<=0)] <- 10^-8
+  }
+  return(rc)
+}
+
+pweibullOff1 <- function(x, replace0 = FALSE, ...) {
+  rc <- pweibull(x-1, ...)
+  if (replace0 && sum(rc<=0)>0) {
+    
+    rc[which(rc<=0)] <- 10^-8
+  }
+  return(rc)
+}
+
+
+
 
 ##' Function that calculates dgamma with a offset of 1 (i.e., 1 is equivlaent to 0)
 ##' 
@@ -699,6 +755,26 @@ dgammaOff1 <- function(x, replace0 = FALSE, ...) {
 
   if (replace0 && rc<=0) {
 
+    rc <- 10^-8
+  }
+  return(rc)
+}
+
+dlnormOff1 <- function(x, replace0 = FALSE, ...) {
+  rc <- dlnorm(x-1, ...)
+  
+  if (replace0 && rc<=0) {
+    
+    rc <- 10^-8
+  }
+  return(rc)
+}
+
+dweibullOff1 <- function(x, replace0 = FALSE, ...) {
+  rc <- dweibull(x-1, ...)
+  
+  if (replace0 && rc<=0) {
+    
     rc <- 10^-8
   }
   return(rc)
