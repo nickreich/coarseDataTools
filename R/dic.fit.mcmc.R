@@ -25,7 +25,8 @@
 ##' @param verbose how often do you want a print out from MCMCpack on iteration number and M-H acceptance rate
 ##' @param burnin number of burnin samples
 ##' @param n.samples number of samples to draw from the posterior (after the burnin)
-##' @param dist distribution to be used (L for log-normal,W for weibull, G for Gamma, and E for erlang)
+##' @param dist distribution to be used (L for log-normal,W for weibull, G for Gamma, and E for erlang, off1G for 1 day right shifted gamma)
+##' @param seed seed for the random number generator for MCMC
 ##' @param ... additional parameters to \link{MCMCmetrop1R}
 ##' @return a cd.fit.mcmc S4 object
 ##' @importFrom MCMCpack MCMCmetrop1R
@@ -39,6 +40,7 @@ dic.fit.mcmc <- function(dat,
                          burnin = 3000,
                          n.samples = 5000,
                          dist = "L",
+												 seed = NULL,
                          ...){
 
         
@@ -46,7 +48,7 @@ dic.fit.mcmc <- function(dat,
         check.data.structure(dat)
                        
         ## check to make sure distribution is supported
-        if(!dist %in% c("G","W","L","E")) stop("Please use one of the following distributions Log-Normal (L) , Weibull (W), Gamma (G), or Erlang (E)")
+        if(!dist %in% c("G","W","L","E","off1G","off1W","off1L")) stop("Please use one of the following distributions Log-Normal (L) , Weibull (W), Gamma (G), Erlang (E), offset Log-Normal (off1L), offset Weibull (off1W) or offset Gamma (off1G)")
         
 ##        ## don't need MCMCpack for Erlang
 ##        if (dist != "E") require(MCMCpack)       
@@ -56,9 +58,9 @@ dic.fit.mcmc <- function(dat,
         
         ## default prior parameters if none specified
         if (is.null(prior.par1)){
-           if (dist == "L") {
+           if (dist == "L" | dist == "off1L") {
             prior.par1 <- c(0,0)
-           } else if (dist == "W" | dist == "G"){
+           } else if (dist == "W" | dist == "off1W" | dist == "G" | dist=="off1G"){
             prior.par1 <- c(0,0.001)
            } else if (dist == "E"){
             prior.par1 <- c(100,0)          
@@ -66,15 +68,21 @@ dic.fit.mcmc <- function(dat,
         
         ## default prior parameters if none specified        
         if (is.null(prior.par2)){
-         if (dist == "L") {
+         if (dist == "L" | dist == "off1L") {
           prior.par2 <- c(1000,1000)
-         } else if (dist == "W" | dist == "G"){
+         } else if (dist == "W" | dist == "off1W" | dist == "G" | dist=="off1G"){
           prior.par2 <- c(1000,0.001)
          } else if (dist == "E"){
           prior.par2 <- c(1,1000)          
          }
         }
               
+				## random seed based off current time if none specified
+				if (is.null(seed)){
+					t <- as.numeric(Sys.time())
+					seed <- 1e8 * (t - floor(t))
+				}
+
         cat(sprintf("Running %.0f MCMC iterations \n",n.samples+burnin))
 
         msg <- NULL
@@ -86,7 +94,7 @@ dic.fit.mcmc <- function(dat,
         init.pars.trans <- dist.optim.transform(dist,init.pars)
   
       
-        if (dist!="E") {
+        if(!dist %in% c("E")) {
           #use MCMC pack for effieciency for distibutions with 2 continuous parameters
           tryCatch(            
               mcmc.run <- MCMCmetrop1R(fun=mcmcpack.ll,
@@ -99,7 +107,8 @@ dic.fit.mcmc <- function(dat,
                                           verbose=verbose,
                                           dist=dist,
                                           logfun=TRUE,
-                                          ...),
+																					seed=seed,
+                                           ...),
                  error=function(e){
                          msg <<- e$message
                          fail <<- TRUE
@@ -134,14 +143,26 @@ dic.fit.mcmc <- function(dat,
                         par1.name <- "meanlog"
                         par2.name <- "sdlog"
                         mcmc.quantiles <- apply(untrans.mcmcs,1,function(x) qlnorm(ptiles.appended,meanlog=x[1],sdlog=x[2]))
+                } else if (dist == "off1L"){
+                  par1.name <- "meanlog"
+                  par2.name <- "sdlog"
+                  mcmc.quantiles <- apply(untrans.mcmcs,1,function(x) {qlnorm(ptiles.appended,meanlog=x[1],sdlog=x[2])+1})
                 } else if (dist == "G"){
                         par1.name <- "shape"
                         par2.name <- "scale"
                         mcmc.quantiles <- apply(untrans.mcmcs,1,function(x) qgamma(ptiles.appended,shape=x[1],scale=x[2]))
+                } else if (dist == "off1G"){
+                        par1.name <- "shape"
+                        par2.name <- "scale"
+                        mcmc.quantiles <- apply(untrans.mcmcs,1,function(x) {qgamma(ptiles.appended,shape=x[1],scale=x[2])+1})
                 } else if (dist == "W"){
                         par1.name <- "shape"
                         par2.name <- "scale"
                         mcmc.quantiles <- apply(untrans.mcmcs,1,function(x) qweibull(ptiles.appended,shape=x[1],scale=x[2]))
+                } else if (dist == "off1W"){
+                  par1.name <- "shape"
+                  par2.name <- "scale"
+                  mcmc.quantiles <- apply(untrans.mcmcs,1,function(x) {qweibull(ptiles.appended,shape=x[1],scale=x[2])+1})
                 } else if (dist == "E"){
                         par1.name <- "shape"
                         par2.name <- "scale"
@@ -209,7 +230,7 @@ mcmcpack.ll <- function(pars,
   
   
   
-  if (dist == "L"){
+  if (dist == "L" || dist == "off1L"){
     ## default gamma on scale param and (inproper) uniform on location
     ll <- tryCatch(-loglikhd(pars,dat,dist) +
                      ## dgamma(pars.untrans[2],shape=par.prior.param1[2],
@@ -222,7 +243,7 @@ mcmcpack.ll <- function(pars,
                      return(-Inf)
                    })
     
-  } else if (dist == "W"){
+  } else if (dist == "W" || dist == "off1W"){
     ## using normal prior on the log-shape param and gamma on scale
     ll <- tryCatch(
       -loglikhd(pars,dat,dist) +
@@ -236,7 +257,7 @@ mcmcpack.ll <- function(pars,
         warning("Loglik failure, returning -Inf")
         return(-Inf)
       })
-  } else if (dist == "G"){
+  } else if (dist == "G" || dist=="off1G"){
     ## using Jeffery's prior
     ll <- tryCatch(-loglikhd(pars,dat,dist)
                    +
