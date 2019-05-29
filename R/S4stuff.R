@@ -105,6 +105,7 @@ setMethod("logLik",
 ##' Plots the estimated survival function with an option to plot the posterior draws or bootstraps behind the fit
 ##' 
 ##' @param x \code{cd.fit} or \code{cd.fit.mcmc} object
+##' @param y unused
 ##' 
 ##' @param col.main color for plotting the main estimate
 ##' 

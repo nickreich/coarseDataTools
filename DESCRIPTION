@@ -28,3 +28,4 @@ Collate:
     'S4stuff.R'
     'sampleSizeSimulation.R'
     'coarseDataTools-package.R'
+RoxygenNote: 6.1.1
