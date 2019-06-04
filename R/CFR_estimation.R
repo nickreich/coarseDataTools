@@ -52,7 +52,7 @@
 ##'   at each EM iteration} \item{DM}{the DM matrix from the SEM algorithm} 
 ##'   \item{DMiter}{a vector showing how many iterations it took for the
 ##'   variance component to converge in the SEM algorithm} }
-##'  @examples        
+##' @examples        
 ##'     ## This is code from the CFR vignette provided in the documentation.
 ##'        
 ##' data(simulated.outbreak.deaths)

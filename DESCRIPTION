@@ -2,8 +2,10 @@ Package: coarseDataTools
 Version: 0.6-3
 Date: 2016-03-05
 Title: A Collection of Functions to Help with Analysis of Coarsely Observed Data
-Author: Nicholas G. Reich <nick@schoolph.umass.edu>, Justin Lessler
-    <jlessler@jhsph.edu>, Andrew Azman <andrewazman@gmail.com>
+Authors@R: c(person("Nicholas G.", "Reich", email = "nick@schoolph.umass.edu", role = c("aut", "cre")),
+  person("Justin", "Lessler", email = "jlessler@jhsph.edu", role = "aut"),
+  person("Andrew", "Azman", email = "andrewazman@gmail.com", role = "aut"),
+  person("Zhian N.", "Kamvar", email = "zkamvar@gmail.com", role = "ctb"))
 Maintainer: Nicholas G. Reich <nick@schoolph.umass.edu>
 License: GPL (>= 2)
 URL: http://cran.r-project.org/package=coarseDataTools
@@ -28,3 +30,4 @@ Collate:
     'S4stuff.R'
     'sampleSizeSimulation.R'
     'coarseDataTools-package.R'
+RoxygenNote: 6.1.1

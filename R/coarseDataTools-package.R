@@ -1,3 +1,12 @@
+##' @importFrom graphics plot
+##' @importFrom MCMCpack MCMCmetrop1R
+##' @importFrom stats logLik
+##' @importFrom grDevices  rgb
+##' @importFrom graphics  lines
+##' @importFrom methods  new
+##' @importFrom stats  coef  dgamma  dlnorm  dnbinom  dnorm  dweibull  glm  integrate  optim  optimize  pgamma  plnorm  poisson  pweibull  qgamma  qlnorm  qnorm  qt  quantile  qweibull  rlnorm  rnorm  runif  sd  vcov
+##' @importFrom utils  data  setTxtProgressBar  txtProgressBar
+
 ##' @name exp.win.lengths
 ##' @title Exposure window lengths from an influenza outbreak at a NYC school
 ##' @description A numeric vector of exposure window lengths taken from a dataset of doubly interval-censored incubation period observations.  All observations came from a NYC public school.  The outbreak has been described in full in Lessler et al. (see citation below). 
