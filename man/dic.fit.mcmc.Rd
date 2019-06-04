@@ -18,7 +18,7 @@ dic.fit.mcmc(dat, prior.par1 = NULL, prior.par2 = NULL,
 
 \item{init.pars}{the initial parameter values (vector length = 2 )}
 
-\item{ptiles}{returned percentiles of the survival survival distrbution}
+\item{ptiles}{returned percentiles of the survival survival distribution}
 
 \item{verbose}{how often do you want a print out from MCMCpack on iteration number and M-H acceptance rate}
 
@@ -51,5 +51,5 @@ The following models are used:
 \deqn{Trigamma(x) = \frac{\partial}{\partial x^2} ln(\Gamma(x))}.)
 \deqn{Erlang model: f(x) = \frac{1}{\theta^k (k-1)!} x^{k-1} exp\{-\frac{x}{\theta}\}}
 \deqn{Erlang Default Prior Specification: k \sim NBinom(100,1), log(\theta) \sim N(0,1000)}
-(Note: parameters in the negative binomial distribution above represent mean and size, respectivley)
+(Note: parameters in the negative binomial distribution above represent mean and size, respectively)
 }

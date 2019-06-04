@@ -26,8 +26,8 @@
 ##'   exposure (E) and symptom onset (S). Also, a "type" column must be
 ##'   specified and have entries with 0, 1, or 2, corresponding to doubly
 ##'   interval-censored, single interval-censored or exact observations,
-##'   respsectively.
-##' @param start.par2 starting value for 2nd parameter of desired distribtution
+##'   respectively.
+##' @param start.par2 starting value for 2nd parameter of desired distribution
 ##' @param opt.method method used by optim
 ##' @param par1.int the log-scale interval of possible median values (in the
 ##'   same units as the observations in dat).  Narrowing this interval can help
@@ -48,7 +48,7 @@
 ##' dic.fit(fluA.inc.per, dist="L")
 ##' @references Reich NG et al.  Statistics in Medicine.  Estimating incubation
 ##'   periods with coarse data. 2009.
-##'   \url{http://www3.interscience.wiley.com/journal/122507367/abstract}
+##'   \url{https://www.ncbi.nlm.nih.gov/pubmed/19598148}
 
 dic.fit <- function(dat,
 		    start.par2=log(2),
@@ -704,10 +704,10 @@ check.data.structure <- function(dat){
 }
 
 
-##' Function that calculates pgamma with a offset of 1 (i.e., 1 is equivlaent to 0)
+##' Function that calculates pgamma with a offset of 1 (i.e., 1 is equivalent to 0)
 ##' 
 ##' @param x value to calculate pgamma at
-##' @param replace0 should we replace 0 with episilon
+##' @param replace0 should we replace 0 with epsilon
 ##' @param ... other parameters to pgamma
 ##'
 ##' @return pgamma offset
@@ -742,10 +742,10 @@ pweibullOff1 <- function(x, replace0 = FALSE, ...) {
 
 
 
-##' Function that calculates dgamma with a offset of 1 (i.e., 1 is equivlaent to 0)
+##' Function that calculates dgamma with a offset of 1 (i.e., 1 is equivalent to 0)
 ##' 
 ##' @param x value to calculate dgamma at
-##' @param replace0 should we replace 0 with episilon
+##' @param replace0 should we replace 0 with epsilon
 ##' @param ... other parameters to dgamma
 ##'
 ##' @return dgamma offset

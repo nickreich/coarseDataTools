@@ -15,9 +15,9 @@ to the left (L) and right (R) endpoints of the windows of possible
 exposure (E) and symptom onset (S). Also, a "type" column must be
 specified and have entries with 0, 1, or 2, corresponding to doubly
 interval-censored, single interval-censored or exact observations,
-respsectively.}
+respectively.}
 
-\item{start.par2}{starting value for 2nd parameter of desired distribtution}
+\item{start.par2}{starting value for 2nd parameter of desired distribution}
 
 \item{opt.method}{method used by optim}
 
@@ -69,7 +69,7 @@ dic.fit(fluA.inc.per, dist="L")
 \references{
 Reich NG et al.  Statistics in Medicine.  Estimating incubation
   periods with coarse data. 2009.
-  \url{http://www3.interscience.wiley.com/journal/122507367/abstract}
+  \url{https://www.ncbi.nlm.nih.gov/pubmed/19598148}
 }
 \seealso{
 \code{\link{cd.fit}}, \code{\link{dic.fit.mcmc}}

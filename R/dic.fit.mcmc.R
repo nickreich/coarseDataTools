@@ -15,13 +15,13 @@
 ##' \deqn{Trigamma(x) = \frac{\partial}{\partial x^2} ln(\Gamma(x))}.)
 ##' \deqn{Erlang model: f(x) = \frac{1}{\theta^k (k-1)!} x^{k-1} exp\{-\frac{x}{\theta}\}}
 ##' \deqn{Erlang Default Prior Specification: k \sim NBinom(100,1), log(\theta) \sim N(0,1000)}
-##' (Note: parameters in the negative binomial distribution above represent mean and size, respectivley)
+##' (Note: parameters in the negative binomial distribution above represent mean and size, respectively)
 ##'
 ##' @param dat the data
 ##' @param prior.par1 vector of first prior parameters for each model parameter. If \code{NULL} then default parameters are used (as described in Details section).
 ##' @param prior.par2 vector of second prior parameters for each model parameter. If \code{NULL} then default parameters are used (as described in Details section).
 ##' @param init.pars the initial parameter values (vector length = 2 )
-##' @param ptiles returned percentiles of the survival survival distrbution
+##' @param ptiles returned percentiles of the survival survival distribution
 ##' @param verbose how often do you want a print out from MCMCpack on iteration number and M-H acceptance rate
 ##' @param burnin number of burnin samples
 ##' @param n.samples number of samples to draw from the posterior (after the burnin)

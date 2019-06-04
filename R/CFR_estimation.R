@@ -27,7 +27,7 @@
 ##'   \describe{ \item{grp}{a 1 or a 2 indicating which of the two groups, j, 
 ##'   the observation is for.} \item{new.times}{an integer value representing
 ##'   the time, t, of observation.} \item{R}{the count of recovered cases with
-##'   onset at time t in group j.} \item{D}{the count of deaths which occured at
+##'   onset at time t in group j.} \item{D}{the count of deaths which occurred at
 ##'   time t in groupo j (note that these deaths did not have disease onset at
 ##'   time t but rather died at time t).} \item{N}{the total cases at t, j, or
 ##'   the sum of R and D columns.} }
@@ -43,7 +43,7 @@
 ##'   EM algorithm iterates of the lag-adjusted relative CFR estimates} 
 ##'   \item{EMiter}{the number of iterations needed for the EM algorithm to
 ##'   converge} \item{EMconv}{indicator for convergence of the EM algorithm.  0
-##'   indicates all paramters converged within max.iter iterations.  1 indicates
+##'   indicates all parameters converged within max.iter iterations.  1 indicates
 ##'   that the estimate of the relative case fatality ratio converged but other
 ##'   did not.  2 indicates that the relative case fatality ratio did not
 ##'   converge.} \item{SEMconv}{indicator for convergence of SEM algorithm. 

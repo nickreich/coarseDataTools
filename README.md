@@ -6,7 +6,7 @@ coarseDataTools
 [![Travis build status](https://travis-ci.org/nickreich/coarseDataTools.svg?branch=master)](https://travis-ci.org/nickreich/coarseDataTools)
 <!-- badges: end -->
 
-This is the repository for the coarseDataTools R package. We use this as a development space. The most recent, stable version of the package can be downloaded either from CRAN (http://cran.r-project.org/web/packages/coarseDataTools/) or from the most recent release version on github (https://github.com/nickreich/coarseDataTools/releases).
+This is the repository for the coarseDataTools R package. We use this as a development space. The most recent, stable version of the package can be downloaded either from CRAN (https://cran.rstudio.com/web/packages/coarseDataTools/index.html) or from the most recent release version on github (https://github.com/nickreich/coarseDataTools/releases).
 
 This package contains functions to analyze coarsely observed data.
     Specifically, it contains functions to (1) fit parametric accelerated

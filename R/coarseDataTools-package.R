@@ -11,7 +11,7 @@
 ##' @title Exposure window lengths from an influenza outbreak at a NYC school
 ##' @description A numeric vector of exposure window lengths taken from a dataset of doubly interval-censored incubation period observations.  All observations came from a NYC public school.  The outbreak has been described in full in Lessler et al. (see citation below). 
 ##' @docType data
-##' @format A numeric vector with 134 positive values.  Each value represents an exposure window length from an observation of the incubation period for that individual.  The exposure window length is the length of time during which exposure could have occured.  For example, if an individual could have been exposed anytime between 6am on Monday to 6am on Wednesday, her exposure window length would be 2 days. 
+##' @format A numeric vector with 134 positive values.  Each value represents an exposure window length from an observation of the incubation period for that individual.  The exposure window length is the length of time during which exposure could have occurred.  For example, if an individual could have been exposed anytime between 6am on Monday to 6am on Wednesday, her exposure window length would be 2 days. 
 ##' 
 ##' @usage data(exp.win.lengths)
 ##' @source Lessler J et al.  New England Journal of Medicine. Outbreak of 2009 Pandemic Influenza A (H1N1) at a New York City School. 2009. 361(27):2628-2636. \url{http://content.nejm.org/cgi/content/full/361/27/2628}
@@ -47,7 +47,7 @@ NULL
 ##' @name simulated.outbreak.deaths
 ##' @docType data
 ##' @title Simulated case and death reports from a fictional outbreak
-##' @description This dataset provides reported counts of cases and deaths occuring at different time points across a simulated outbreak. Details of the data simulation algorithm are provided in the manuscript "Estimating case fatality ratios from infectious disease surveillance data" (Reich et al., under review, available upon request).
+##' @description This dataset provides reported counts of cases and deaths occurring at different time points across a simulated outbreak. Details of the data simulation algorithm are provided in the manuscript "Estimating case fatality ratios from infectious disease surveillance data" (Reich et al., under review, available upon request).
 ##' @usage data(simulated.outbreak.deaths)
 ##' @format
 ##' \describe{

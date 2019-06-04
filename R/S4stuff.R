@@ -43,7 +43,7 @@ setClass("cd.fit",
 ##'
 ##'@section Slots:
 ##'  \describe{
-##'    \item{\code{ests}:}{Matrix of class \code{"numeric"}. This matrix summarizes the results of fitting the model. Rows correspond to the first parameter , the second paramaeter and then percentiles specified by the ptiles argument. Columns correspond to the point estimate, the lower and upper bounds on the 95\% credible interval and the standard error of the point estimate.}
+##'    \item{\code{ests}:}{Matrix of class \code{"numeric"}. This matrix summarizes the results of fitting the model. Rows correspond to the first parameter , the second parameter and then percentiles specified by the ptiles argument. Columns correspond to the point estimate, the lower and upper bounds on the 95\% credible interval and the standard error of the point estimate.}
 ##'    \item{\code{conv}:}{Object of class \code{"numeric"}. Not used in with \code{dic.fit.mcmc}}
 ##'    \item{\code{MSG}:}{Object of class \code{"character"}. The error message returned from optim() if the routine fails to converge.}
 ##'    \item{\code{loglik}:}{Object of class \code{"numeric"}.  Not used in with \code{dic.fit.mcmc}.}
@@ -111,9 +111,9 @@ setMethod("logLik",
 ##' 
 ##' @param col.samps color for the samples (should include some alpha transparency)
 ##' 
-##' @param plot.n.samps how many posterior or boostrap samples do you want to plot?
+##' @param plot.n.samps how many posterior or bootstrap samples do you want to plot?
 ##' 
-##' @param add add to exisiting plot?
+##' @param add add to existing plot?
 ##' 
 ##' @param xlim xlim for plot, defaults to the range of the data slot in x
 ##' 

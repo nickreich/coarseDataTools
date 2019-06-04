@@ -18,7 +18,7 @@ Reich NG, Lessler J, Cummings DAT, Brookmeyer R. Estimating case fatality ratios
 data(simulated.outbreak.deaths)
 }
 \description{
-This dataset provides reported counts of cases and deaths occuring at different time points across a simulated outbreak. Details of the data simulation algorithm are provided in the manuscript "Estimating case fatality ratios from infectious disease surveillance data" (Reich et al., under review, available upon request).
+This dataset provides reported counts of cases and deaths occurring at different time points across a simulated outbreak. Details of the data simulation algorithm are provided in the manuscript "Estimating case fatality ratios from infectious disease surveillance data" (Reich et al., under review, available upon request).
 }
 \examples{
 data(simulated.outbreak.deaths)

@@ -2,14 +2,14 @@
 % Please edit documentation in R/dic.fit.R
 \name{pgammaOff1}
 \alias{pgammaOff1}
-\title{Function that calculates pgamma with a offset of 1 (i.e., 1 is equivlaent to 0)}
+\title{Function that calculates pgamma with a offset of 1 (i.e., 1 is equivalent to 0)}
 \usage{
 pgammaOff1(x, replace0 = FALSE, ...)
 }
 \arguments{
 \item{x}{value to calculate pgamma at}
 
-\item{replace0}{should we replace 0 with episilon}
+\item{replace0}{should we replace 0 with epsilon}
 
 \item{...}{other parameters to pgamma}
 }
@@ -17,5 +17,5 @@ pgammaOff1(x, replace0 = FALSE, ...)
 pgamma offset
 }
 \description{
-Function that calculates pgamma with a offset of 1 (i.e., 1 is equivlaent to 0)
+Function that calculates pgamma with a offset of 1 (i.e., 1 is equivalent to 0)
 }

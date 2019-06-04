@@ -1,6 +1,6 @@
 Package: coarseDataTools
-Version: 0.6-3
-Date: 2016-03-05
+Version: 0.6-4
+Date: 2019-06-04
 Title: A Collection of Functions to Help with Analysis of Coarsely Observed Data
 Authors@R: c(person("Nicholas G.", "Reich", email = "nick@schoolph.umass.edu", role = c("aut", "cre")),
   person("Justin", "Lessler", email = "jlessler@jhsph.edu", role = "aut"),
@@ -8,7 +8,7 @@ Authors@R: c(person("Nicholas G.", "Reich", email = "nick@schoolph.umass.edu", r
   person("Zhian N.", "Kamvar", email = "zkamvar@gmail.com", role = "ctb"))
 Maintainer: Nicholas G. Reich <nick@schoolph.umass.edu>
 License: GPL (>= 2)
-URL: http://cran.r-project.org/package=coarseDataTools
+URL: https://cran.rstudio.com/web/packages/coarseDataTools/index.html
 Imports:
     MCMCpack,
     graphics,

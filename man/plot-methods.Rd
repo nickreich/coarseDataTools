@@ -19,9 +19,9 @@
 
 \item{col.samps}{color for the samples (should include some alpha transparency)}
 
-\item{plot.n.samps}{how many posterior or boostrap samples do you want to plot?}
+\item{plot.n.samps}{how many posterior or bootstrap samples do you want to plot?}
 
-\item{add}{add to exisiting plot?}
+\item{add}{add to existing plot?}
 
 \item{xlim}{xlim for plot, defaults to the range of the data slot in x}
 
