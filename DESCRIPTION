@@ -1,14 +1,14 @@
 Package: coarseDataTools
 Version: 0.6-4
 Date: 2019-06-04
-Title: A Collection of Functions to Help with Analysis of Coarsely Observed Data
+Title: Analysis of Coarsely Observed Data
 Authors@R: c(person("Nicholas G.", "Reich", email = "nick@schoolph.umass.edu", role = c("aut", "cre")),
   person("Justin", "Lessler", email = "jlessler@jhsph.edu", role = "aut"),
   person("Andrew", "Azman", email = "andrewazman@gmail.com", role = "aut"),
   person("Zhian N.", "Kamvar", email = "zkamvar@gmail.com", role = "ctb"))
 Maintainer: Nicholas G. Reich <nick@schoolph.umass.edu>
 License: GPL (>= 2)
-URL: https://cran.rstudio.com/web/packages/coarseDataTools/index.html
+URL: https://cran.r-project.org/web/packages/coarseDataTools/index.html
 Imports:
     MCMCpack,
     graphics,
@@ -21,7 +21,9 @@ Description: Functions to analyze coarse data.
     This package's development was motivated by applications to infectious
     disease: in particular, problems with estimating the incubation period and
     the case fatality ratio of a given disease.  Sample data files are included
-    in the package.
+    in the package. See Reich et al. (2009) <doi:10.1002/sim.3659>, 
+    Reich et al. (2012) <doi:10.1111/j.1541-0420.2011.01709.x>, and 
+    Lessler et al. (2009) <doi:10.1016/S1473-3099(09)70069-6>.
 Collate:
     'CFR_estimation.R'
     'dic.fit.mcmc.R'

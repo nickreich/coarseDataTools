@@ -16,6 +16,18 @@ citEntry(entry  = "Article",
          year = 2009,
          textVersion = "Reich NG, Lessler J, Cummings DAT, Brookmeyer R. (2009). Estimating incubation periods with coarse data. Statistics in Medicine. 28(22):2769--2784.")
 
+
+citEntry(entry  = "Article",
+         title = "Estimating absolute and relative case fatality ratios from infectious disease surveillance data.",
+         author= c(person(c("Nicholas G"), "Reich"),
+                   person(c("Justin"), "Lessler"),
+                   person(c("Derek AT"), "Cummings"),
+                   person(c("Ron"), "Brookmeyer")),
+         journal = "Biometrics",
+         year = 2012,
+         textVersion = "Reich NG, Lessler J, Cummings DAT, Brookmeyer R. Estimating absolute and relative case fatality ratios from infectious disease surveillance data. Biometrics. 2012, 68(2): 598--606.")
+
+
 citEntry(entry  = "Manual",
          title = "coarseDataTools: A collection of functions to help with analysis of coarsely observed data",
          author= c(person(c("Nicholas G"), "Reich"),
