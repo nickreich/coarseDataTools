@@ -8,7 +8,7 @@ Authors@R: c(person("Nicholas G.", "Reich", email = "nick@schoolph.umass.edu", r
   person("Zhian N.", "Kamvar", email = "zkamvar@gmail.com", role = "ctb"))
 Maintainer: Nicholas G. Reich <nick@schoolph.umass.edu>
 License: GPL (>= 2)
-URL: https://cran.r-project.org/web/packages/coarseDataTools/index.html
+URL: https://cran.r-project.org/package=coarseDataTools
 Imports:
     MCMCpack,
     graphics,
