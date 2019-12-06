@@ -1,6 +1,6 @@
 Package: coarseDataTools
-Version: 0.6-4
-Date: 2019-06-04
+Version: 0.6-5
+Date: 2019-12-05
 Title: Analysis of Coarsely Observed Data
 Authors@R: c(person("Nicholas G.", "Reich", email = "nick@schoolph.umass.edu", role = c("aut", "cre")),
   person("Justin", "Lessler", email = "jlessler@jhsph.edu", role = "aut"),

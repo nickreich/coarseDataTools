@@ -80,6 +80,6 @@ NULL
 ##' @examples
 ##' data(nycH1N1)
 ##' head(nycH1N1)
-##' dic.fit(nycH1N1)
+##' \dontrun{dic.fit(nycH1N1)}
 ##' @keywords datasets
 NULL

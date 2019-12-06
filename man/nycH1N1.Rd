@@ -23,6 +23,6 @@ These observations on the incubation period of influenza A come from the investi
 \examples{
 data(nycH1N1)
 head(nycH1N1)
-dic.fit(nycH1N1)
+\dontrun{dic.fit(nycH1N1)}
 }
 \keyword{datasets}

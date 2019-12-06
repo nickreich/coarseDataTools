@@ -41,6 +41,7 @@
 ##' @param n.boots number of bootstrap resamples (0 means that asymptotic results are desired)
 ##' @param ... additional options passed to optim
 ##' @return a cd.fit S4 object.
+##' @importFrom methods is
 ##' @seealso \code{\link{cd.fit}}, \code{\link{dic.fit.mcmc}}
 ##' @export
 ##' @examples
@@ -77,7 +78,7 @@ dic.fit <- function(dat,
 
     ## make sure dat is a matrix
     dat <- as.matrix(dat[,c("EL", "ER", "SL", "SR", "type")])
-    if(class(dat)=="data.frame") stop("dat should be a matrix.")
+    if(is(dat,"data.frame")) stop("dat should be a matrix.")
 
     ## find starting values for DIC analysis using profile likelihoods
     start.par1 <- optimize(f=pl.par1, interval=par1.int,
