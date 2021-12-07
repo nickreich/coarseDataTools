@@ -106,21 +106,16 @@ setMethod("logLik",
 ##' 
 ##' @param x \code{cd.fit} or \code{cd.fit.mcmc} object
 ##' @param y unused
-##' 
 ##' @param col.main color for plotting the main estimate
-##' 
 ##' @param col.samps color for the samples (should include some alpha transparency)
-##' 
 ##' @param plot.n.samps how many posterior or bootstrap samples do you want to plot?
-##' 
 ##' @param add add to existing plot?
-##' 
 ##' @param xlim xlim for plot, defaults to the range of the data slot in x
-##' 
 ##' @param ... other options to pass to plot
-##' @rdname plot-methods
+##' 
+##' @rdname plot
 ##' @importFrom graphics plot
-##' @exportMethod plot
+##' @export
 setMethod("plot",
           "cd.fit",
           function(x,y,
