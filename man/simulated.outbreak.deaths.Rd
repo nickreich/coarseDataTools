@@ -4,13 +4,15 @@
 \name{simulated.outbreak.deaths}
 \alias{simulated.outbreak.deaths}
 \title{Simulated case and death reports from a fictional outbreak}
-\format{\describe{
+\format{
+\describe{
             \item{\code{time}}{time, t,  after start of outbreak}
             \item{\code{grp}}{an categorical variable indicating membership in one of two groups of a covariate, j}
             \item{\code{R}}{number of recovered cases reported at the given t and j}
             \item{\code{D}}{number of deaths reported at the given t and j}
             \item{\code{N}}{total number of cases and deaths reported at t and j, or D+R}
-            }}
+            }
+}
 \source{
 Reich NG, Lessler J, Cummings DAT, Brookmeyer R. Estimating case fatality ratios from infectious disease surveillance data. Biometrics. 2012. 68(2): 598-606.
 }

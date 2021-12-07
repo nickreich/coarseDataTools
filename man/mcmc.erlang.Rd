@@ -4,8 +4,16 @@
 \alias{mcmc.erlang}
 \title{Does a metropolis hastings for the Erlang distribution}
 \usage{
-mcmc.erlang(dat, prior.par1, prior.par2, init.pars, verbose, burnin,
-  n.samples, sds = c(1, 1))
+mcmc.erlang(
+  dat,
+  prior.par1,
+  prior.par2,
+  init.pars,
+  verbose,
+  burnin,
+  n.samples,
+  sds = c(1, 1)
+)
 }
 \arguments{
 \item{dat}{the data to fit}

@@ -4,10 +4,17 @@
 \alias{dic.fit}
 \title{censored survival data}
 \usage{
-dic.fit(dat, start.par2 = log(2), opt.method = "L-BFGS-B",
-  par1.int = c(log(0.5), log(13)), par2.int = c(log(1.01),
-  log(log(5))), ptiles = c(0.05, 0.95, 0.99), dist = "L",
-  n.boots = 0, ...)
+dic.fit(
+  dat,
+  start.par2 = log(2),
+  opt.method = "L-BFGS-B",
+  par1.int = c(log(0.5), log(13)),
+  par2.int = c(log(1.01), log(log(5))),
+  ptiles = c(0.05, 0.95, 0.99),
+  dist = "L",
+  n.boots = 0,
+  ...
+)
 }
 \arguments{
 \item{dat}{a matrix with columns named "EL", "ER", "SL", "SR", corresponding

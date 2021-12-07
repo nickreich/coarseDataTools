@@ -5,9 +5,19 @@
 \title{Fits the distribution to the passed-in data using MCMC
 as implemented in MCMCpack.}
 \usage{
-dic.fit.mcmc(dat, prior.par1 = NULL, prior.par2 = NULL,
-  init.pars = c(1, 1), ptiles = c(0.05, 0.95, 0.99), verbose = 1000,
-  burnin = 3000, n.samples = 5000, dist = "L", seed = NULL, ...)
+dic.fit.mcmc(
+  dat,
+  prior.par1 = NULL,
+  prior.par2 = NULL,
+  init.pars = c(1, 1),
+  ptiles = c(0.05, 0.95, 0.99),
+  verbose = 1000,
+  burnin = 3000,
+  n.samples = 5000,
+  dist = "L",
+  seed = NULL,
+  ...
+)
 }
 \arguments{
 \item{dat}{the data}

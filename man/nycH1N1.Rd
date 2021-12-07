@@ -4,13 +4,15 @@
 \name{nycH1N1}
 \alias{nycH1N1}
 \title{Incubation period data from New York City Public Schools, 2009 H1N1 influenza outbreak}
-\format{A data frame with 134 observations on the following 5 variables. 
+\format{
+A data frame with 134 observations on the following 5 variables. 
 \describe{
 \item{\code{EL}}{the earliest possible time of infection}
 \item{\code{ER}}{the latest possible time of infection}
 \item{\code{SL}}{the earliest possible time of symptom onset}
 \item{\code{SR}}{the latest possible time of symptom onset}
-\item{\code{type}}{an indicator of the type of observation: 0 for doubly interval-censored, 1 for single-interval censored, 2 for exact. All of these observations are doubly interval-censored.}}}
+\item{\code{type}}{an indicator of the type of observation: 0 for doubly interval-censored, 1 for single-interval censored, 2 for exact. All of these observations are doubly interval-censored.}}
+}
 \source{
 Lessler J, Reich NG, Cummings DAT and The DOHMH Swine Influenza Investigation Team. Outbreak of 2009 Pandemic Influenza A (H1N1) at a New York City School. New England Journal of Medicine. 2009. 361(27):2628-2636.
 }

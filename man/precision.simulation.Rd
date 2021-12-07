@@ -7,14 +7,30 @@
 \alias{generate.coarse.data}
 \title{Simulate incubation period analyses with coarse data}
 \usage{
-precision.simulation(N, med = 2, disp = 1.3, percentile = 0.5,
-  nsim = 100, exact.data = FALSE, pct.type.A = 0.5,
-  exp.win.dat = NULL, verb = FALSE)
+precision.simulation(
+  N,
+  med = 2,
+  disp = 1.3,
+  percentile = 0.5,
+  nsim = 100,
+  exact.data = FALSE,
+  pct.type.A = 0.5,
+  exp.win.dat = NULL,
+  verb = FALSE
+)
 
 precision.simulation.exact(N, med, disp, percentile, nsim, verb)
 
-precision.simulation.coarse(N, med, disp, percentile, nsim, pct.type.A,
-  exp.win.dat, verb)
+precision.simulation.coarse(
+  N,
+  med,
+  disp,
+  percentile,
+  nsim,
+  pct.type.A,
+  exp.win.dat,
+  verb
+)
 
 generate.coarse.data(N, med, disp, pct.type.A, exp.win.dat)
 }
