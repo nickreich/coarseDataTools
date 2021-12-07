@@ -1,19 +1,23 @@
 Package: coarseDataTools
-Version: 0.6-5
-Date: 2019-12-05
+Version: 0.6-6
+Date: 2021-12-07
 Title: Analysis of Coarsely Observed Data
-Authors@R: c(person("Nicholas G.", "Reich", email = "nick@schoolph.umass.edu", role = c("aut", "cre")),
-  person("Justin", "Lessler", email = "jlessler@jhsph.edu", role = "aut"),
+Authors@R: c(person("Nicholas G.", "Reich", email = "nick@umass.edu", role = c("aut", "cre")),
+  person("Justin", "Lessler", email = "jlessler@unc.edu", role = "aut"),
   person("Andrew", "Azman", email = "andrewazman@gmail.com", role = "aut"),
   person("Zhian N.", "Kamvar", email = "zkamvar@gmail.com", role = "ctb"))
-Maintainer: Nicholas G. Reich <nick@schoolph.umass.edu>
+Maintainer: Nicholas G. Reich <nick@umass.edu>
 License: GPL (>= 2)
 URL: https://cran.r-project.org/package=coarseDataTools
+Encoding: UTF-8
 Imports:
     MCMCpack,
     graphics,
     stats,
     methods
+Suggests: 
+    markdown, 
+    knitr
 Description: Functions to analyze coarse data.
     Specifically, it contains functions to (1) fit parametric accelerated
     failure time models to interval-censored survival time data, and (2)
@@ -32,4 +36,5 @@ Collate:
     'S4stuff.R'
     'sampleSizeSimulation.R'
     'coarseDataTools-package.R'
-RoxygenNote: 6.1.1
+VignetteBuilder: knitr
+RoxygenNote: 7.1.2

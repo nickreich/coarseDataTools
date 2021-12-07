@@ -1,46 +1,42 @@
-\documentclass{article}
+---
+title: "Using outbreak data to estimate the relative case fatality ratio"
+author: "Nicholas G Reich"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Example for estimating the case fatality ratio}
+  %\VignetteEngine{knitr::knitr}
+  \usepackage[utf8]{inputenc}
+---
 
-\usepackage[margin=1in]{geometry}
 
-\SweaveOpts{prefix.string=../figures/fig}
-
-%\VignetteIndexEntry{Example for estimating the case fatality ratio}
-
-\begin{document}
-
-\title{Using outbreak data to estimate the relative case fatality ratio}
-\author{Nicholas G. Reich}
-
-\maketitle
-
-\section{Introduction to the data}
+## Introduction to the data
 
 The goal of this vignette is to provide a tutorial for implementing the
 case fatality ratio estimation methods available in the coarseDataTools R package.  To illustrate the methods, we will estimate a
 relative case fatality ratio from a simulated outbreak dataset.
 
 
-\section{Loading the data and the code}
+## Loading the data and the code
 We begin by loading the package and a set of simulated data.
 
-<<label=sourcing>>=
+```{r label=sourcing}
 library(coarseDataTools)
 data(simulated.outbreak.deaths)
-@
+```
 
 The data that we have loaded is a simulated dataset with five
 columns.  Let's take a peek at the dataset.
-<<label=datapeek>>=
+```{r label=datapeek}
 simulated.outbreak.deaths[15:20,]
-@
+```
 The rows index observations at a particular time and group.  The columns are defined as follows:
-\begin{itemize}
-  \item time = the specified unit of time, $t$, for this observation
-  \item grp = the covariate group, $j$, for this observation
-  \item R = the number of recovered cases observed
-  \item D = the number of dead cases observed
-  \item N = the total number of cases observed, or D + R
-\end{itemize}
+
+  -  time = the specified unit of time, $t$, for this observation
+  -  grp = the covariate group, $j$, for this observation
+  -  R = the number of recovered cases observed
+  -  D = the number of dead cases observed
+  -  N = the total number of cases observed, or D + R
 
 We must perform a little bit of pre-processing on the data so that it
 is ready for the analysis.  Specifically, we need to define the $T$
@@ -49,7 +45,7 @@ moment)  some convergence issues associated with
 small sample sizes, we will only include times
 where both groups have at least 10 total cases observed.
 
-<<label=preprocessing>>=
+```{r label=preprocessing}
 ## set minimum number of observed cases for inclusion
 min.cases <- 10
 
@@ -66,14 +62,15 @@ idx.for.Estep <- first.t:last.t
 new.times <- 1:length(idx.for.Estep)
 simulated.outbreak.deaths <- cbind(simulated.outbreak.deaths, new.times=NA)
 simulated.outbreak.deaths[c(idx.for.Estep, idx.for.Estep+60),"new.times"] <- rep(new.times, 2)
-@
+```
 
 If we look at the new data matrix, we can see the new variable
 that we've made and that will be used in the analysis:
-<<label=datapeek2>>=
+```{r label=datapeek2}
 simulated.outbreak.deaths[15:20,]
-@
-\section{Running an analysis}
+```
+
+## Running an analysis
 
 We wish to fit a model to the simulated dataset that adjusts for changing reporting rates over time and
 for a lag between disease onset and death.  We assume that the
@@ -99,19 +96,19 @@ occur on the third day after disease onset.  Also, we need to set
 starting values for the $\alpha$ parameters in the model.  We will
 assume that $\alpha_t=0$ for all $t$.
 
-<<label=setValues>>=
+```{r label=setValues}
 assumed.nu = c(0, .3, .4, .3)
 alpha.start <- rep(0, 22)
-@
+```
 
 That is all the set up required.  We can now call the central
 function, $\tt{EMforCFR()}$, which generates three estimates of the
 CFR: the na\"ive, the reporting-rate-adjusted and the lag-adjusted estimators.
-<<label=runAnalysis, cache=TRUE>>=
+```{r label=runAnalysis, cache=TRUE, warning=FALSE}
 cfr.ests <- EMforCFR(assumed.nu=assumed.nu,
 alpha.start.values=alpha.start, full.data=simulated.outbreak.deaths, verb=FALSE,
-SEM.var=TRUE, max.iter=500, tol=1e-5)
-@
+SEM.var=TRUE, max.iter=100, tol=1e-5)
+```
 
 [Note that running cfr.ests will generate warnings (many of them,
 likely) but not to worry because this is due to the fact that the
@@ -120,33 +117,29 @@ density function.  This is an expected behavior and is not an
 indication of a problem with the routine.]
 
 The function $\tt{EMforCFR()}$ returns a list with the following components:
-\begin{itemize}
-  \item naive.rel.cfr = the na\"ive estimator for the relative CFR
-  \item glm.rel.cfr = the reporting-rate-adjusted estimator for the relative CFR
-  \item EM.rel.cfr = the lag-adjusted estimator for the relative CFR
-  \item EM.rel.cfr.var = the variance for the log-scale lag-adjusted
+
+  -  naive.rel.cfr = the na\"ive estimator for the relative CFR
+  -  glm.rel.cfr = the reporting-rate-adjusted estimator for the relative CFR
+  -  EM.rel.cfr = the lag-adjusted estimator for the relative CFR
+  -  EM.rel.cfr.var = the variance for the log-scale lag-adjusted
     estimator taken from the final M-step
-  \item EM.rel.cfr.var.SEM = the Supplemented EM algorithm variance
+  -  EM.rel.cfr.var.SEM = the Supplemented EM algorithm variance
     for the log-scale lag-adjusted estimator
-  \item EM.rel.cfr.chain = a vector of the EM algorithm iterates of the
+  -  EM.rel.cfr.chain = a vector of the EM algorithm iterates of the
     lag-adjusted relative CFR estimates
-  \item ests = the coefficient estimates for the model
-  \item ests.chain.EM = a matrix with all of the coefficient
+  -  ests = the coefficient estimates for the model
+  -  ests.chain.EM = a matrix with all of the coefficient
     estimates, at each EM iteration
-  \item DM = the DM matrix from the SEM algorithm
-  \item DMiter = a vector showing how many iterations it took for the
+  -  DM = the DM matrix from the SEM algorithm
+  -  DMiter = a vector showing how many iterations it took for the
     variance component to converge in the SEM algorithm
-\end{itemize}
 
 
 We are particularly interested in the following components:
-<<label=estimationResults>>=
+```{r label=estimationResults}
 cfr.ests$naive.rel.cfr
 cfr.ests$glm.rel.cfr
 cfr.ests$EM.rel.cfr
 cfr.ests$EM.rel.cfr.var.SEM
-@
+```
 
-
-
-\end{document}
