@@ -6,7 +6,7 @@ output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Example for estimating the case fatality ratio}
   %\VignetteEngine{knitr::knitr}
-  %\VignetteEncoding{UTF-8}
+  \usepackage[utf8]{inputenc}
 ---
 
 
