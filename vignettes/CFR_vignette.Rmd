@@ -2,15 +2,10 @@
 title: "Using outbreak data to estimate the relative case fatality ratio"
 author: "Nicholas G Reich"
 date: "`r format(Sys.time(), '%d %B %Y')`"
-output:
-  html_document:
-    toc: true
-    toc_float:
-      collapsed: false
-      smooth_scroll: false
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Example for estimating the case fatality ratio}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
 ---
 
