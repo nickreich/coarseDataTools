@@ -15,7 +15,9 @@ Imports:
     graphics,
     stats,
     methods
-Suggests: knitr
+Suggests: 
+    markdown, 
+    knitr
 Description: Functions to analyze coarse data.
     Specifically, it contains functions to (1) fit parametric accelerated
     failure time models to interval-censored survival time data, and (2)
