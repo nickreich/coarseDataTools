@@ -1,4 +1,3 @@
-##' @importFrom graphics plot
 ##' @importFrom MCMCpack MCMCmetrop1R
 ##' @importFrom stats logLik
 ##' @importFrom grDevices  rgb
