@@ -49,7 +49,7 @@
 ##' dic.fit(fluA.inc.per, dist="L")
 ##' @references Reich NG et al.  Statistics in Medicine.  Estimating incubation
 ##'   periods with coarse data. 2009.
-##'   \url{https://www.ncbi.nlm.nih.gov/pubmed/19598148}
+##'   \url{https://pubmed.ncbi.nlm.nih.gov/19598148/}
 
 dic.fit <- function(dat,
 		    start.par2=log(2),

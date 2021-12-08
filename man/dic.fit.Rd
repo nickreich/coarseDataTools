@@ -76,7 +76,7 @@ dic.fit(fluA.inc.per, dist="L")
 \references{
 Reich NG et al.  Statistics in Medicine.  Estimating incubation
   periods with coarse data. 2009.
-  \url{https://www.ncbi.nlm.nih.gov/pubmed/19598148}
+  \url{https://pubmed.ncbi.nlm.nih.gov/19598148/}
 }
 \seealso{
 \code{\link{cd.fit}}, \code{\link{dic.fit.mcmc}}
