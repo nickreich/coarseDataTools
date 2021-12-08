@@ -20,4 +20,4 @@ v06.4 - merged hackout3 branch to support new distributions
 
 v06.5 - minor modifications to fix improper call to `class()` and other new NOTES.
 
-v06.6 - update vignette to Rmd, minor modifications to fix S4 method documentation.
+v06.6 - update vignette to Rmd, removal of plot method for cd.fit object.
