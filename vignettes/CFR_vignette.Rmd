@@ -97,7 +97,7 @@ starting values for the $\alpha$ parameters in the model.  We will
 assume that $\alpha_t=0$ for all $t$.
 
 ```{r label=setValues}
-assumed.nu <- c(0, .3, .4, .3)
+assumed.nu <- c(0, 0.3, 0.4, 0.3)
 alpha.start <- rep(0, 22)
 ```
 

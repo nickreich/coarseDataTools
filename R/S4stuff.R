@@ -78,8 +78,8 @@ setMethod("show", "cd.fit", function(object) {
     cat(sprintf(
       "\nNote: dispersion parameter is exp(sdlog). In this case it is %.3f (95%% CI %.3f-%.3f). \n",
       exp(object@ests[2, 1]),
-      exp(object@ests[2, 1]) - qt(.975, nrow(object@data) - 1) * se.dispersion,
-      exp(object@ests[2, 1]) + qt(.975, nrow(object@data) - 1) * se.dispersion
+      exp(object@ests[2, 1]) - qt(0.975, nrow(object@data) - 1) * se.dispersion,
+      exp(object@ests[2, 1]) + qt(0.975, nrow(object@data) - 1) * se.dispersion
     ))
   }
 })

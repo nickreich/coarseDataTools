@@ -61,10 +61,10 @@
 precision.simulation <- function(N,
                                  med = 2,
                                  disp = 1.3,
-                                 percentile = .5,
+                                 percentile = 0.5,
                                  nsim = 100,
                                  exact.data = FALSE,
-                                 pct.type.A = .5,
+                                 pct.type.A = 0.5,
                                  exp.win.dat = NULL,
                                  verb = FALSE) {
   ## logic check

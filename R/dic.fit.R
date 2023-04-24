@@ -54,9 +54,9 @@
 dic.fit <- function(dat,
                     start.par2 = log(2),
                     opt.method = "L-BFGS-B",
-                    par1.int = c(log(.5), log(13)),
+                    par1.int = c(log(0.5), log(13)),
                     par2.int = c(log(1.01), log(log(5))),
-                    ptiles = c(.05, .95, .99),
+                    ptiles = c(0.05, 0.95, 0.99),
                     dist = "L",
                     n.boots = 0,
                     ...) {
@@ -149,8 +149,8 @@ dic.fit <- function(dat,
       Sig <- solve(tmp$hessian)
       ses <- dic.getSE(dat = dat, par1 = log(med), log.par2 = log(log(disp)), Sig = Sig, ptiles = ptiles.appended, dist = dist, opt.method = opt.method)
       ## get cis
-      cil <- ests - qt(.975, n - 1) * ses
-      cih <- ests + qt(.975, n - 1) * ses
+      cil <- ests - qt(0.975, n - 1) * ses
+      cih <- ests + qt(0.975, n - 1) * ses
       ## save the quantile estimates
       quant.matrix <- matrix(c(ests, cil, cih, ses),
         nrow = 2 + length(ptiles.appended), byrow = FALSE
@@ -180,8 +180,8 @@ dic.fit <- function(dat,
         opt.method = opt.method
       )
       ## get cis
-      cil <- ests - qt(.975, n - 1) * ses
-      cih <- ests + qt(.975, n - 1) * ses
+      cil <- ests - qt(0.975, n - 1) * ses
+      cih <- ests + qt(0.975, n - 1) * ses
 
       ## save the quantile estimates
       quant.matrix <- matrix(c(ests, cil, cih, ses),
@@ -213,7 +213,7 @@ dic.fit <- function(dat,
         boot.params <- boot.params[-which(na.rows), ]
       }
 
-      cis.params <- apply(boot.params, 2, function(x) quantile(x, c(.025, 0.975)))
+      cis.params <- apply(boot.params, 2, function(x) quantile(x, c(0.025, 0.975)))
 
       ## adding median to  below since the exp(shape) paramter no longer has the nice interpretration
       ## of the log-normal model
@@ -239,7 +239,7 @@ dic.fit <- function(dat,
       sds.params <- apply(boot.params, 2, sd)
 
       ## get percentile estimates
-      cis.ptiles <- apply(boot.funcs, 1, function(x) quantile(x, c(.025, .975)))
+      cis.ptiles <- apply(boot.funcs, 1, function(x) quantile(x, c(0.025, 0.975)))
       sds.ptiles <- apply(boot.funcs, 1, sd)
 
       quant.matrix <- matrix(c(untransformed.fit.params, ests, cis.params[1, ], cis.ptiles[1, ], cis.params[2, ], cis.ptiles[2, ], sds.params, sds.ptiles), nrow = 2 + length(ptiles.appended), byrow = FALSE)
