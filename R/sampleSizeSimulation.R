@@ -197,8 +197,7 @@ generate.coarse.data <- function(N, med, disp, pct.type.A, exp.win.dat) {
 
 
   E <- runif(N, 10, 11)
-  T <- rlnorm(N, log(med), log(disp))
-  S <- T + E
+  S <- rlnorm(N, log(med), log(disp)) + E
   SR <- ceiling(S)
   SL <- floor(S)
 

@@ -245,7 +245,7 @@ mcmcpack.ll <- function(pars,
         sum(dnorm(pars,
           prior.par1,
           prior.par2,
-          log = T
+          log = TRUE
         )),
       error = function(e) {
         warning("Loglik failure, returning -Inf")
@@ -259,11 +259,11 @@ mcmcpack.ll <- function(pars,
         dnorm(pars[1],
           prior.par1[1],
           prior.par2[1],
-          log = T
+          log = TRUE
         ) +
         dgamma(pars.untrans[2],
           shape = prior.par1[2],
-          rate = prior.par2[2], log = T
+          rate = prior.par2[2], log = TRUE
         ),
       error = function(e) {
         warning("Loglik failure, returning -Inf")
@@ -310,8 +310,8 @@ mcmc.erlang <- function(dat, prior.par1, prior.par2,
   shape.cur <- init.pars[1]
   scale.cur <- log(init.pars[2])
   ll.cur <- -loglikhd(c(log(shape.cur), scale.cur), dat, dist = "G") +
-    dnbinom(shape.cur, mu = prior.par1[1], size = prior.par2[1], log = T) +
-    dnorm(scale.cur, prior.par1[2], prior.par2[2], log = T)
+    dnbinom(shape.cur, mu = prior.par1[1], size = prior.par2[1], log = TRUE) +
+    dnorm(scale.cur, prior.par1[2], prior.par2[2], log = TRUE)
 
   if (ll.cur == -Inf) {
     stop("zero starting likelihood. check priors are appropriate for Erlang distribution")
@@ -329,8 +329,8 @@ mcmc.erlang <- function(dat, prior.par1, prior.par2,
       ll.prop <- -Inf
     } else {
       ll.prop <- -loglikhd(c(log(shape.prop), scale.prop), dat, dist = "G") +
-        dnbinom(shape.prop, mu = prior.par1[1], size = prior.par2[1], log = T) +
-        dnorm(scale.prop, prior.par1[2], prior.par2[2], log = T)
+        dnbinom(shape.prop, mu = prior.par1[1], size = prior.par2[1], log = TRUE) +
+        dnorm(scale.prop, prior.par1[2], prior.par2[2], log = TRUE)
     }
 
     # accept or reject

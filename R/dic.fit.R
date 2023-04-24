@@ -630,7 +630,7 @@ dic.get.boots <- function(par1, par2, dist, dat, opt.method, n.boots = 100) {
   boots <- vector("list", n.boots)
 
   ## sample line numbers from the data
-  line.nums <- matrix(sample(seq_len(nrow(dat)), nrow(dat) * n.boots, replace = T), nrow = nrow(dat), ncol = n.boots)
+  line.nums <- matrix(sample(seq_len(nrow(dat)), nrow(dat) * n.boots, replace = TRUE), nrow = nrow(dat), ncol = n.boots)
   ## set up progress bar
   pb <- txtProgressBar(min = 0, max = n.boots, style = 3)
   for (i in 1:n.boots) {
