@@ -68,10 +68,10 @@ precision.simulation <- function(N,
                                  exp.win.dat = NULL,
                                  verb = FALSE) {
   ## logic check
-  if (percentile <= 0 | percentile >= 1) {
+  if (percentile <= 0 || percentile >= 1) {
     stop("percentile must be between 0 and 1.")
   }
-  if (pct.type.A < 0 | pct.type.A > 1) {
+  if (pct.type.A < 0 || pct.type.A > 1) {
     stop("% of data that is type A must be between 0 and 1.")
   }
   if (is.null(exp.win.dat)) {
@@ -141,7 +141,7 @@ precision.simulation.exact <- function(N,
       storage[i, c("ests", "SE")] <- NA
     }
     storage[i, "conv"] <- tmp.fit$conv
-    if (verb & i %% (round(nsim / 10)) == 0) {
+    if (verb && i %% (round(nsim / 10)) == 0) {
       print(paste("iteration", i, "complete ::", Sys.time()))
     }
   }
@@ -181,7 +181,7 @@ precision.simulation.coarse <- function(N,
       storage[i, c("ests", "SE")] <- NA
     }
     storage[i, "conv"] <- tmp.fit$conv
-    if (verb & i %% (round(nsim / 10)) == 0) {
+    if (verb && i %% (round(nsim / 10)) == 0) {
       print(paste("iteration", i, "complete ::", Sys.time()))
     }
   }

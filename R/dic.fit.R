@@ -67,10 +67,10 @@ dic.fit <- function(dat,
   if (!dist %in% c("G", "W", "L")) stop("Please use one of the following distributions Log-Normal (L) , Weibull (W), or Gamma (G)")
 
   ## no asymptotic results for gamma disribution at the moment so will need bootstrap to be larger tha 0 if dist != "L"
-  if (dist %in% c("G") & n.boots <= 0) stop("You must use bootstraping with this distrbution at the moment.  Please increase n.boots to something larger than 0")
+  if (dist %in% c("G") && n.boots <= 0) stop("You must use bootstraping with this distrbution at the moment.  Please increase n.boots to something larger than 0")
 
   ## check if ptiles are valid
-  if (any(ptiles >= 1) | any(ptiles <= 0)) stop("Sorry the percentiles you are requesting are not valid.")
+  if (any(ptiles >= 1, ptiles <= 0)) stop("Sorry the percentiles you are requesting are not valid.")
 
   ## fix sample size
   n <- nrow(dat)
@@ -136,7 +136,7 @@ dic.fit <- function(dat,
     ptiles.appended <- sort(union(0.5, ptiles))
 
     ## get asymtotic CIs and SEs
-    if (dist == "L" & n.boots <= 0) {
+    if (dist == "L" && n.boots <= 0) {
       med <- exp(untransformed.fit.params[1])
       disp <- exp(untransformed.fit.params[2])
 
@@ -159,7 +159,7 @@ dic.fit <- function(dat,
 
       rownames(quant.matrix) <- c("meanlog", "sdlog", ptiles.names)
       colnames(quant.matrix) <- c("est", "CIlow", "CIhigh", "StdErr")
-    } else if (dist == "W" & n.boots <= 0) {
+    } else if (dist == "W" && n.boots <= 0) {
       shape <- untransformed.fit.params[1]
       scale <- untransformed.fit.params[2]
 
@@ -694,14 +694,14 @@ single.boot <- function(par1.s, par2.s, opt.method, dat.tmp, dist, ...) {
 ## Transforms parameters of a specific distriution for unbounded optimization
 ## returns vector of transformed parameters
 dist.optim.transform <- function(dist, pars) {
-  if (dist == "G" || dist == "off1G") {
+  if (dist %in% c("G", "off1G")) {
     return(log(pars)) # for shape and scale
-  } else if (dist == "W" || dist == "off1W") {
+  } else if (dist %in% c("W", "off1W")) {
     return(log(pars)) # for shape and scale
   } else if (dist == "E") {
     # shape not transformed, logged
     return(c(pars[1], log(pars[2])))
-  } else if (dist == "L" || dist == "off1L") {
+  } else if (dist %in% c("L", "off1L")) {
     return(c(pars[1], log(pars[2]))) # for meanlog, sdlog
   } else {
     stop(sprintf("Distribtion (%s) not supported", dist))
@@ -711,14 +711,14 @@ dist.optim.transform <- function(dist, pars) {
 ## Untransforms parameters before entering likelihood
 ## returns vector of untransformed parameters
 dist.optim.untransform <- function(dist, pars) {
-  if (dist == "G" || dist == "off1G") {
+  if (dist %in% c("G", "off1G")) {
     return(exp(pars)) # for shape and scale
-  } else if (dist == "W" || dist == "off1W") {
+  } else if (dist %in% c("W", "off1W")) {
     return(exp(pars)) # for shape and scale
   } else if (dist == "E") {
     # shape identity, scale logged in estimation scale
     return(c(pars[1], exp(pars[2])))
-  } else if (dist == "L" || dist == "off1L") {
+  } else if (dist %in% c("L", "off1L")) {
     return(c(pars[1], exp(pars[2]))) # for meanlog, sdlog
   } else {
     stop(sprintf("Distribtion (%s) not supported", dist))

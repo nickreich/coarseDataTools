@@ -52,13 +52,13 @@ dic.fit.mcmc <- function(dat,
   ##        if (dist != "E") require(MCMCpack)
 
   ## check that percentiles are valid
-  if (any(ptiles >= 1) | any(ptiles <= 0)) stop("Sorry the percentiles you are requesting are not valid.")
+  if (any(ptiles >= 1, ptiles <= 0)) stop("Sorry the percentiles you are requesting are not valid.")
 
   ## default prior parameters if none specified
   if (is.null(prior.par1)) {
-    if (dist == "L" | dist == "off1L") {
+    if (dist %in% c("L", "off1L")) {
       prior.par1 <- c(0, 0)
-    } else if (dist == "W" | dist == "off1W" | dist == "G" | dist == "off1G") {
+    } else if (dist %in% c("W", "off1W", "G", "off1G")) {
       prior.par1 <- c(0, 0.001)
     } else if (dist == "E") {
       prior.par1 <- c(100, 0)
@@ -67,9 +67,9 @@ dic.fit.mcmc <- function(dat,
 
   ## default prior parameters if none specified
   if (is.null(prior.par2)) {
-    if (dist == "L" | dist == "off1L") {
+    if (dist %in% c("L", "off1L")) {
       prior.par2 <- c(1000, 1000)
-    } else if (dist == "W" | dist == "off1W" | dist == "G" | dist == "off1G") {
+    } else if (dist %in% c("W", "off1W", "G", "off1G")) {
       prior.par2 <- c(1000, 0.001)
     } else if (dist == "E") {
       prior.par2 <- c(1, 1000)
@@ -348,7 +348,7 @@ mcmc.erlang <- function(dat, prior.par1, prior.par2,
       states[i, ] <- c(shape.cur, scale.cur, ll.cur, 0)
     }
 
-    if (verbose != 0 & i %% verbose == 0) {
+    if (verbose != 0 && i %% verbose == 0) {
       cat("Erlang MCMC iteration ", i, " of ", burnin + n.samples, "\n")
       cat("LL = ", ll.cur, "\n")
       cat("theta = ", c(shape.cur, scale.cur), "\n")
