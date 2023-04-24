@@ -93,7 +93,7 @@ dic.fit.mcmc <- function(dat,
   init.pars.trans <- dist.optim.transform(dist, init.pars)
 
 
-  if (!dist %in% c("E")) {
+  if (dist != "E") {
     # use MCMC pack for effieciency for distibutions with 2 continuous parameters
     tryCatch(
       mcmc.run <- MCMCmetrop1R(

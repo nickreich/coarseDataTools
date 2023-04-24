@@ -67,7 +67,7 @@ dic.fit <- function(dat,
   if (!dist %in% c("G", "W", "L")) stop("Please use one of the following distributions Log-Normal (L) , Weibull (W), or Gamma (G)")
 
   ## no asymptotic results for gamma disribution at the moment so will need bootstrap to be larger tha 0 if dist != "L"
-  if (dist %in% c("G") && n.boots <= 0) stop("You must use bootstraping with this distrbution at the moment.  Please increase n.boots to something larger than 0")
+  if (dist == "G" && n.boots <= 0) stop("You must use bootstraping with this distrbution at the moment.  Please increase n.boots to something larger than 0")
 
   ## check if ptiles are valid
   if (any(ptiles >= 1, ptiles <= 0)) stop("Sorry the percentiles you are requesting are not valid.")
@@ -559,7 +559,7 @@ exactlik <- function(par1, par2, EL, ER, SL, SR, dist) {
 ##' @export
 loglikhd <- function(pars, dat, dist) {
   # if the distribution is erlanf transform correctly for gamma
-  if (dist %in% c("E")) {
+  if (dist == "E") {
     return(loglikhd(c(log(pars[1]), pars[2]), dat, dist = "G"))
   }
 
