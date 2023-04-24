@@ -754,7 +754,7 @@ check.data.structure <- function(dat) {
 ##'
 pgammaOff1 <- function(x, replace0 = FALSE, ...) {
   rc <- pgamma(x - 1, ...)
-  if (replace0 && sum(rc <= 0) > 0) {
+  if (replace0 && any(rc <= 0)) {
     rc[which(rc <= 0)] <- 10^-8
   }
   return(rc)
@@ -762,7 +762,7 @@ pgammaOff1 <- function(x, replace0 = FALSE, ...) {
 
 plnormOff1 <- function(x, replace0 = FALSE, ...) {
   rc <- plnorm(x - 1, ...)
-  if (replace0 && sum(rc <= 0) > 0) {
+  if (replace0 && any(rc <= 0)) {
     rc[which(rc <= 0)] <- 10^-8
   }
   return(rc)
@@ -770,7 +770,7 @@ plnormOff1 <- function(x, replace0 = FALSE, ...) {
 
 pweibullOff1 <- function(x, replace0 = FALSE, ...) {
   rc <- pweibull(x - 1, ...)
-  if (replace0 && sum(rc <= 0) > 0) {
+  if (replace0 && any(rc <= 0)) {
     rc[which(rc <= 0)] <- 10^-8
   }
   return(rc)
