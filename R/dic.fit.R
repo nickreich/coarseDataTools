@@ -400,10 +400,7 @@ diclik <- function(par1, par2, EL, ER, SL, SR, dist) {
       dist = dist
     )$value
     return(dic1 + dic2 + dic3)
-  }
-
-  ## if exposure window is bigger than symptom window
-  else {
+  } else { ## if exposure window is bigger than symptom window
     dic1 <- integrate(fw1,
       lower = SL - ER, upper = SR - ER, subdivisions = 10,
       par1 = par1, par2 = par2,
