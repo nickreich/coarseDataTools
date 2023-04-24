@@ -59,7 +59,7 @@ last.t <- max(which(N.1 > min.cases & N.2 > min.cases))
 idx.for.Estep <- first.t:last.t
 
 ## find and label the subset of times to be used for estimation routine
-new.times <- 1:length(idx.for.Estep)
+new.times <- seq_along(idx.for.Estep)
 simulated.outbreak.deaths <- cbind(simulated.outbreak.deaths, new.times = NA)
 simulated.outbreak.deaths[c(idx.for.Estep, idx.for.Estep + 60), "new.times"] <- rep(new.times, 2)
 ```

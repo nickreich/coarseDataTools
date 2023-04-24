@@ -388,7 +388,7 @@ run.Estep <- function(alpha, full.data, nlag, assumed.nu) {
     denom.1 <- denom.2 <- rep(0, nlag)
     for (i in 1:nlag) {
       N.idx <- (t + i - 1):(t + i - nlag)
-      nu.idx <- 1:length(N.idx)
+      nu.idx <- seq_along(N.idx)
       ## group 1
       denom.1[i] <- sum(assumed.nu[nu.idx] * N.1[N.idx] * exp(alpha.long[N.idx]))
       ## group 2
