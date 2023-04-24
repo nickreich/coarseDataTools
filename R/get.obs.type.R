@@ -4,13 +4,13 @@
 ##' @return vector of guessed types
 ##' @export
 get.obs.type <- function(dat) {
-        type <- rep(0, nrow(dat))
-        ## get the single interval censored
-        type[dat[,"EL"]==dat[,"ER"]]<-1
-        type[dat[,"SL"]==dat[,"SR"]]<-1
-        type[dat[,"ER"]>=dat[,"SL"]]<-1
+  type <- rep(0, nrow(dat))
+  ## get the single interval censored
+  type[dat[, "EL"] == dat[, "ER"]] <- 1
+  type[dat[, "SL"] == dat[, "SR"]] <- 1
+  type[dat[, "ER"] >= dat[, "SL"]] <- 1
 
-        ## some of those are actually exact!
-        type[(dat[,"EL"]==dat[,"ER"]) & (dat[,"SL"]==dat[,"SR"])]<- 2
-        return(type)
+  ## some of those are actually exact!
+  type[(dat[, "EL"] == dat[, "ER"]) & (dat[, "SL"] == dat[, "SR"])] <- 2
+  return(type)
 }
