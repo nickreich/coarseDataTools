@@ -283,7 +283,6 @@ EMforCFR <- function(assumed.nu, alpha.start.values, full.data,
 SEM.variance <- function(full.data, dat, phi, max.iter, tol, nlag,
                          alpha.start.values, assumed.nu) {
   ## algorithm parameters
-  eps <- 1
   iter <- 0
   phi.hat <- phi ## using phi from notation in Bayesian Data Analysis (Gelman, p323)
   phi0 <- c(1, alpha.start.values, 1) ## the starting values for the parameters: c(beta0, alpha2-T, gamma2)

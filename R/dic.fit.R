@@ -649,8 +649,6 @@ dic.get.boots <- function(par1, par2, dist, dat, opt.method, n.boots = 100) {
 ## returns optim list object with estimates for the untransformed two parameters of the specified dist
 single.boot <- function(par1.s, par2.s, opt.method, dat.tmp, dist, ...) {
   tmp <- list(convergence = 1)
-  msg <- NULL
-  fail <- FALSE
   pars.transformed <- dist.optim.transform(dist, c(par1.s, par2.s))
   tryCatch(
     tmp <- optim(
@@ -661,19 +659,16 @@ single.boot <- function(par1.s, par2.s, opt.method, dat.tmp, dist, ...) {
       dat = dat.tmp, dist = dist, ...
     ),
     error = function(e) {
-      msg <- e$message
-      fail <- TRUE
+      NULL
     },
     warning = function(w) {
-      msg <- w$message
-      fail <- TRUE
+      NULL
     }
   )
 
   if (tmp$convergence != 0 || all(tmp$hessian == 0)) {
     msg <- tmp$message
     if (all(tmp$hessian == 0)) msg <- paste(msg, "& hessian is singular")
-    fail <- TRUE
   }
 
   ## transform back to original scale
