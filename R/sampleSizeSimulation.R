@@ -132,7 +132,7 @@ precision.simulation.exact <- function(N,
     tmp.dat <- data[which(data[, "dataset.id"] == i), ]
     tmp.fit <- dic.fit(tmp.dat, ptiles = percentile)
     if (tmp.fit$conv == 1) {
-      row.name <- paste("p", round(percentile * 100), sep = "")
+      row.name <- paste0("p", round(percentile * 100))
       which.row <-
         which(rownames(tmp.fit$ests) == row.name)[1]
       storage[i, c("ests", "SE")] <-
@@ -172,7 +172,7 @@ precision.simulation.coarse <- function(N,
     )
     tmp.fit <- dic.fit(tmp.dat, ptiles = percentile)
     if (tmp.fit$conv == 1) {
-      row.name <- paste("p", round(percentile * 100), sep = "")
+      row.name <- paste0("p", round(percentile * 100))
       which.row <-
         which(rownames(tmp.fit$ests) == row.name)[1]
       storage[i, c("ests", "SE")] <-
