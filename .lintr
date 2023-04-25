@@ -1,0 +1,16 @@
+linters: linters_with_tags(
+    tags = NULL, # include all linters
+    object_name_linter = NULL,
+    undesirable_function_linter = NULL,
+    implicit_integer_linter = NULL,
+    extraction_operator_linter = NULL,
+    todo_comment_linter = NULL,
+    function_argument_linter = NULL,
+    line_length_linter = NULL,
+    commented_code_linter = NULL,
+    cyclocomp_linter = NULL,
+    unnecessary_lambda_linter = NULL,
+    any_is_na_linter = NULL,
+    undesirable_operator_linter = NULL,
+    implicit_assignment_linter = NULL
+  )
