@@ -4,7 +4,7 @@ coarseDataTools
 <!-- badges: start -->
 [![CRAN](http://cranlogs.r-pkg.org/badges/coarseDataTools)](https://cran.r-project.org/package=coarseDataTools)
 [![Travis build status](https://travis-ci.org/nickreich/coarseDataTools.svg?branch=master)](https://travis-ci.org/nickreich/coarseDataTools)
-[![R-CMD-check](https://github.com/nickreich/coarseDataTools/workflows/R-CMD-check/badge.svg)](https://github.com/nickreich/coarseDataTools/actions)
+[![R-CMD-check](https://github.com/nickreich/coarseDataTools/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/nickreich/coarseDataTools/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 This is the repository for the coarseDataTools R package. We use this as a development space. The most recent, stable version of the package can be downloaded either from CRAN (https://cran.r-project.org/package=coarseDataTools) or from the most recent release version on github (https://github.com/nickreich/coarseDataTools/releases).
