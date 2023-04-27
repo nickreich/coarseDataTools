@@ -5,7 +5,7 @@
 \title{A function to estimate the relative case fatality ratio when reporting rates
 are time-varying and deaths are lagged because of survival time.}
 \usage{
-EMforCFR(assumed.nu, alpha.start.values, full.data, max.iter = 50, 
+EMforCFR(assumed.nu, alpha.start.values, full.data, max.iter = 50,
   verb = FALSE, tol = 1e-10, SEM.var = TRUE)
 }
 \arguments{
@@ -31,23 +31,23 @@ algorithm to calculate the variance of the parameter estimates.}
 }
 \value{
 A list with the following elements \describe{ \item{naive.rel.cfr
-  }{the naive estimate of the relative case fatality ratio} 
+  }{the naive estimate of the relative case fatality ratio}
   \item{glm.rel.cfr }{the reporting-rate-adjusted estimate of the relative
   case fatality ratio} \item{EM.rel.cfr }{the lag-adjusted estimate of the
   relative case fatality ratio} \item{EM.re.cfr.var }{the variance for the
-  log-scale lag-adjusted estimator taken from the final M-step} 
+  log-scale lag-adjusted estimator taken from the final M-step}
   \item{EM.rel.cfr.var.SEM }{ the Supplemented EM algorithm variance for the
   log-scale lag-adjusted estimator} \item{EM.rel.cfr.chain }{a vector of the
-  EM algorithm iterates of the lag-adjusted relative CFR estimates} 
+  EM algorithm iterates of the lag-adjusted relative CFR estimates}
   \item{EMiter}{the number of iterations needed for the EM algorithm to
   converge} \item{EMconv}{indicator for convergence of the EM algorithm.  0
   indicates all parameters converged within max.iter iterations.  1 indicates
   that the estimate of the relative case fatality ratio converged but other
   did not.  2 indicates that the relative case fatality ratio did not
-  converge.} \item{SEMconv}{indicator for convergence of SEM algorithm. 
+  converge.} \item{SEMconv}{indicator for convergence of SEM algorithm.
   Same scheme as EMconv.} \item{ests}{ the coefficient estimates for the
   model } \item{ests.chain}{ a matrix with all of the coefficient estimates,
-  at each EM iteration} \item{DM}{the DM matrix from the SEM algorithm} 
+  at each EM iteration} \item{DM}{the DM matrix from the SEM algorithm}
   \item{DMiter}{a vector showing how many iterations it took for the
   variance component to converge in the SEM algorithm} }
 }
@@ -57,8 +57,8 @@ fatality ratio between two groups when reporting rates are time-varying and
 deaths are lagged because of survival time.
 }
 \details{
-The data matrix full.data must have the following columns: 
-  \describe{ \item{grp}{a 1 or a 2 indicating which of the two groups, j, 
+The data matrix full.data must have the following columns:
+  \describe{ \item{grp}{a 1 or a 2 indicating which of the two groups, j,
   the observation is for.} \item{new.times}{an integer value representing
   the time, t, of observation.} \item{R}{the count of recovered cases with
   onset at time t in group j.} \item{D}{the count of deaths which occurred at
@@ -67,30 +67,29 @@ The data matrix full.data must have the following columns:
   the sum of R and D columns.} }
 }
 \examples{
-       
     ## This is code from the CFR vignette provided in the documentation.
-       
+
 data(simulated.outbreak.deaths)
-min.cases <- 10 
-N.1 <- simulated.outbreak.deaths[1:60, "N"] 
-N.2 <- simulated.outbreak.deaths[61:120, "N"] 
-first.t <- min(which(N.1 > min.cases & N.2 > min.cases)) 
-last.t <- max(which(N.1 > min.cases & N.2 > min.cases)) 
-idx.for.Estep <- first.t:last.t 
-new.times <- 1:length(idx.for.Estep) 
-simulated.outbreak.deaths <- cbind(simulated.outbreak.deaths, new.times = NA) 
+min.cases <- 10
+N.1 <- simulated.outbreak.deaths[1:60, "N"]
+N.2 <- simulated.outbreak.deaths[61:120, "N"]
+first.t <- min(which(N.1 > min.cases & N.2 > min.cases))
+last.t <- max(which(N.1 > min.cases & N.2 > min.cases))
+idx.for.Estep <- first.t:last.t
+new.times <- 1:length(idx.for.Estep)
+simulated.outbreak.deaths <- cbind(simulated.outbreak.deaths, new.times = NA)
 simulated.outbreak.deaths[c(idx.for.Estep, idx.for.Estep + 60), "new.times"] <- rep(new.times, + 2)
 assumed.nu = c(0, 0.3, 0.4, 0.3)
 alpha.start <- rep(0, 22)
-       
-## caution! this next line may take several minutes (5-10, depanding on 
+
+## caution! this next line may take several minutes (5-10, depanding on
 ##    the speed of your machine) to run.
-\dontrun{cfr.ests <- EMforCFR(assumed.nu = assumed.nu, 
-                              alpha.start.values = alpha.start, 
-                              full.data = simulated.outbreak.deaths, 
-                              verb = FALSE, 
-                              SEM.var = TRUE, 
-                              max.iter = 500, 
+\dontrun{cfr.ests <- EMforCFR(assumed.nu = assumed.nu,
+                              alpha.start.values = alpha.start,
+                              full.data = simulated.outbreak.deaths,
+                              verb = FALSE,
+                              SEM.var = TRUE,
+                              max.iter = 500,
                               tol = 1e-05)}
 }
 \keyword{case}

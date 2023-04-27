@@ -5,7 +5,7 @@
 \alias{fluA.inc.per}
 \title{Coarse incubation period data for influenza A}
 \format{
-A data frame with 151 observations on the following 7 variables. 
+A data frame with 151 observations on the following 7 variables.
 \describe{
 \item{\code{author}}{the name of the primary author for the source of the observation}
 \item{\code{year}}{the year of the study which is the source of the observation}

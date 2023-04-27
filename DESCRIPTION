@@ -37,4 +37,4 @@ Collate:
     'sampleSizeSimulation.R'
     'coarseDataTools-package.R'
 VignetteBuilder: knitr
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.3
