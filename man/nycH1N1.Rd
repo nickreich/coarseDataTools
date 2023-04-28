@@ -5,7 +5,7 @@
 \alias{nycH1N1}
 \title{Incubation period data from New York City Public Schools, 2009 H1N1 influenza outbreak}
 \format{
-A data frame with 134 observations on the following 5 variables. 
+A data frame with 134 observations on the following 5 variables.
 \describe{
 \item{\code{EL}}{the earliest possible time of infection}
 \item{\code{ER}}{the latest possible time of infection}

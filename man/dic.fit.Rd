@@ -8,8 +8,8 @@ dic.fit(
   dat,
   start.par2 = log(2),
   opt.method = "L-BFGS-B",
-  par1.int = c(log(0.5), log(13)),
-  par2.int = c(log(1.01), log(log(5))),
+  par1.int = log(c(0.5, 13)),
+  par2.int = log(c(1.01, log(5))),
   ptiles = c(0.05, 0.95, 0.99),
   dist = "L",
   n.boots = 0,
@@ -50,7 +50,7 @@ a cd.fit S4 object.
 }
 \description{
 \code{dic.fit} fits a parametric accelerated failure time model to survival
-data. It was developed with the application to estimating incubation periods of infectious diseases 
+data. It was developed with the application to estimating incubation periods of infectious diseases
 in mind but is applicable to many general problems.
 The data can be a mixture of doubly interval-censored, single
 interval-censored or exact observations from a single univariate

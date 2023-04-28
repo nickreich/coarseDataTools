@@ -22,17 +22,21 @@
 ##' @rdname cd.fit
 ##' @aliases cd.fit-class
 ##' @exportClass cd.fit
-setClass("cd.fit",
-         representation(ests = "matrix",
-                        conv = "numeric",
-                        MSG="character",
-                        loglik="numeric",
-                        samples="data.frame",
-                        data="data.frame",
-                        dist="character",
-                        inv.hessian="matrix",
-                        est.method="character",
-                        ci.method="character"))
+setClass(
+  "cd.fit",
+  representation(
+    ests = "matrix",
+    conv = "numeric",
+    MSG = "character",
+    loglik = "numeric",
+    samples = "data.frame",
+    data = "data.frame",
+    dist = "character",
+    inv.hessian = "matrix",
+    est.method = "character",
+    ci.method = "character"
+  )
+)
 
 
 ##' An S4 Class that stores a MCMC fit coarse data object
@@ -41,7 +45,7 @@ setClass("cd.fit",
 ##' This is the output from \code{dic.fit.mcmc()}, which contains the important bits of information about the model fit and key options used.
 ##'
 ##'
-##'@section Slots:
+##' @section Slots:
 ##'  \describe{
 ##'    \item{\code{ests}:}{Matrix of class \code{"numeric"}. This matrix summarizes the results of fitting the model. Rows correspond to the first parameter , the second parameter and then percentiles specified by the ptiles argument. Columns correspond to the point estimate, the lower and upper bounds on the 95\% credible interval and the standard error of the point estimate.}
 ##'    \item{\code{conv}:}{Object of class \code{"numeric"}. Not used in with \code{dic.fit.mcmc}}
@@ -60,30 +64,32 @@ setClass("cd.fit",
 ##' @aliases cd.fit.mcmc-class
 ##' @exportClass cd.fit.mcmc
 setClass("cd.fit.mcmc",
-         contains="cd.fit")
+  contains = "cd.fit"
+)
 
 ## we don't want boots and data printing out all the time
-setMethod("show","cd.fit",function(object){
-    cat(sprintf("Coarse Data Model Parameter and Quantile Estimates: \n"))
-    print(object@ests)
-    cat(sprintf("\n-2*Log Likelihood = %.1f \n",-2*object@loglik))
-    if (object@conv == 0) warning("This model did not converge. Try different starting values or increase the number of iterations")
-    if (object@dist == "L" & nrow(object@inv.hessian) > 0) {
-        se.dispersion <- sqrt(object@inv.hessian[2,2] * (exp(object@ests[2,1] + log(object@ests[2,1])))^2) #using delta method
-        cat(sprintf("\nNote: dispersion parameter is exp(sdlog). In this case it is %.3f (95%% CI %.3f-%.3f). \n",
-                    exp(object@ests[2,1]),
-                    exp(object@ests[2,1])-qt(.975, nrow(object@data)-1)*se.dispersion,
-                    exp(object@ests[2,1])+qt(.975, nrow(object@data)-1)*se.dispersion
-                    ))
-    }
+setMethod("show", "cd.fit", function(object) {
+  cat(sprintf("Coarse Data Model Parameter and Quantile Estimates: \n"))
+  print(object@ests)
+  cat(sprintf("\n-2*Log Likelihood = %.1f \n", -2 * object@loglik))
+  if (object@conv == 0) warning("This model did not converge. Try different starting values or increase the number of iterations")
+  if (object@dist == "L" & nrow(object@inv.hessian) > 0) {
+    se.dispersion <- sqrt(object@inv.hessian[2, 2] * (exp(object@ests[2, 1] + log(object@ests[2, 1])))^2) # using delta method
+    cat(sprintf(
+      "\nNote: dispersion parameter is exp(sdlog). In this case it is %.3f (95%% CI %.3f-%.3f). \n",
+      exp(object@ests[2, 1]),
+      exp(object@ests[2, 1]) - qt(0.975, nrow(object@data) - 1) * se.dispersion,
+      exp(object@ests[2, 1]) + qt(0.975, nrow(object@data) - 1) * se.dispersion
+    ))
+  }
 })
 
 ## we don't want boots and data printing out all the time
-setMethod("show","cd.fit.mcmc",function(object){
-    cat(sprintf("Coarse Data Model Parameter and Quantile Estimates: \n"))
-    print(object@ests)
-    if (object@dist == "L") cat(sprintf("\n Note: dispersion parameter is exp(sdlog). In this case it is %.3f. \n",exp(object@ests[2,1])))
-    cat(sprintf("Note: please check that the MCMC converged on the target distribution by running multiple chains. MCMC samples are available in the mcmc slot (e.g. my.fit@mcmc) \n"))
+setMethod("show", "cd.fit.mcmc", function(object) {
+  cat(sprintf("Coarse Data Model Parameter and Quantile Estimates: \n"))
+  print(object@ests)
+  if (object@dist == "L") cat(sprintf("\n Note: dispersion parameter is exp(sdlog). In this case it is %.3f. \n", exp(object@ests[2, 1])))
+  cat(sprintf("Note: please check that the MCMC converged on the target distribution by running multiple chains. MCMC samples are available in the mcmc slot (e.g. my.fit@mcmc) \n"))
 })
 
 #' Get the log-likelihood value of a \code{cd.fit} or \code{cd.fit.mcmc} object
@@ -96,9 +102,10 @@ setMethod("show","cd.fit.mcmc",function(object){
 #' @aliases logLik logLik,cd.fit-method
 #' @export
 #' @importFrom stats logLik
-setMethod("logLik",
-          "cd.fit",
-          function(object){
-              object@loglik
-          })
-
+setMethod(
+  "logLik",
+  "cd.fit",
+  function(object) {
+    object@loglik
+  }
+)

@@ -28,7 +28,7 @@ data(simulated.outbreak.deaths)
 The data that we have loaded is a simulated dataset with five
 columns.  Let's take a peek at the dataset.
 ```{r label=datapeek}
-simulated.outbreak.deaths[15:20,]
+simulated.outbreak.deaths[15:20, ]
 ```
 The rows index observations at a particular time and group.  The columns are defined as follows:
 
@@ -50,24 +50,24 @@ where both groups have at least 10 total cases observed.
 min.cases <- 10
 
 ## observed cases
-N.1 <- simulated.outbreak.deaths[1:60,"N"]
-N.2 <- simulated.outbreak.deaths[61:120,"N"]
+N.1 <- simulated.outbreak.deaths[1:60, "N"]
+N.2 <- simulated.outbreak.deaths[61:120, "N"]
 
 ## subset to run analyis on times with greater than min.cases
-first.t <-  min(which(N.1 > min.cases & N.2 > min.cases))
-last.t <-  max(which(N.1 > min.cases & N.2 > min.cases))
+first.t <- min(which(N.1 > min.cases & N.2 > min.cases))
+last.t <- max(which(N.1 > min.cases & N.2 > min.cases))
 idx.for.Estep <- first.t:last.t
 
 ## find and label the subset of times to be used for estimation routine
-new.times <- 1:length(idx.for.Estep)
-simulated.outbreak.deaths <- cbind(simulated.outbreak.deaths, new.times=NA)
-simulated.outbreak.deaths[c(idx.for.Estep, idx.for.Estep+60),"new.times"] <- rep(new.times, 2)
+new.times <- seq_along(idx.for.Estep)
+simulated.outbreak.deaths <- cbind(simulated.outbreak.deaths, new.times = NA)
+simulated.outbreak.deaths[c(idx.for.Estep, idx.for.Estep + 60), "new.times"] <- rep(new.times, 2)
 ```
 
 If we look at the new data matrix, we can see the new variable
 that we've made and that will be used in the analysis:
 ```{r label=datapeek2}
-simulated.outbreak.deaths[15:20,]
+simulated.outbreak.deaths[15:20, ]
 ```
 
 ## Running an analysis
@@ -97,7 +97,7 @@ starting values for the $\alpha$ parameters in the model.  We will
 assume that $\alpha_t=0$ for all $t$.
 
 ```{r label=setValues}
-assumed.nu = c(0, .3, .4, .3)
+assumed.nu <- c(0, 0.3, 0.4, 0.3)
 alpha.start <- rep(0, 22)
 ```
 
@@ -105,9 +105,11 @@ That is all the set up required.  We can now call the central
 function, $\tt{EMforCFR()}$, which generates three estimates of the
 CFR: the na\"ive, the reporting-rate-adjusted and the lag-adjusted estimators.
 ```{r label=runAnalysis, cache=TRUE, warning=FALSE}
-cfr.ests <- EMforCFR(assumed.nu=assumed.nu,
-alpha.start.values=alpha.start, full.data=simulated.outbreak.deaths, verb=FALSE,
-SEM.var=TRUE, max.iter=100, tol=1e-5)
+cfr.ests <- EMforCFR(
+  assumed.nu = assumed.nu,
+  alpha.start.values = alpha.start, full.data = simulated.outbreak.deaths, verb = FALSE,
+  SEM.var = TRUE, max.iter = 100, tol = 1e-5
+)
 ```
 
 [Note that running cfr.ests will generate warnings (many of them,
