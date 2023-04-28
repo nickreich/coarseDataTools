@@ -14,10 +14,12 @@ v0.5.1 - changed code to eliminate NOTE message in R CMD CHECK.
 
 v0.6 - added Azman/Lessler contributions: MCMC estimation functions, ability to fit Weibull and Gamma distributions, and bootstrap confidence intervals.
 
-v06.3 - minor modifications to address NAMESPACE issues.
+v0.6.3 - minor modifications to address NAMESPACE issues.
 
-v06.4 - merged hackout3 branch to support new distributions
+v0.6.4 - merged hackout3 branch to support new distributions
 
-v06.5 - minor modifications to fix improper call to `class()` and other new NOTES.
+v0.6.5 - minor modifications to fix improper call to `class()` and other new NOTES.
 
-v06.6 - update vignette to Rmd, removal of plot method for cd.fit object.
+v0.6.6 - update vignette to Rmd, removal of plot method for cd.fit object.
+
+v0.7 - Refactor code to align with lintr standards, adding Hugo Gruson as contributor.
