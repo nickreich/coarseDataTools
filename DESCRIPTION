@@ -1,11 +1,12 @@
 Package: coarseDataTools
-Version: 0.6-6
-Date: 2021-12-07
+Version: 0.7
+Date: 2023-04-28
 Title: Analysis of Coarsely Observed Data
 Authors@R: c(person("Nicholas G.", "Reich", email = "nick@umass.edu", role = c("aut", "cre")),
   person("Justin", "Lessler", email = "jlessler@unc.edu", role = "aut"),
   person("Andrew", "Azman", email = "andrewazman@gmail.com", role = "aut"),
-  person("Zhian N.", "Kamvar", email = "zkamvar@gmail.com", role = "ctb"))
+  person("Zhian N.", "Kamvar", email = "zkamvar@gmail.com", role = "ctb"),
+  person("Hugo", "Gruson", email = "hugo.gruson@normalesup.org", role = "ctb"))
 Maintainer: Nicholas G. Reich <nick@umass.edu>
 License: GPL (>= 2)
 URL: https://cran.r-project.org/package=coarseDataTools
