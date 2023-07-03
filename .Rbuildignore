@@ -6,3 +6,6 @@ cran-comments.md
 ^\.github$
 ^CRAN-SUBMISSION$
 ^\.lintr$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
