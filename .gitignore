@@ -39,3 +39,4 @@ vignettes/*.pdf
 # Vim and emacs files
 *~
 *.swp
+docs

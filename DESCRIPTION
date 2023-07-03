@@ -9,7 +9,8 @@ Authors@R: c(person("Nicholas G.", "Reich", email = "nick@umass.edu", role = c("
   person("Hugo", "Gruson", email = "hugo.gruson@normalesup.org", role = "ctb"))
 Maintainer: Nicholas G. Reich <nick@umass.edu>
 License: GPL (>= 2)
-URL: https://cran.r-project.org/package=coarseDataTools
+URL: https://cran.r-project.org/package=coarseDataTools,
+    http://nickreich.github.io/coarseDataTools/
 Encoding: UTF-8
 Imports:
     MCMCpack,
