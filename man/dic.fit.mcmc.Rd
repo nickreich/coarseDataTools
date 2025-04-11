@@ -40,7 +40,7 @@ dic.fit.mcmc(
 
 \item{seed}{seed for the random number generator for MCMC}
 
-\item{...}{additional parameters to \link{MCMCmetrop1R}}
+\item{...}{additional parameters to \link[MCMCpack]{MCMCmetrop1R}}
 }
 \value{
 a cd.fit.mcmc S4 object

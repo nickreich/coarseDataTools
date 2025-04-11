@@ -1,3 +1,7 @@
+# coarseDataTools 0.7.2
+
+* update cross-reference link for CRAN compatibility
+
 # coarseDataTools 0.7.1
 
 * Added pkgdown, moved ChangeLog to NEWS.md

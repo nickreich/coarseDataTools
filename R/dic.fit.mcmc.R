@@ -27,7 +27,7 @@
 ##' @param n.samples number of samples to draw from the posterior (after the burnin)
 ##' @param dist distribution to be used (L for log-normal,W for weibull, G for Gamma, and E for erlang, off1G for 1 day right shifted gamma)
 ##' @param seed seed for the random number generator for MCMC
-##' @param ... additional parameters to \link{MCMCmetrop1R}
+##' @param ... additional parameters to \link[MCMCpack]{MCMCmetrop1R}
 ##' @return a cd.fit.mcmc S4 object
 ##' @importFrom MCMCpack MCMCmetrop1R
 ##' @export

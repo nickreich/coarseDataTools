@@ -13,7 +13,7 @@
 ##' @format A numeric vector with 134 positive values.  Each value represents an exposure window length from an observation of the incubation period for that individual.  The exposure window length is the length of time during which exposure could have occurred.  For example, if an individual could have been exposed anytime between 6am on Monday to 6am on Wednesday, her exposure window length would be 2 days.
 ##'
 ##' @usage data(exp.win.lengths)
-##' @source Lessler J et al.  New England Journal of Medicine. Outbreak of 2009 Pandemic Influenza A (H1N1) at a New York City School. 2009. 361(27):2628-2636. \url{https://www.nejm.org/doi/full/10.1056/nejmoa0906089}
+##' @source Lessler J et al.  New England Journal of Medicine. Outbreak of 2009 Pandemic Influenza A (H1N1) at a New York City School. 2009. 361(27):2628-2636. \doi{10.1056/NEJMoa0906089}
 ##'
 ##' @examples
 ##' data(exp.win.lengths)

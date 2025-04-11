@@ -1,6 +1,6 @@
 Package: coarseDataTools
-Version: 0.7.1
-Date: 2023-07-03
+Version: 0.7.2
+Date: 2025-04-09
 Title: Analysis of Coarsely Observed Data
 Authors@R: c(person("Nicholas G.", "Reich", email = "nick@umass.edu", role = c("aut", "cre")),
   person("Justin", "Lessler", email = "jlessler@unc.edu", role = "aut"),
@@ -9,9 +9,10 @@ Authors@R: c(person("Nicholas G.", "Reich", email = "nick@umass.edu", role = c("
   person("Hugo", "Gruson", email = "hugo.gruson@normalesup.org", role = "ctb"))
 Maintainer: Nicholas G. Reich <nick@umass.edu>
 License: GPL (>= 2)
-URL: https://cran.r-project.org/package=coarseDataTools,
-    http://nickreich.github.io/coarseDataTools/
+URL: http://nickreich.github.io/coarseDataTools/
 Encoding: UTF-8
+Depends:
+    R (>= 3.5.0)
 Imports:
     MCMCpack,
     graphics,
@@ -39,4 +40,4 @@ Collate:
     'sampleSizeSimulation.R'
     'coarseDataTools-package.R'
 VignetteBuilder: knitr
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
