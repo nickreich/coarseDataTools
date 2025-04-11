@@ -1,75 +1,27 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>http://nickreich.github.io/coarseDataTools/404.html</loc>
-  </url>
-  <url>
-    <loc>http://nickreich.github.io/coarseDataTools/articles/CFR_vignette.html</loc>
-  </url>
-  <url>
-    <loc>http://nickreich.github.io/coarseDataTools/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>http://nickreich.github.io/coarseDataTools/authors.html</loc>
-  </url>
-  <url>
-    <loc>http://nickreich.github.io/coarseDataTools/index.html</loc>
-  </url>
-  <url>
-    <loc>http://nickreich.github.io/coarseDataTools/news/index.html</loc>
-  </url>
-  <url>
-    <loc>http://nickreich.github.io/coarseDataTools/reference/EMforCFR.html</loc>
-  </url>
-  <url>
-    <loc>http://nickreich.github.io/coarseDataTools/reference/cd.fit.html</loc>
-  </url>
-  <url>
-    <loc>http://nickreich.github.io/coarseDataTools/reference/cd.fit.mcmc.html</loc>
-  </url>
-  <url>
-    <loc>http://nickreich.github.io/coarseDataTools/reference/dgammaOff1.html</loc>
-  </url>
-  <url>
-    <loc>http://nickreich.github.io/coarseDataTools/reference/dic.fit.html</loc>
-  </url>
-  <url>
-    <loc>http://nickreich.github.io/coarseDataTools/reference/dic.fit.mcmc.html</loc>
-  </url>
-  <url>
-    <loc>http://nickreich.github.io/coarseDataTools/reference/exp.win.lengths.html</loc>
-  </url>
-  <url>
-    <loc>http://nickreich.github.io/coarseDataTools/reference/fluA.inc.per.html</loc>
-  </url>
-  <url>
-    <loc>http://nickreich.github.io/coarseDataTools/reference/get.obs.type.html</loc>
-  </url>
-  <url>
-    <loc>http://nickreich.github.io/coarseDataTools/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>http://nickreich.github.io/coarseDataTools/reference/logLik-methods.html</loc>
-  </url>
-  <url>
-    <loc>http://nickreich.github.io/coarseDataTools/reference/loglikhd.html</loc>
-  </url>
-  <url>
-    <loc>http://nickreich.github.io/coarseDataTools/reference/mcmc.erlang.html</loc>
-  </url>
-  <url>
-    <loc>http://nickreich.github.io/coarseDataTools/reference/mcmcpack.ll.html</loc>
-  </url>
-  <url>
-    <loc>http://nickreich.github.io/coarseDataTools/reference/nycH1N1.html</loc>
-  </url>
-  <url>
-    <loc>http://nickreich.github.io/coarseDataTools/reference/pgammaOff1.html</loc>
-  </url>
-  <url>
-    <loc>http://nickreich.github.io/coarseDataTools/reference/precision.simulation.html</loc>
-  </url>
-  <url>
-    <loc>http://nickreich.github.io/coarseDataTools/reference/simulated.outbreak.deaths.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>http://nickreich.github.io/coarseDataTools/404.html</loc></url>
+<url><loc>http://nickreich.github.io/coarseDataTools/articles/CFR_vignette.html</loc></url>
+<url><loc>http://nickreich.github.io/coarseDataTools/articles/index.html</loc></url>
+<url><loc>http://nickreich.github.io/coarseDataTools/authors.html</loc></url>
+<url><loc>http://nickreich.github.io/coarseDataTools/index.html</loc></url>
+<url><loc>http://nickreich.github.io/coarseDataTools/news/index.html</loc></url>
+<url><loc>http://nickreich.github.io/coarseDataTools/reference/EMforCFR.html</loc></url>
+<url><loc>http://nickreich.github.io/coarseDataTools/reference/cd.fit.html</loc></url>
+<url><loc>http://nickreich.github.io/coarseDataTools/reference/cd.fit.mcmc.html</loc></url>
+<url><loc>http://nickreich.github.io/coarseDataTools/reference/dgammaOff1.html</loc></url>
+<url><loc>http://nickreich.github.io/coarseDataTools/reference/dic.fit.html</loc></url>
+<url><loc>http://nickreich.github.io/coarseDataTools/reference/dic.fit.mcmc.html</loc></url>
+<url><loc>http://nickreich.github.io/coarseDataTools/reference/exp.win.lengths.html</loc></url>
+<url><loc>http://nickreich.github.io/coarseDataTools/reference/fluA.inc.per.html</loc></url>
+<url><loc>http://nickreich.github.io/coarseDataTools/reference/get.obs.type.html</loc></url>
+<url><loc>http://nickreich.github.io/coarseDataTools/reference/index.html</loc></url>
+<url><loc>http://nickreich.github.io/coarseDataTools/reference/logLik-methods.html</loc></url>
+<url><loc>http://nickreich.github.io/coarseDataTools/reference/loglikhd.html</loc></url>
+<url><loc>http://nickreich.github.io/coarseDataTools/reference/mcmc.erlang.html</loc></url>
+<url><loc>http://nickreich.github.io/coarseDataTools/reference/mcmcpack.ll.html</loc></url>
+<url><loc>http://nickreich.github.io/coarseDataTools/reference/nycH1N1.html</loc></url>
+<url><loc>http://nickreich.github.io/coarseDataTools/reference/pgammaOff1.html</loc></url>
+<url><loc>http://nickreich.github.io/coarseDataTools/reference/precision.simulation.html</loc></url>
+<url><loc>http://nickreich.github.io/coarseDataTools/reference/simulated.outbreak.deaths.html</loc></url>
 </urlset>
+
